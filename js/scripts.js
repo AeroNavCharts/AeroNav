@@ -3,6 +3,7 @@ const listInner = document.getElementById('listInner');
 const backBtn = document.getElementById('backBtn');
 const categoryBar = document.getElementById('categoryBar');
 const viewerFrame = document.getElementById('viewerFrame');
+const viewerLoading = document.getElementById('viewerLoading');
 const viewerTitle = document.getElementById('viewerTitle');
 const viewerSub = document.getElementById('viewerSub');
 const pinnedRow = document.getElementById('pinnedRow');
@@ -13,13 +14,24 @@ let currentCategory = null;
 let currentChart = null;
 let pinned = [];
 
-window.addEventListener('DOMContentLoaded', () => {
+
+window.addEventListener('load', () => {
     const loader = document.getElementById('pageLoading');
-    setTimeout(() => {
-        loader.style.opacity = 0;
-        setTimeout(() => loader.style.display = 'none', 500);
-    }, 3000);
+    loader.style.opacity = 0;
+    setTimeout(() => loader.style.display = 'none', 500);
 });
+
+function showLoader() {
+    viewerLoading.style.display = 'flex';
+    viewerLoading.style.opacity = '1';
+}
+
+function hideLoader() {
+    viewerLoading.style.opacity = '0';
+    setTimeout(() => {
+        viewerLoading.style.display = 'none';
+    }, 500); 
+}
 
 function toPreview(link) {
     if (!link) return null;
@@ -181,6 +193,7 @@ function getCatColor(cat) {
 }
 
 function loadChartInViewer(chartObj, opts = {}) {
+    showLoader();
     const link = chartObj.link || null;
     viewerFrame.src = toPreview(link) || 'about:blank';
     const icao = chartObj.airportIcao || chartObj.icao || '';
@@ -190,6 +203,8 @@ function loadChartInViewer(chartObj, opts = {}) {
         if (chartObj && chartObj.id) pinChart(chartObj);
     };
     currentChart = chartObj;
+    viewerFrame.addEventListener('load', hideLoader);
+
 }
 
 function pinChart(chart) {
