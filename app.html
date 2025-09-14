@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description"
+    content="AeroNav - Your dedicated team to making professional aeronautical charts for RoAv Games for Roblox since 2024" />
+  <meta name="author" content="AeroNav" />
+  <meta name="keywords" content="AeroNav Charts" />
+  <meta property="og:image" content="/src/assets/aerologo.png" />
+  <link rel="stylesheet" href="/src/css/app.css">
+  <title>AeronavCharts</title>
+</head>
+
+<body>
+  <div id="pageLoading" class="page-loading">
+    <div class="loader-content">
+      <img src="/src/assets/aerologo.png" alt="AeroNav Charts Logo" class="loader-logo" />
+      <div class="spinner"></div>
+      <div class="loading-text">Please be patient! Loading assets...</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="top">
+      <div class="left" id="leftCol" aria-label="Airports and charts">
+        <div class="header">
+          <div>
+            <div class="logo"><a href="/">AeroNav Charts</a></div>
+            <div class="hint">
+              Notice errors? Contact us at
+              <a href="mailto:aeronavcartography@gmail.com">aeronavcartography@gmail.com</a>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <button class="back hidden" id="backBtn">Back</button>
+            <button class="back" id="hideBtn">Hide</button>
+          </div>
+        </div>
+        <div class="category-bar" id="categoryBar" style="display: none"></div>
+        <div class="list" id="listArea">
+          <div class="list-inner" id="listInner"></div>
+        </div>
+        <div style="margin-top: auto; position: sticky; bottom: 0; background: var(--left-bg); padding-top: 8px;">
+          <div style="display: flex; gap: 4px; align-items: center;">
+            <input id="leftSearch" class="search" placeholder="Search" style="flex: 1; padding: 8px; border-radius: 8px; border: 0;
+                        background: #0a2132; color: var(--text); box-sizing: border-box;" />
+          </div>
+        </div>
+      </div>
+      <div class="right" id="rightCol">
+        <div class="viewer" role="region" aria-label="Chart viewer">
+          <div class="viewer-top">
+            <div>
+              <div class="viewer-title" id="viewerTitle">ENROUTE — ENROUTE CHART</div>
+              <div class="viewer-sub" id="viewerSub">Pinned enroute chart (fixed)</div>
+            </div>
+            <div class="controls">
+              <a class="btn" href="https://sites.google.com/view/donatetoaeronav?usp=sharing" style="color: white;"
+                target="_blank">Donate</a>
+              <a class="btn" href="https://tico09.com/24SPY" target="_blank" style="color: white;">24Spy</a>
+              <a class="btn" href="https://24pilot.ptfsrp.com" target="_blank" style="color: white;">24Pilot</a>
+              <div style="width: 1px; background: white; opacity: 0.5; margin: 0 8px;"></div>
+              <button class="btn" id="pinCurrent">Pin current</button>
+            </div>
+          </div>
+          <div class="iframe-wrap">
+            <iframe id="viewerFrame" src="about:blank" title="Aeronav chart viewer"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pinned-wrap" aria-label="Pinned charts">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <div style="font-weight: 900;">Pinned Charts</div>
+      </div>
+      <div class="pinned-row" id="pinnedRow" role="list"></div>
+    </div>
+    <div class="ad">Contact sweet_kid to have an ad displayed here</div>
+  </div>
+
+  <script src="src/js/data.js"></script>
+  <script src="src/js/scripts.js" defer></script>
+</body>
+
+</html>
