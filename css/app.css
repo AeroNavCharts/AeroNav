@@ -431,7 +431,9 @@ a:focus {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    min-height: calc(100vh - 200px);
+    min-height: 320px;
+    max-height: 700px;
+    height: 100%;
     box-shadow: var(--shadow);
     backdrop-filter: var(--glass-blur);
     border: 1px solid rgba(255, 255, 255, 0.1);
