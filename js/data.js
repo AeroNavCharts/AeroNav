@@ -165,13 +165,13 @@ const AIRPORTS = [
       },
       {
         "id": "10-3C",
-        "title": "THENR 1 RNAV DEPARTURE",
+        "title": "THENR 3 RNAV DEPARTURE",
         "category": "SID",
         "link": "https://drive.google.com/file/d/1vDVZC7kdQ9EXXo_DkjYnqbsb26WIihPy/view?usp=drive_link"
       },
       {
         "id": "10-3D",
-        "title": "THENR 1 RNAV DEPARTURE",
+        "title": "YOUTH 4 RNAV DEPARTURE",
         "category": "SID",
         "link": "https://drive.google.com/file/d/1yNr0Gj_rvJP8yb8j3cWnS-kHokzxoqJ7/view?usp=drive_link"
       },
