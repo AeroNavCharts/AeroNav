@@ -21,16 +21,73 @@ window.addEventListener('load', () => {
     setTimeout(() => loader.style.display = 'none', 500);
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    if (!localStorage.getItem('cookiesAccepted')) {
+        const consent = document.createElement('div');
+        consent.id = 'cookieConsent';
+        consent.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 33, 50, 0.85);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            width: 50%;
+            font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        `;
+
+        const text = document.createElement('p');
+        text.style.margin = '0';
+        text.style.fontSize = '14px';
+        text.innerHTML = `Hey User! While we don't use cookies here, the embedded chart viewer does. By clicking continue, you agree to the privacy policy of <a href="https://policies.google.com/privacy?hl=en&fg=1" target="_blank">Google</a>.`;
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Accept';
+        btn.style.cssText = `
+            background: rgba(0, 200, 255, 0.8);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 16px;
+            cursor: pointer;
+            z-index: 2147483647;
+            font-weight: bold;
+        `;
+        btn.onmouseover = () => btn.style.background = 'rgba(0, 200, 255, 1)';
+        btn.onmouseout = () => btn.style.background = 'rgba(0, 200, 255, 0.8)';
+        btn.addEventListener('click', () => {
+            localStorage.setItem('cookiesAccepted', 'true');
+            consent.remove();
+        });
+
+        consent.appendChild(text);
+        consent.appendChild(btn);
+        document.body.appendChild(consent);
+    }
+});
+
+
 function showLoader() {
     viewerLoading.style.display = 'flex';
     viewerLoading.style.opacity = '1';
 }
 
+
+
 function hideLoader() {
     viewerLoading.style.opacity = '0';
     setTimeout(() => {
         viewerLoading.style.display = 'none';
-    }, 500); 
+    }, 500);
+
 }
 
 function toPreview(link) {
@@ -85,7 +142,42 @@ function init() {
     pinCurrentBtn.addEventListener('click', () => {
         if (currentChart) pinCurrent();
     });
+    if (!localStorage.getItem('botPromptDontAskAgain')) {
+        Swal.fire({
+            title: 'Enhance your experience!',
+            text: 'Get charts in Discord with our new bot!',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Add Bot',
+            cancelButtonText: 'No thanks',
+            customClass: {
+                popup: 'swal-custom-popup',
+                confirmButton: 'swal-btn-confirm',
+                cancelButton: 'swal-btn-cancel'
+            },
+            didOpen: () => {
+                const btn = document.createElement('button');
+                btn.textContent = "Nah, and don't ask again";
+                btn.className = 'swal-btn-deny';
+                btn.style.display = 'block';
+                btn.style.margin = '12px auto 0';
+                btn.style.width = '60%';
+                btn.addEventListener('click', () => {
+                    localStorage.setItem('botPromptDontAskAgain', 'true');
+                    Swal.close();
+                });
+
+                const container = Swal.getPopup().querySelector('.swal2-actions');
+                container.parentNode.appendChild(btn);
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open('https://discord.com/oauth2/authorize?client_id=1426101225056632959', '_blank');
+            }
+        });
+    }
 }
+
 
 
 
