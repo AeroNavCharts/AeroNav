@@ -13,6 +13,80 @@ let currentAirport = null;
 let currentCategory = null;
 let currentChart = null;
 let pinned = [];
+// new consts
+const HOTLINKS = [];
+const HOT_BY_KEY = new Map();
+// end new consts 
+
+// the rest u can figure out i dont feel like labeling anything else
+// "if it works dont touch it" - wise man
+
+function parseHashNumber() {
+    const h = (location.hash || '').trim();
+    if (!h) return null;
+    const m = h.match(/^#?(\d+)$/);
+    if (!m) return null;
+    const n = parseInt(m[1], 10);
+    return Number.isFinite(n) ? n : null;
+}
+
+function navigateByHash() {
+    const n = parseHashNumber();
+    if (!n) return;
+    const cur = getHotId(currentChart);
+    if (cur === n) return;
+    openChartByHotId(n);
+}
+
+function buildHotlinks() {
+    HOTLINKS.length = 0;
+    HOT_BY_KEY.clear();
+    let counter = 1;
+    AIRPORTS.forEach((ap, ai) => {
+        (ap.charts || []).forEach((c, ci) => {
+            const entry = {
+                hotId: counter,
+                airportIndex: ai,
+                chartIndex: ci,
+                icao: ap.icao,
+                id: c.id,
+                title: c.title,
+                category: c.category || '',
+                link: c.link
+            };
+            HOTLINKS.push(entry);
+            const key = `${ap.icao}||${c.id}`;
+            HOT_BY_KEY.set(key, counter);
+            counter++;
+        });
+    });
+}
+
+function getHotId(chartObj) {
+    if (!chartObj) return null;
+    const icao = chartObj.airportIcao || chartObj.icao;
+    const id = chartObj.id;
+    if (!icao || !id) return null;
+    const key = `${icao}||${id}`;
+    return HOT_BY_KEY.get(key) || null;
+}
+
+function openChartByHotId(n) {
+    const idx = Number(n) - 1;
+    if (!Number.isFinite(idx) || idx < 0 || idx >= HOTLINKS.length) return false;
+    const ref = HOTLINKS[idx];
+    openAirportView(ref.airportIndex);
+    const chartObj = {
+        airportIndex: ref.airportIndex,
+        airportIcao: ref.icao,
+        id: ref.id,
+        title: ref.title,
+        category: ref.category,
+        link: ref.link
+    };
+    loadChartInViewer(chartObj, { fromPinned: false });
+    return true;
+}
 
 
 window.addEventListener('load', () => {
@@ -112,6 +186,7 @@ function eh(s) {
 }
 
 function init() {
+    buildHotlinks();
     renderAirportList();
     leftSearch.addEventListener('input', onSearch);
     backBtn.addEventListener('click', () => {
@@ -136,12 +211,14 @@ function init() {
         savePinned();
         renderPinned();
     }
-    if (pinned && pinned[0]) loadChartInViewer(pinned[0], {
-        fromPinned: true
-    });
+    let loadedByHash = false;
+    const hn = parseHashNumber();
+    if (hn) loadedByHash = openChartByHotId(hn);
+    if (!loadedByHash && pinned && pinned[0]) loadChartInViewer(pinned[0], { fromPinned: true });
     pinCurrentBtn.addEventListener('click', () => {
         if (currentChart) pinCurrent();
     });
+    window.addEventListener('hashchange', navigateByHash);
     if (!localStorage.getItem('botPromptDontAskAgain')) {
         Swal.fire({
             title: 'Enhance your experience!',
@@ -296,7 +373,11 @@ function loadChartInViewer(chartObj, opts = {}) {
     };
     currentChart = chartObj;
     viewerFrame.addEventListener('load', hideLoader);
-
+    const hid = getHotId(chartObj);
+    if (hid) {
+        const targetHash = `#${hid}`;
+        if (location.hash !== targetHash) location.hash = targetHash;
+    }
 }
 
 function pinChart(chart) {
