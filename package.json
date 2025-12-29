@@ -1,0 +1,7 @@
+{
+  "name": "aeronav",
+  "private": true,
+  "scripts": {
+    "client": "cd client && npm run dev"
+  }
+}
