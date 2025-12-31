@@ -655,6 +655,44 @@ document.addEventListener('DOMContentLoaded', function () {
         showArrow.style.display = 'none';
     });
 
+    // Ad show/hide controls (keeps GIF, accessible and persistable)
+    const siteAd = document.getElementById('siteAd');
+    const adCloseBtn = document.getElementById('adCloseBtn');
+    const showAdBtn = document.getElementById('showAdBtn');
+
+    function hideSiteAd(persist = true) {
+        if (!siteAd) return;
+        siteAd.classList.add('ad-hidden');
+        siteAd.setAttribute('aria-hidden', 'true');
+        if (showAdBtn) {
+            showAdBtn.style.display = 'block';
+            showAdBtn.setAttribute('aria-hidden', 'false');
+        }
+        if (persist) localStorage.setItem('adsHidden', 'true');
+    }
+
+    function showSiteAd(persist = true) {
+        if (!siteAd) return;
+        siteAd.classList.remove('ad-hidden');
+        siteAd.setAttribute('aria-hidden', 'false');
+        if (showAdBtn) {
+            showAdBtn.style.display = 'none';
+            showAdBtn.setAttribute('aria-hidden', 'true');
+        }
+        if (persist) localStorage.removeItem('adsHidden');
+    }
+
+    if (siteAd) {
+        // initialize based on stored preference
+        if (localStorage.getItem('adsHidden') === 'true') {
+            hideSiteAd(false);
+        } else {
+            showSiteAd(false);
+        }
+        if (adCloseBtn) adCloseBtn.addEventListener('click', () => hideSiteAd(true));
+        if (showAdBtn) showAdBtn.addEventListener('click', () => showSiteAd(true));
+    }
+
     function resetSearch() {
         searchInput.value = '';
         if (currentAirport === null) {

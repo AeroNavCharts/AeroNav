@@ -1083,12 +1083,6 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/16tJmjo4ZrjeazTk_litB8uvuoXvqIRrG/view?usp=drive_link"
             },
             {
-                "id": "10-9A",
-                "title": "DE-ICING",
-                "category": "TAXI",
-                "link": "https://drive.google.com/file/d/1CJgDKPZ2ju4Q7mTeAOA_HrnE1vtvESIW/view?usp=drive_link"
-            },
-            {
                 "id": "10-3",
                 "title": "BORDER 1 DEPARTURE",
                 "category": "SID",
@@ -1232,12 +1226,6 @@ const AIRPORTS = [
                 "title": "PARKING GATES",
                 "category": "TAXI",
                 "link": "https://drive.google.com/file/d/1EwDFL_bwMdV4PHGnslTPoBqwy-LNrgZv/view?usp=drive_link"
-            },
-            {
-                "id": "10-9E",
-                "title": "DE-ICING",
-                "category": "TAXI",
-                "link": "https://drive.google.com/file/d/1BtAG7EWfZoxM96GN0j2G8SVaJ99AAIeI/view?usp=drive_link"
             },
             {
                 "id": "10-3",

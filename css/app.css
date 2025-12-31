@@ -459,9 +459,15 @@ a:focus {
 .controls {
     display: flex;
     gap: 0.625rem;
-}
+    align-items: center;
+} 
 
 .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
     padding: clamp(0.5rem, 1.5vw, 0.625rem) clamp(0.625rem, 1.8vw, 0.875rem);
     border-radius: 0.625rem;
     border: none;
@@ -473,7 +479,8 @@ a:focus {
     box-shadow: var(--shadow);
     min-height: var(--touch-target); 
     font-size: clamp(0.875rem, 2vw, 1rem);
-}
+    vertical-align: middle;
+} 
 
 .btn:hover {
     background: linear-gradient(145deg, #3a4b68, #2e3f5a);
@@ -608,6 +615,92 @@ iframe {
     color: var(--muted);
     backdrop-filter: var(--glass-blur);
     border: 0.0625rem solid rgba(255, 255, 255, 0.1);
+    transition: opacity 0.25s ease, transform 0.2s ease;
+}
+
+.ad-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.ad-label {
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.ad-controls {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn.btn-small {
+    padding: clamp(0.25rem, 0.8vw, 0.4rem) clamp(0.5rem, 1.2vw, 0.6rem);
+    font-size: 0.85rem;
+}
+
+.ad-close {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.375rem;
+}
+
+.ad-close:hover,
+.ad-close:focus {
+    color: #fff;
+    background: rgba(255,255,255,0.04);
+    outline: none;
+}
+
+.ad-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    display: block;
+    margin: 0 auto;
+}
+
+.ad-caption {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+}
+
+.ad-show {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    background: rgba(10,33,50,0.85);
+    color: #fff;
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    box-shadow: var(--shadow);
+    display: none;
+    z-index: 9999;
+}
+
+.ad-hidden {
+    opacity: 0;
+    transform: translateY(0.5rem);
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .ad-header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+    .ad-controls { justify-content: flex-end; }
+    .ad-caption { display: none; }
 }
 
 .swal-custom-popup {
