@@ -1,4 +1,5 @@
 const leftSearch = document.getElementById('leftSearch');
+const mobileSearch = document.getElementById('mobileSearch');
 const listInner = document.getElementById('listInner');
 const backBtn = document.getElementById('backBtn');
 const categoryBar = document.getElementById('categoryBar');
@@ -8,6 +9,19 @@ const viewerTitle = document.getElementById('viewerTitle');
 const viewerSub = document.getElementById('viewerSub');
 const pinnedRow = document.getElementById('pinnedRow');
 const pinCurrentBtn = document.getElementById('pinCurrent');
+const menuToggle = document.getElementById('menuToggle');
+const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
+const leftCol = document.getElementById('leftCol');
+const moreBtn = document.getElementById('moreBtn');
+const controlsDropdown = document.getElementById('controlsDropdown');
+const skeletonLoader = document.getElementById('skeletonLoader');
+const emptyState = document.getElementById('emptyState');
+const quickActionsBtn = document.getElementById('quickActionsBtn');
+const quickActionsSheet = document.getElementById('quickActionsSheet');
+const clearPinnedBtn = document.getElementById('clearPinned');
+
+let searchTimeout = null;
 
 let currentAirport = null;
 let currentCategory = null;
@@ -88,6 +102,178 @@ function openChartByHotId(n) {
     return true;
 }
 
+
+function toggleMobileMenu() {
+    if (!leftCol || !menuToggle) return;
+    const isActive = leftCol.classList.toggle('active');
+    menuToggle.classList.toggle('active', isActive);
+    document.body.style.overflow = isActive ? 'hidden' : '';
+}
+
+function closeMobileMenu() {
+    if (!leftCol || !menuToggle) return;
+    leftCol.classList.remove('active');
+    menuToggle.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function toggleMobileSearch() {
+    if (!mobileSearchOverlay) return;
+    const isActive = mobileSearchOverlay.classList.toggle('active');
+    if (isActive && mobileSearch) {
+        setTimeout(() => mobileSearch.focus(), 100);
+    }
+}
+
+function closeMobileSearch() {
+    if (!mobileSearchOverlay) return;
+    mobileSearchOverlay.classList.remove('active');
+}
+
+function toggleMoreMenu() {
+    if (!controlsDropdown) return;
+    controlsDropdown.classList.toggle('active');
+}
+
+function closeMoreMenu() {
+    if (!controlsDropdown) return;
+    controlsDropdown.classList.remove('active');
+}
+
+function toggleQuickActions() {
+    if (!quickActionsSheet) return;
+    quickActionsSheet.classList.toggle('active');
+    document.body.style.overflow = quickActionsSheet.classList.contains('active') ? 'hidden' : '';
+}
+
+function closeQuickActions() {
+    if (!quickActionsSheet) return;
+    quickActionsSheet.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function setupQuickActions() {
+    const quickHome = document.getElementById('quickHome');
+    const quickRefresh = document.getElementById('quickRefresh');
+    const quickFullscreen = document.getElementById('quickFullscreen');
+    const quickShare = document.getElementById('quickShare');
+    
+    if (quickHome) {
+        quickHome.addEventListener('click', () => {
+            window.location.href = '/';
+        });
+    }
+    
+    if (quickRefresh) {
+        quickRefresh.addEventListener('click', () => {
+            if (currentChart) {
+                loadChartInViewer(currentChart, { fromPinned: false });
+            }
+            closeQuickActions();
+        });
+    }
+    
+    if (quickFullscreen) {
+        quickFullscreen.addEventListener('click', () => {
+            const iframe = document.getElementById('viewerFrame');
+            if (iframe) {
+                if (iframe.requestFullscreen) {
+                    iframe.requestFullscreen();
+                } else if (iframe.webkitRequestFullscreen) {
+                    iframe.webkitRequestFullscreen();
+                } else if (iframe.msRequestFullscreen) {
+                    iframe.msRequestFullscreen();
+                }
+            }
+            closeQuickActions();
+        });
+    }
+    
+    if (quickShare) {
+        quickShare.addEventListener('click', () => {
+            if (navigator.share && currentChart) {
+                const shareData = {
+                    title: `${currentChart.airportIcao} ${currentChart.id} - ${currentChart.title}`,
+                    text: `Check out this chart: ${currentChart.title}`,
+                    url: window.location.href
+                };
+                navigator.share(shareData).catch(() => {});
+            } else {
+                const url = window.location.href;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        Swal.fire({
+                            title: 'Link Copied!',
+                            text: 'Chart link copied to clipboard',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false,
+                            customClass: {
+                                popup: 'swal-custom-popup'
+                            }
+                        });
+                    });
+                }
+            }
+            closeQuickActions();
+        });
+    }
+    
+    if (quickActionsSheet) {
+        quickActionsSheet.addEventListener('click', (e) => {
+            if (e.target === quickActionsSheet) {
+                closeQuickActions();
+            }
+        });
+    }
+}
+
+function clearAllPinned() {
+    Swal.fire({
+        title: 'Clear all pinned charts?',
+        text: 'This will remove all pinned charts except the enroute chart.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Clear All',
+        cancelButtonText: 'Cancel',
+        customClass: {
+            popup: 'swal-custom-popup',
+            confirmButton: 'swal-btn-deny',
+            cancelButton: 'swal-btn-cancel'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            pinned = pinned.filter(p => p.fixed);
+            savePinned();
+            renderPinned();
+            Swal.fire({
+                title: 'Cleared!',
+                text: 'All pinned charts have been removed.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'swal-custom-popup'
+                }
+            });
+        }
+    });
+}
+
+function updateClearPinnedButton() {
+    if (clearPinnedBtn) {
+        const hasNonFixed = pinned.some(p => !p.fixed);
+        clearPinnedBtn.style.display = hasNonFixed ? 'block' : 'none';
+    }
+}
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) {
+        closeMobileMenu();
+        closeMobileSearch();
+        document.body.style.overflow = '';
+    }
+});
 
 window.addEventListener('load', () => {
     const loader = document.getElementById('pageLoading');
@@ -189,6 +375,9 @@ function init() {
     buildHotlinks();
     renderAirportList();
     leftSearch.addEventListener('input', onSearch);
+    if (mobileSearch) {
+        mobileSearch.addEventListener('input', onSearch);
+    }
     backBtn.addEventListener('click', () => {
         currentAirport = null;
         currentCategory = null;
@@ -196,7 +385,48 @@ function init() {
         backBtn.classList.add('hidden');
         categoryBar.style.display = 'none';
         renderAirportList();
+        if (window.innerWidth <= 1024) {
+            closeMobileMenu();
+        }
     });
+    
+    if (menuToggle) {
+        menuToggle.addEventListener('click', toggleMobileMenu);
+    }
+    
+    if (mobileSearchToggle) {
+        mobileSearchToggle.addEventListener('click', toggleMobileSearch);
+    }
+    
+    if (moreBtn) {
+        moreBtn.addEventListener('click', toggleMoreMenu);
+    }
+    
+    if (quickActionsBtn) {
+        quickActionsBtn.addEventListener('click', toggleQuickActions);
+    }
+    
+    if (clearPinnedBtn) {
+        clearPinnedBtn.addEventListener('click', clearAllPinned);
+    }
+    
+    setupQuickActions();
+    
+    document.addEventListener('click', (e) => {
+        if (leftCol && leftCol.classList.contains('active') && 
+            !leftCol.contains(e.target) && !menuToggle.contains(e.target)) {
+            closeMobileMenu();
+        }
+        if (controlsDropdown && controlsDropdown.classList.contains('active') &&
+            !moreBtn.contains(e.target) && !controlsDropdown.contains(e.target)) {
+            closeMoreMenu();
+        }
+        if (mobileSearchOverlay && mobileSearchOverlay.classList.contains('active') &&
+            !mobileSearchOverlay.contains(e.target) && !mobileSearchToggle.contains(e.target)) {
+            closeMobileSearch();
+        }
+    });
+    
     loadPinned();
     renderPinned();
     if (!pinned.length || pinned[0].id !== 'ENROUTE') {
@@ -312,6 +542,7 @@ function renderChartList() {
     if (currentAirport === null) return;
     const airport = AIRPORTS[currentAirport];
     const q = (leftSearch.value || '').trim().toLowerCase();
+    let count = 0;
     airport.charts.forEach(c => {
         const cat = (c.category || '').toUpperCase() || '';
         if (currentCategory && cat !== currentCategory) return;
@@ -320,7 +551,7 @@ function renderChartList() {
             if (!hay.includes(q)) return;
         }
         const row = document.createElement('div');
-        row.className = 'chart-row';
+        row.className = 'chart-row initial';
         row.innerHTML = `<div class="chart-id">${eh(c.id)}</div>
                      <div class="chart-title">${eh(c.title)}<div class="chart-small">${eh(airport.icao)}</div></div>
                      <div class="chart-meta">${eh(cat)}</div>`;
@@ -340,9 +571,14 @@ function renderChartList() {
             loadChartInViewer(currentChart, {
                 fromPinned: false
             });
+            if (window.innerWidth <= 1024) {
+                closeMobileMenu();
+            }
         });
         listInner.appendChild(row);
+        count++;
     });
+    checkEmptyState();
 }
 
 function getCatColor(cat) {
@@ -404,6 +640,7 @@ function pinChart(chart) {
 
 function renderPinned() {
     pinnedRow.innerHTML = '';
+    updateClearPinnedButton();
     pinned.forEach((p, idx) => {
         const card = document.createElement('div');
         card.className = 'pin-card';
@@ -501,22 +738,56 @@ function pinCurrent() {
 }
 
 function onSearch() {
-    const q = (leftSearch.value || '').trim().toLowerCase();
-    if (currentAirport === null) {
-        renderAirportList(q);
-    } else {
-        renderChartList();
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        const q = (leftSearch.value || '').trim().toLowerCase();
+        if (mobileSearch && mobileSearch.value !== leftSearch.value) {
+            mobileSearch.value = leftSearch.value;
+        }
+        if (q) {
+            showSkeletonLoader();
+        }
+        setTimeout(() => {
+            hideSkeletonLoader();
+            if (currentAirport === null) {
+                renderAirportList(q);
+            } else {
+                renderChartList();
+            }
+            checkEmptyState();
+        }, 300);
+    }, 150);
+}
+
+function showSkeletonLoader() {
+    if (skeletonLoader) {
+        skeletonLoader.classList.add('active');
+        listInner.style.display = 'none';
     }
+}
+
+function hideSkeletonLoader() {
+    if (skeletonLoader) {
+        skeletonLoader.classList.remove('active');
+        listInner.style.display = 'block';
+    }
+}
+
+function checkEmptyState() {
+    if (!emptyState) return;
+    const hasItems = listInner && listInner.children.length > 0;
+    emptyState.style.display = hasItems ? 'none' : 'flex';
 }
 
 function renderAirportList(filter) {
     listInner.innerHTML = '';
     const q = (filter || '').trim().toLowerCase();
+    let count = 0;
     AIRPORTS.forEach((a, idx) => {
         const hay = `${a.icao} ${a.name} ${a.iata}`.toLowerCase();
         if (q && !hay.includes(q)) return;
         const div = document.createElement('div');
-        div.className = 'item-airport';
+        div.className = 'item-airport initial';
         div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
                        <div>
                          <div class="airport-title">${eh(a.icao)} — ${eh(a.name)}</div>
@@ -526,7 +797,9 @@ function renderAirportList(filter) {
                      </div>`;
         div.addEventListener('click', () => openAirportView(idx));
         listInner.appendChild(div);
+        count++;
     });
+    checkEmptyState();
 }
 
 function openAirportView(idx) {
