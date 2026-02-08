@@ -385,7 +385,7 @@ const AIRPORTS = [
                 "id": "N/A",
                 "title": "LARNACA SOP",
                 "category": "REF",
-                "link": "https://drive.google.com/file/d/1-gR7LzUvnP9JngHj1KKtgCBji6mk8xlB/view?usp=drive_link"
+                "link": "https://drive.google.com/file/d/1v7P3b1B_xZe9UuLsMnepvaim8jcRBSQj/view?usp=drive_link"
             }
         ]
     },
