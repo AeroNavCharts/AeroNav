@@ -284,6 +284,22 @@ a:focus {
     text-shadow: 0 0 0.5rem rgba(102, 163, 255, 0.5);
 }
 
+.notice-banner {
+    background: linear-gradient(90deg, #5a3e00, #7a5500);
+    color: #ffe08a;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    border-radius: var(--radius);
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.notice-banner strong {
+    font-weight: 700;
+}
+
 .wrap {
     display: flex;
     flex-direction: column;

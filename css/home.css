@@ -61,6 +61,21 @@ a:focus {
     text-shadow: 0 0 8px rgba(102, 163, 255, 0.5);
 }
 
+.notice-banner {
+    background: linear-gradient(90deg, #5a3e00, #7a5500);
+    color: #ffe08a;
+    text-align: center;
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.notice-banner strong {
+    font-weight: 700;
+}
+
 /* Landing Page Styles */
 .landing-wrap {
     display: flex;
