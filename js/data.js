@@ -963,7 +963,7 @@ const AIRPORTS = [
             },
             {
                 "id": "10-3F",
-                "title": "WNDDY 3 RNAV DEPARTURE",
+                "title": "WNNDY 3 RNAV DEPARTURE",
                 "category": "SID",
                 "link": "https://drive.google.com/file/d/1SdI4x6-dvk31Y9HpPGgCDqCPhvaLyEr1/view?usp=drive_link"
             },
