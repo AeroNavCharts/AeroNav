@@ -783,7 +783,7 @@ const AIRPORTS = [
             },
             {
                 "id": "10-2C",
-                "title": "KUNAV 1 RNAV ARRIVAL",
+                "title": "KUNAV 2 RNAV ARRIVAL",
                 "category": "STAR",
                 "link": "https://drive.google.com/file/d/1OOXWF-nTfrI6kSILSI-Xav3GK05mRGjI/view?usp=drive_link"
             },
