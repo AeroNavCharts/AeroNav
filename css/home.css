@@ -1,21 +1,21 @@
 :root {
-    --left-bg: linear-gradient(145deg, #1a2535 0%, #121a27 100%);
-    --list-bg: linear-gradient(145deg, #2a3a52 0%, #1f2e44 100%);
-    --selected: linear-gradient(90deg, #2a6ab8 0%, #1c4a8a 100%);
+    --left-bg: #121a27;
+    --list-bg: #1f2e44;
+    --selected: #1c4a8a;
     --text: #f0f6ff;
     --muted: #a8b8d8;
-    --page-bg: radial-gradient(circle at top, #0a1b3a 0%, #040e21 100%);
+    --page-bg: #040e21;
     --cat-STAR: #7ab369;
     --cat-APP: #d6956a;
     --cat-TAXI: #40b8e8;
     --cat-SID: #e770a8;
     --cat-REF: #9b66cc;
 
-    --radius: 12px;
+    --radius: 0;
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-blur: blur(12px);
+    --glass-bg: transparent;
+    --glass-blur: none;
 }
 
 html,
@@ -89,9 +89,8 @@ a:focus {
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--left-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -117,11 +116,10 @@ a:focus {
 .nav-btn {
     padding: 8px 16px;
     border-radius: 10px;
-    background: var(--glass-bg);
+    background: transparent;
     color: var(--text);
     font-weight: 700;
     transition: all var(--transition);
-    backdrop-filter: var(--glass-blur);
 }
 
 .nav-btn:hover {
@@ -203,19 +201,11 @@ a:focus {
 }
 
 .feature-card {
-    background: var(--glass-bg);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: var(--shadow);
-    backdrop-filter: var(--glass-blur);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all var(--transition);
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    transition: none;
 }
 
-.feature-card:hover {
-    transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-}
 
 .feature-card h3 {
     font-size: 20px;
@@ -242,9 +232,8 @@ a:focus {
 
 .footer {
     padding: 24px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--left-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .footer-content {
@@ -497,8 +486,7 @@ a:focus {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(10, 33, 50, 0.85);
-    backdrop-filter: blur(10px);
+    background: #0a2132;
     color: #fff;
     padding: 14px 24px;
     border-radius: 16px;
