@@ -18,9 +18,10 @@
     <div class="loader-content">
       <img src="/assets/aerologo.webp" alt="AeroNav Charts Logo" class="loader-logo" />
       <div class="spinner"></div>
-      <div class="loading-text">Please be patient! Loading assets...</div>
+      <div class="loading-text">Loading charts...</div>
     </div>
   </div>
+
   <div class="mobile-header">
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
       <span></span>
@@ -29,170 +30,248 @@
     </button>
     <div class="mobile-logo">AeroNav Charts</div>
     <button class="mobile-search-toggle" id="mobileSearchToggle" aria-label="Toggle search">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"></circle>
         <path d="m21 21-4.35-4.35"></path>
       </svg>
     </button>
   </div>
-  <div class="wrap">
-    <div class="notice-banner">
-      <strong>IGRV Charts Outdated</strong> — AeroNav is aware that IGRV charts are currently outdated. We will update the IGRV charts once the official enroute chart has been updated.
-    </div>
-    <div class="top">
-      <div class="left" id="leftCol" aria-label="Airports and charts">
-        <div class="header">
-          <div>
-            <div class="logo"><a href="/">AeroNav Charts</a></div>
-            <div class="hint">Notice errors? Contact us at <a
-                href="mailto:aeronavcartography@gmail.com">aeronavcartography@gmail.com</a></div>
+
+  <div class="app">
+    <nav class="rail" aria-label="Sections">
+      <a class="rail-btn" href="/" aria-label="Home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 10.5 12 3l9 7.5" />
+          <path d="M5 9.5V21h14V9.5" />
+        </svg>
+        <span>Home</span>
+      </a>
+      <button class="rail-btn active" data-panel="airports" aria-label="Airports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 3.5c.8 0 1.3.7 1.3 1.6v3.6l7 4v2l-7-2.1v4l2.3 1.6v1.7L12 19l-3.6.9v-1.7l2.3-1.6v-4l-7 2.1v-2l7-4V5.1c0-.9.5-1.6 1.3-1.6Z" />
+        </svg>
+        <span>Charts</span>
+      </button>
+      <button class="rail-btn" data-panel="pinned" aria-label="Pinned charts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5Z" />
+          <path d="M12 13v8" />
+        </svg>
+        <span>Pinned</span>
+      </button>
+      <button class="rail-btn" data-panel="links" aria-label="Links">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M10 13a4 4 0 0 0 5.7.3l3-3A4 4 0 0 0 13 4.6l-1.4 1.4" />
+          <path d="M14 11a4 4 0 0 0-5.7-.3l-3 3A4 4 0 0 0 11 19.4l1.4-1.4" />
+        </svg>
+        <span>Links</span>
+      </button>
+      <img class="rail-logo" src="/assets/aerologo.webp" alt="AeroNav Charts" />
+    </nav>
+
+    <aside class="panel" id="leftCol" aria-label="Airports and charts">
+      <section class="panel-view active" id="viewAirports">
+        <div class="panel-head">
+          <button class="ghost-btn hidden" id="backBtn" aria-label="Go back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+          </button>
+          <div class="panel-heading">
+            <div class="panel-title" id="panelTitle">Airports</div>
+            <div class="panel-sub" id="panelSub">Select an airport to see its charts</div>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px">
-            <button class="back hidden" id="backBtn" aria-label="Go back">Back</button>
-            <button class="back" id="hideBtn" aria-label="Hide sidebar">Hide</button>
-          </div>
+          <button class="ghost-btn" id="hideBtn" aria-label="Hide panel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
+
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input id="leftSearch" class="search" placeholder="Filter charts and airports" />
+          <button class="clear-btn" id="doneBtn" disabled aria-label="Clear search">Clear</button>
+        </div>
+
         <div class="category-bar" id="categoryBar" style="display: none"></div>
+
         <div class="list" id="listArea">
           <div class="skeleton-loader" id="skeletonLoader">
             <div class="skeleton-item"></div>
             <div class="skeleton-item"></div>
             <div class="skeleton-item"></div>
             <div class="skeleton-item"></div>
-            <div class="skeleton-item"></div>
           </div>
           <div class="empty-state" id="emptyState" style="display: none;">
-            <svg class="empty-icon" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="1.5">
-              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <div class="empty-title">No results found</div>
-            <div class="empty-sub">Try adjusting your search or filters</div>
+            <div class="empty-title">Nothing matches that</div>
+            <div class="empty-sub">Try a different ICAO code or chart name</div>
           </div>
           <div class="list-inner" id="listInner"></div>
         </div>
+
         <div class="mobile-search-overlay" id="mobileSearchOverlay">
           <input id="mobileSearch" class="search mobile-search-input" placeholder="Search airports and charts..." />
         </div>
-        <div style="margin-top: auto; position: sticky; bottom: 0; background: var(--left-bg); padding-top: 8px;">
-          <div style="display: flex; gap: 4px; align-items: center;">
-            <input id="leftSearch" class="search" placeholder="Search"
-              style="flex: 1; padding: 8px; border-radius: 8px; border: 0; background: #0a2132; color: var(--text); box-sizing: border-box;" />
+      </section>
+
+      <section class="panel-view" id="viewPinned">
+        <div class="panel-head">
+          <div class="panel-heading">
+            <div class="panel-title">Pinned charts</div>
+            <div class="panel-sub">Kept between visits on this device</div>
+          </div>
+          <button class="ghost-btn text" id="clearPinned" style="display: none;">Clear</button>
+        </div>
+        <div class="list">
+          <div class="pinned-col" id="pinnedRow" role="list"></div>
+        </div>
+      </section>
+
+      <section class="panel-view" id="viewLinks">
+        <div class="panel-head">
+          <div class="panel-heading">
+            <div class="panel-title">Links</div>
+            <div class="panel-sub">Tools from us and the community</div>
           </div>
         </div>
-      </div>
-      <div class="right" id="rightCol">
-        <div class="viewer" role="region" aria-label="Chart viewer">
-          <div class="viewer-top">
-            <div>
-              <div class="viewer-title" id="viewerTitle">ENROUTE — ENROUTE CHART</div>
-              <div class="viewer-sub" id="viewerSub">Pinned enroute chart (fixed)</div>
-            </div>
-            <div class="controls">
-              <button class="btn btn-icon" id="pinCurrent" aria-label="Pin current chart">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 17v5m-7-5 7-7 7 7" />
-                  <path d="m5 10 7-7 7 7" />
-                </svg>
-                <span class="btn-text">Pin</span>
-              </button>
-              <div class="controls-more">
-                <button class="btn btn-icon" id="moreBtn" aria-label="More options">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
-                  <span class="btn-text">More</span>
-                </button>
-                <div class="controls-dropdown" id="controlsDropdown">
-                  <a class="dropdown-item" href="/donate" target="_blank">Donate</a>
-                  <a class="dropdown-item" href="https://tico09.com/24SPY" target="_blank">24Spy</a>
-                  <a class="dropdown-item" href="https://24pilot.ptfsrp.com" target="_blank">24Pilot</a>
-                  <a class="dropdown-item" href="https://flighteye.awdevsoftware.org/" target="_blank">FlightEye</a>
-                  <a class="dropdown-item" href="https://discord.com/oauth2/authorize?client_id=1426101225056632959"
-                    target="_blank">Discord Bot</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="iframe-wrap" style="position: relative;">
-            <div id="viewerLoading" class="viewer-loading"
-              style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10;">
-              <div class="loader-content"
-                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                <img src="/assets/aerologo.webp" alt="AeroNav Charts Logo" class="loader-logo" />
-                <div class="spinner"></div>
-                <div class="loading-text">Loading your selected chart...</div>
-              </div>
-            </div>
-            <iframe id="viewerFrame" src="about:blank" title="Aeronav chart viewer"></iframe>
+        <div class="list">
+          <div class="link-list">
+            <a class="link-row" href="/donate" target="_blank">Donate to AeroNav</a>
+            <a class="link-row" href="https://tico09.com/24SPY" target="_blank">24Spy</a>
+            <a class="link-row" href="https://24pilot.ptfsrp.com" target="_blank">24Pilot</a>
+            <a class="link-row" href="https://flighteye.awdevsoftware.org/" target="_blank">FlightEye</a>
+            <a class="link-row" href="https://discord.com/oauth2/authorize?client_id=1426101225056632959"
+              target="_blank">Discord bot</a>
+            <a class="link-row" href="mailto:aeronavcartography@gmail.com">Report a chart error</a>
           </div>
         </div>
+      </section>
+    </aside>
+
+    <main class="viewer">
+      <div class="notice-banner">
+        <strong>IGRV charts outdated</strong> — we will update them once the official enroute chart is revised.
       </div>
-    </div>
-    <div class="pinned-wrap" aria-label="Pinned charts">
-      <div class="pinned-header">
-        <div style="font-weight: 900; font-size: 1rem;">Pinned Charts</div>
-        <button class="btn-text-link" id="clearPinned" style="display: none;">
-          Clear All
-        </button>
-      </div>
-      <div class="pinned-row" id="pinnedRow" role="list"></div>
-    </div>
-    <button class="fab" id="quickActionsBtn" aria-label="Quick actions">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="16" />
-        <line x1="8" y1="12" x2="16" y2="12" />
-      </svg>
-    </button>
-    <div class="bottom-sheet" id="quickActionsSheet">
-      <div class="bottom-sheet-handle"></div>
-      <div class="bottom-sheet-content">
-        <h3 class="bottom-sheet-title">Quick Actions</h3>
-        <div class="quick-actions-grid">
-          <button class="quick-action-btn" id="quickHome">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+
+      <div class="viewer-bar">
+        <div class="viewer-heading">
+          <div class="viewer-title" id="viewerTitle">ENR — ENROUTE - ENROUTE CHART</div>
+          <div class="viewer-sub" id="viewerSub">ENROUTE</div>
+        </div>
+        <div class="controls">
+          <button class="icon-btn" id="pinCurrent" aria-label="Pin this chart" title="Pin chart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5Z" />
+              <path d="M12 13v8" />
             </svg>
-            <span>Home</span>
           </button>
-          <button class="quick-action-btn" id="quickRefresh">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10" />
-              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+          <button class="icon-btn" id="refreshBtn" aria-label="Reload chart" title="Reload">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 11a8 8 0 1 0-.7 4.5" />
+              <path d="M20 4v7h-7" />
             </svg>
-            <span>Refresh</span>
           </button>
-          <button class="quick-action-btn" id="quickFullscreen">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="icon-btn" id="fullscreenBtn" aria-label="Fullscreen" title="Fullscreen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
             </svg>
-            <span>Fullscreen</span>
           </button>
-          <button class="quick-action-btn" id="quickShare">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="18" cy="5" r="3" />
-              <circle cx="6" cy="12" r="3" />
-              <circle cx="18" cy="19" r="3" />
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          <button class="icon-btn" id="shareBtn" aria-label="Copy link" title="Copy link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="18" cy="5" r="2.5" />
+              <circle cx="6" cy="12" r="2.5" />
+              <circle cx="18" cy="19" r="2.5" />
+              <path d="m8.3 13.4 7.4 4.2M15.7 6.4 8.3 10.6" />
             </svg>
-            <span>Share</span>
           </button>
+          <div class="controls-more">
+            <button class="icon-btn" id="moreBtn" aria-label="More options" title="More">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="1" />
+                <circle cx="12" cy="5" r="1" />
+                <circle cx="12" cy="19" r="1" />
+              </svg>
+            </button>
+            <div class="controls-dropdown" id="controlsDropdown">
+              <a class="dropdown-item" href="/donate" target="_blank">Donate</a>
+              <a class="dropdown-item" href="https://tico09.com/24SPY" target="_blank">24Spy</a>
+              <a class="dropdown-item" href="https://24pilot.ptfsrp.com" target="_blank">24Pilot</a>
+              <a class="dropdown-item" href="https://flighteye.awdevsoftware.org/" target="_blank">FlightEye</a>
+              <a class="dropdown-item" href="https://discord.com/oauth2/authorize?client_id=1426101225056632959"
+                target="_blank">Discord Bot</a>
+              <a class="dropdown-item" href="mailto:aeronavcartography@gmail.com">Report an error</a>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="ad" role="complementary" aria-label="Sponsored advertisement" id="siteAd">
-      <div class="ad-header">
-        <span class="ad-label">Sponsored</span>
+
+      <div class="iframe-wrap">
+        <div id="viewerLoading" class="viewer-loading" style="display: none;">
+          <div class="loader-content">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading chart...</div>
+          </div>
+        </div>
+        <iframe id="viewerFrame" src="about:blank" title="Aeronav chart viewer"></iframe>
       </div>
-      <figure style="margin:0;">
+
+      <div class="ad" id="siteAd" role="complementary" aria-label="Sponsored">
+        <span class="ad-label">Sponsored</span>
         <a href="/donate">Thank you for supporting AeroNav. Contact us to get an ad of your own.</a>
-      </figure>
+        <button class="ad-close" id="adCloseBtn" aria-label="Hide ad">&times;</button>
+      </div>
+    </main>
+  </div>
+
+  <button class="fab" id="quickActionsBtn" aria-label="Quick actions">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="12" y1="6" x2="12" y2="18" />
+      <line x1="6" y1="12" x2="18" y2="12" />
+    </svg>
+  </button>
+
+  <div class="bottom-sheet" id="quickActionsSheet">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-content">
+      <h3 class="bottom-sheet-title">Quick actions</h3>
+      <div class="quick-actions-grid">
+        <button class="quick-action-btn" id="quickHome">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 10.5 12 3l9 7.5" />
+            <path d="M5 9.5V21h14V9.5" />
+          </svg>
+          <span>Home</span>
+        </button>
+        <button class="quick-action-btn" id="quickRefresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M20 11a8 8 0 1 0-.7 4.5" />
+            <path d="M20 4v7h-7" />
+          </svg>
+          <span>Reload</span>
+        </button>
+        <button class="quick-action-btn" id="quickFullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+          </svg>
+          <span>Fullscreen</span>
+        </button>
+        <button class="quick-action-btn" id="quickShare">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="18" cy="5" r="2.5" />
+            <circle cx="6" cy="12" r="2.5" />
+            <circle cx="18" cy="19" r="2.5" />
+            <path d="m8.3 13.4 7.4 4.2M15.7 6.4 8.3 10.6" />
+          </svg>
+          <span>Share</span>
+        </button>
+      </div>
     </div>
   </div>
+
   <script src="/js/data.js"></script>
   <script src="/js/scripts.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

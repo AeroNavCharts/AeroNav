@@ -20,6 +20,14 @@ const emptyState = document.getElementById('emptyState');
 const quickActionsBtn = document.getElementById('quickActionsBtn');
 const quickActionsSheet = document.getElementById('quickActionsSheet');
 const clearPinnedBtn = document.getElementById('clearPinned');
+const panelTitle = document.getElementById('panelTitle');
+const panelSub = document.getElementById('panelSub');
+const railButtons = Array.from(document.querySelectorAll('.rail-btn[data-panel]'));
+const panelViews = {
+    airports: document.getElementById('viewAirports'),
+    pinned: document.getElementById('viewPinned'),
+    links: document.getElementById('viewLinks')
+};
 
 let searchTimeout = null;
 
@@ -102,6 +110,71 @@ function openChartByHotId(n) {
     return true;
 }
 
+
+function showPanel(name) {
+    Object.entries(panelViews).forEach(([key, el]) => {
+        if (el) el.classList.toggle('active', key === name);
+    });
+    railButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.panel === name));
+    if (leftCol) leftCol.classList.remove('collapsed');
+    if (window.innerWidth <= 900 && leftCol) leftCol.classList.add('active');
+}
+
+function setPanelHeading(title, sub) {
+    if (panelTitle) panelTitle.textContent = title;
+    if (panelSub) panelSub.textContent = sub;
+}
+
+function isPinned(icao, id) {
+    return pinned.some(p => p.icao === icao && p.id === id);
+}
+
+function buildChartRow(chart, airport) {
+    const cat = (chart.category || '').toUpperCase();
+    const row = document.createElement('div');
+    row.className = 'chart-row';
+    if (currentChart && currentChart.airportIcao === airport.icao && currentChart.id === chart.id) {
+        row.classList.add('selected');
+    }
+    const main = document.createElement('div');
+    main.className = 'chart-main';
+    main.innerHTML = `<div class="chart-title">${eh(chart.title)}</div><div class="chart-id">${eh(chart.id)}${cat ? ' · ' + eh(cat) : ''}</div>`;
+    const pin = document.createElement('button');
+    pin.className = 'chart-pin';
+    pin.type = 'button';
+    pin.setAttribute('aria-label', 'Pin chart');
+    pin.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5Z"/><path d="M12 13v8"/></svg>`;
+    if (isPinned(airport.icao, chart.id)) pin.classList.add('pinned');
+    const chartObj = {
+        airportIndex: AIRPORTS.indexOf(airport),
+        airportIcao: airport.icao,
+        id: chart.id,
+        title: chart.title,
+        category: chart.category || '',
+        link: chart.link
+    };
+    pin.addEventListener('click', e => {
+        e.stopPropagation();
+        if (isPinned(airport.icao, chart.id)) {
+            pinned = pinned.filter(p => !(p.icao === airport.icao && p.id === chart.id));
+            savePinned();
+            renderPinned();
+            pin.classList.remove('pinned');
+        } else {
+            pinChart(chartObj);
+            pin.classList.add('pinned');
+        }
+    });
+    row.appendChild(main);
+    row.appendChild(pin);
+    row.addEventListener('click', () => {
+        document.querySelectorAll('.chart-row.selected').forEach(r => r.classList.remove('selected'));
+        row.classList.add('selected');
+        loadChartInViewer(chartObj, { fromPinned: false });
+        if (window.innerWidth <= 900) closeMobileMenu();
+    });
+    return row;
+}
 
 function toggleMobileMenu() {
     if (!leftCol || !menuToggle) return;
@@ -285,44 +358,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('cookiesAccepted')) {
         const consent = document.createElement('div');
         consent.id = 'cookieConsent';
-        consent.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(10, 33, 50, 0.85);
-            backdrop-filter: blur(10px);
-            color: #fff;
-            padding: 14px 24px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 9999;
-            width: 50%;
-            font-family: 'Segoe UI', sans-serif;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        `;
+        consent.className = 'cookie-consent';
 
         const text = document.createElement('p');
-        text.style.margin = '0';
-        text.style.fontSize = '14px';
-        text.innerHTML = `Hey User! While we don't use cookies here, the embedded chart viewer does. By clicking continue, you agree to the privacy policy of <a href="https://policies.google.com/privacy?hl=en&fg=1" target="_blank">Google</a>.`;
+        text.innerHTML = `We don't set cookies, but the embedded chart viewer does. Continuing means you accept <a href="https://policies.google.com/privacy?hl=en&fg=1" target="_blank">Google's privacy policy</a>.`;
 
         const btn = document.createElement('button');
         btn.textContent = 'Accept';
-        btn.style.cssText = `
-            background: rgba(0, 200, 255, 0.8);
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            padding: 8px 16px;
-            cursor: pointer;
-            z-index: 2147483647;
-            font-weight: bold;
-        `;
-        btn.onmouseover = () => btn.style.background = 'rgba(0, 200, 255, 1)';
-        btn.onmouseout = () => btn.style.background = 'rgba(0, 200, 255, 0.8)';
         btn.addEventListener('click', () => {
             localStorage.setItem('cookiesAccepted', 'true');
             consent.remove();
@@ -381,14 +423,51 @@ function init() {
     backBtn.addEventListener('click', () => {
         currentAirport = null;
         currentCategory = null;
-        currentChart = null;
         backBtn.classList.add('hidden');
         categoryBar.style.display = 'none';
-        renderAirportList();
-        if (window.innerWidth <= 1024) {
-            closeMobileMenu();
+        setPanelHeading('Airports', 'Select an airport to see its charts');
+        if (leftSearch) {
+            leftSearch.value = '';
+            leftSearch.placeholder = 'Filter charts and airports';
         }
+        renderAirportList();
     });
+
+    railButtons.forEach(btn => {
+        btn.addEventListener('click', () => showPanel(btn.dataset.panel));
+    });
+
+    const refreshBtn = document.getElementById('refreshBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            if (currentChart) loadChartInViewer(currentChart, { fromPinned: false });
+        });
+    }
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', () => {
+            const wrap = document.querySelector('.iframe-wrap');
+            if (!wrap) return;
+            if (document.fullscreenElement) document.exitFullscreen();
+            else if (wrap.requestFullscreen) wrap.requestFullscreen();
+        });
+    }
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            if (!navigator.clipboard) return;
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                Swal.fire({
+                    title: 'Link copied',
+                    text: 'Chart link copied to clipboard',
+                    icon: 'success',
+                    timer: 1600,
+                    showConfirmButton: false,
+                    customClass: { popup: 'swal-custom-popup' }
+                });
+            });
+        });
+    }
     
     if (menuToggle) {
         menuToggle.addEventListener('click', toggleMobileMenu);
@@ -542,7 +621,6 @@ function renderChartList() {
     if (currentAirport === null) return;
     const airport = AIRPORTS[currentAirport];
     const q = (leftSearch.value || '').trim().toLowerCase();
-    let count = 0;
     airport.charts.forEach(c => {
         const cat = (c.category || '').toUpperCase() || '';
         if (currentCategory && cat !== currentCategory) return;
@@ -550,33 +628,7 @@ function renderChartList() {
             const hay = ((c.id || '') + ' ' + (c.title || '')).toLowerCase();
             if (!hay.includes(q)) return;
         }
-        const row = document.createElement('div');
-        row.className = 'chart-row initial';
-        row.innerHTML = `<div class="chart-id">${eh(c.id)}</div>
-                     <div class="chart-title">${eh(c.title)}<div class="chart-small">${eh(airport.icao)}</div></div>
-                     <div class="chart-meta">${eh(cat)}</div>`;
-        row.addEventListener('click', () => {
-            Array.from(document.querySelectorAll('.chart-row')).forEach(r =>
-                r.classList.remove('selected')
-            );
-            row.classList.add('selected');
-            currentChart = {
-                airportIndex: currentAirport,
-                airportIcao: airport.icao,
-                id: c.id,
-                title: c.title,
-                category: c.category || '',
-                link: c.link
-            };
-            loadChartInViewer(currentChart, {
-                fromPinned: false
-            });
-            if (window.innerWidth <= 1024) {
-                closeMobileMenu();
-            }
-        });
-        listInner.appendChild(row);
-        count++;
+        listInner.appendChild(buildChartRow(c, airport));
     });
     checkEmptyState();
 }
@@ -787,14 +839,12 @@ function renderAirportList(filter) {
         const hay = `${a.icao} ${a.name} ${a.iata}`.toLowerCase();
         if (q && !hay.includes(q)) return;
         const div = document.createElement('div');
-        div.className = 'item-airport initial';
-        div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-                       <div>
+        div.className = 'item-airport';
+        div.innerHTML = `<div style="min-width:0">
                          <div class="airport-title">${eh(a.icao)} — ${eh(a.name)}</div>
                          <div class="airport-sub">${eh(a.iata)}</div>
                        </div>
-                       <div class="airport-sub">Charts: ${a.charts.length}</div>
-                     </div>`;
+                       <div class="airport-count">${a.charts.length}</div>`;
         div.addEventListener('click', () => openAirportView(idx));
         listInner.appendChild(div);
         count++;
@@ -805,7 +855,10 @@ function renderAirportList(filter) {
 function openAirportView(idx) {
     currentAirport = idx;
     backBtn.classList.remove('hidden');
+    showPanel('airports');
     const airport = AIRPORTS[idx];
+    setPanelHeading(`${airport.icao} — ${airport.iata}`, airport.name);
+    if (leftSearch) leftSearch.placeholder = 'Filter charts';
     const cats = [];
     airport.charts.forEach(c => {
         const cat = (c.category || '').toUpperCase() || '';
@@ -852,186 +905,66 @@ function renderCategoryBarView(cats) {
 }
 
 function renderChartListView() {
-    listInner.innerHTML = '';
-    if (currentAirport === null) return;
-    const airport = AIRPORTS[currentAirport];
-    const q = (leftSearch.value || '').trim().toLowerCase();
-    airport.charts.forEach(c => {
-        const cat = (c.category || '').toUpperCase() || '';
-        if (currentCategory && cat !== currentCategory) return;
-        if (q) {
-            const hay = ((c.id || '') + ' ' + (c.title || '')).toLowerCase();
-            if (!hay.includes(q)) return;
-        }
-        const row = document.createElement('div');
-        row.className = 'chart-row';
-        row.innerHTML = `<div class="chart-id">${eh(c.id)}</div><div class="chart-title">${eh(c.title)}<div class="chart-small">${eh(airport.icao)}</div></div><div class="chart-meta">${eh(cat)}</div>`;
-        row.addEventListener('click', () => {
-            Array.from(document.querySelectorAll('.chart-row')).forEach(r =>
-                r.classList.remove('selected')
-            );
-            row.classList.add('selected');
-            const chartObj = {
-                airportIndex: currentAirport,
-                airportIcao: airport.icao,
-                id: c.id,
-                title: c.title,
-                category: c.category || '',
-                link: c.link
-            };
-            loadChartInViewer(chartObj, {
-                fromPinned: false
-            });
-        });
-        listInner.appendChild(row);
-    });
+    renderChartList();
 }
 
 init();
 
 document.addEventListener('DOMContentLoaded', function () {
     const hideBtn = document.getElementById('hideBtn');
-    const leftCol = document.getElementById('leftCol');
-    const rightCol = document.getElementById('rightCol');
-    const viewer = document.querySelector('.viewer');
+    const panel = document.getElementById('leftCol');
     const searchInput = document.getElementById('leftSearch');
     const doneBtn = document.getElementById('doneBtn');
-    const categoryBar = document.getElementById('categoryBar');
     const listInnerDiv = document.getElementById('listInner');
 
-    const showArrow = document.createElement('button');
-    showArrow.innerHTML = '&#9654;';
-    showArrow.style.cssText =
-        'display:none;position:fixed;top:50%;left:10px;transform:translateY(-50%);background:#12314a;color:#fff;border:none;border-radius:50%;padding:10px 14px;font-size:18px;cursor:pointer;z-index:9999;';
-    document.body.appendChild(showArrow);
+    const showPanelBtn = document.createElement('button');
+    showPanelBtn.className = 'panel-restore';
+    showPanelBtn.setAttribute('aria-label', 'Show panel');
+    showPanelBtn.innerHTML = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M9 5l7 7-7 7\"/></svg>";
+    showPanelBtn.style.display = 'none';
+    document.body.appendChild(showPanelBtn);
 
-    if (hideBtn) {
-        hideBtn.addEventListener('click', function () {
-            if (leftCol.style.display !== 'none') {
-                leftCol.style.display = 'none';
-                rightCol.style.flex = '1 1 100%';
-                viewer.style.height = 'calc(100vh - 160px)';
-                showArrow.style.display = 'block';
-            } else {
-                leftCol.style.display = 'flex';
-                rightCol.style.flex = '1';
-                viewer.style.height = '';
-                showArrow.style.display = 'none';
-            }
+    function setPanelCollapsed(collapsed) {
+        if (!panel) return;
+        panel.classList.toggle('collapsed', collapsed);
+        showPanelBtn.style.display = collapsed ? 'flex' : 'none';
+    }
+
+    if (hideBtn) hideBtn.addEventListener('click', () => setPanelCollapsed(true));
+    showPanelBtn.addEventListener('click', () => setPanelCollapsed(false));
+
+    const siteAd = document.getElementById('siteAd');
+    const adCloseBtn = document.getElementById('adCloseBtn');
+
+    if (siteAd) {
+        if (localStorage.getItem('adsHidden') === 'true') siteAd.classList.add('ad-hidden');
+        if (adCloseBtn) {
+            adCloseBtn.addEventListener('click', () => {
+                siteAd.classList.add('ad-hidden');
+                localStorage.setItem('adsHidden', 'true');
+            });
+        }
+    }
+
+    if (doneBtn && searchInput) {
+        doneBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            doneBtn.disabled = true;
+            if (currentAirport === null) renderAirportList();
+            else renderChartList();
+            checkEmptyState();
+        });
+        searchInput.addEventListener('input', () => {
+            doneBtn.disabled = !searchInput.value.trim().length;
         });
     }
 
-    showArrow.addEventListener('click', function () {
-        leftCol.style.display = 'flex';
-        rightCol.style.flex = '1';
-        viewer.style.height = '';
-        showArrow.style.display = 'none';
-    });
-
-    // Ad show/hide controls (keeps GIF, accessible and persistable)
-    const siteAd = document.getElementById('siteAd');
-    const adCloseBtn = document.getElementById('adCloseBtn');
-    const showAdBtn = document.getElementById('showAdBtn');
-
-    function hideSiteAd(persist = true) {
-        if (!siteAd) return;
-        siteAd.classList.add('ad-hidden');
-        siteAd.setAttribute('aria-hidden', 'true');
-        if (showAdBtn) {
-            showAdBtn.style.display = 'block';
-            showAdBtn.setAttribute('aria-hidden', 'false');
-        }
-        if (persist) localStorage.setItem('adsHidden', 'true');
-    }
-
-    function showSiteAd(persist = true) {
-        if (!siteAd) return;
-        siteAd.classList.remove('ad-hidden');
-        siteAd.setAttribute('aria-hidden', 'false');
-        if (showAdBtn) {
-            showAdBtn.style.display = 'none';
-            showAdBtn.setAttribute('aria-hidden', 'true');
-        }
-        if (persist) localStorage.removeItem('adsHidden');
-    }
-
-    if (siteAd) {
-        // initialize based on stored preference
-        if (localStorage.getItem('adsHidden') === 'true') {
-            hideSiteAd(false);
-        } else {
-            showSiteAd(false);
-        }
-        if (adCloseBtn) adCloseBtn.addEventListener('click', () => hideSiteAd(true));
-        if (showAdBtn) showAdBtn.addEventListener('click', () => showSiteAd(true));
-    }
-
-    function resetSearch() {
-        searchInput.value = '';
-        if (currentAirport === null) {
-            window.renderAirportList();
-        } else {
-            window.renderChartList();
-        }
-    }
-
-    doneBtn.addEventListener('click', function () {
-        resetSearch();
-        doneBtn.disabled = true;
-    });
-
-    searchInput.addEventListener('input', function () {
-        doneBtn.disabled = !searchInput.value.trim().length;
-    });
-
-    listInnerDiv.addEventListener(
-        'click',
-        function (e) {
+    if (listInnerDiv && searchInput && doneBtn) {
+        listInnerDiv.addEventListener('click', e => {
             if (e.target.closest('.item-airport')) {
                 searchInput.value = '';
                 doneBtn.disabled = true;
             }
-        },
-        true
-    );
-
-    window.renderChartList = function () {
-        listInner.innerHTML = '';
-        if (currentAirport === null) return;
-        const airport = AIRPORTS[currentAirport];
-        const q = (leftSearch.value || '').trim().toLowerCase();
-        airport.charts.forEach(c => {
-            const cat = (c.category || '').toUpperCase() || '';
-            if (currentCategory && cat !== currentCategory) return;
-            if (q) {
-                const hay = ((c.id || '') + ' ' + (c.title || '')).toLowerCase();
-                if (!hay.includes(q)) return;
-            }
-            const row = document.createElement('div');
-            row.className = 'chart-row';
-            row.innerHTML = `<div class="chart-id">${eh(c.id)}</div>
-                       <div class="chart-title">${eh(c.title)}<div class="chart-small">${eh(airport.icao)}</div></div>
-                       <div class="chart-meta">${eh(cat)}</div>`;
-            row.addEventListener('click', () => {
-                Array.from(document.querySelectorAll('.chart-row')).forEach(r =>
-                    r.classList.remove('selected')
-                );
-                row.classList.add('selected');
-                currentChart = {
-                    airportIndex: currentAirport,
-                    airportIcao: airport.icao,
-                    id: c.id,
-                    title: c.title,
-                    category: c.category || '',
-                    link: c.link
-                };
-                loadChartInViewer(currentChart, {
-                    fromPinned: false
-                });
-                searchInput.value = '';
-                doneBtn.disabled = true;
-            });
-            listInner.appendChild(row);
-        });
-    };
+        }, true);
+    }
 });
