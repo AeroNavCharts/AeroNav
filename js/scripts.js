@@ -558,7 +558,7 @@ function init() {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                window.open('https://discord.com/oauth2/authorize?client_id=1426101225056632959', '_blank');
+                window.open('https://discord.com/oauth2/authorize?client_id=1537343054237933638', '_blank');
             }
         });
     }
