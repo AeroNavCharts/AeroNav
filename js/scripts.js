@@ -789,13 +789,13 @@ function pinCurrent() {
     pinChart(currentChart);
 }
 
-function onSearch() {
+function onSearch(e) {
     clearTimeout(searchTimeout);
+    const source = e && e.target ? e.target : leftSearch;
+    if (source === mobileSearch && leftSearch) leftSearch.value = mobileSearch.value;
+    else if (mobileSearch && leftSearch) mobileSearch.value = leftSearch.value;
     searchTimeout = setTimeout(() => {
         const q = (leftSearch.value || '').trim().toLowerCase();
-        if (mobileSearch && mobileSearch.value !== leftSearch.value) {
-            mobileSearch.value = leftSearch.value;
-        }
         if (q) {
             showSkeletonLoader();
         }
