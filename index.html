@@ -8,54 +8,101 @@
   <meta name="author" content="AeroNav" />
   <meta name="keywords" content="AeroNav Charts" />
   <meta property="og:image" content="/assets/aerologo.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=Inter:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/css/home.css" />
   <title>AeroNavCharts</title>
 </head>
 
-<body>
-  <div class="notice-banner">
-    <strong>IGRV Charts Outdated</strong> — AeroNav is aware that IGRV charts are currently outdated. We will update the IGRV charts once the official enroute chart has been updated.
-  </div>
+<body class="home">
   <div class="landing-wrap">
     <header class="header">
-      <img class="logo" src="/assets/aerologo.webp" alt="Aeronav Charts Logo">
-      <nav class="nav">
-        <a href="/app" class="nav-btn">Go to App</a>
+      <a href="/" class="logo-link"><img class="logo" src="/assets/aerologo.webp" alt="AeroNav"></a>
+      <nav class="nav" aria-label="Main">
+        <a href="/app" class="nav-btn">Chart viewer</a>
+        <a href="/academy" class="nav-btn">AeroAcademy</a>
         <a href="/donate" class="nav-btn">Donate</a>
       </nav>
     </header>
 
-    <section class="hero" style="min-height: 40vh;">
-      <div class="hero-content">
-        <h1 class="hero-title">Aeronautical charts for PTFS</h1>
-        <p class="hero-sub">AeroNav has been drawing enroute, SID, STAR, approach, and taxi charts for Roblox flight
-          simulators since 2024. Free to use, no account needed.</p>
-        <a href="/app" class="cta-btn">Open the chart viewer</a>
-      </div>
-    </section>
+    <main>
+      <section class="hero-chart" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <h1 class="title-main" id="heroTitle">Charts for every PTFS airport</h1>
+          <p class="title-sub">Departures, arrivals, approaches and taxi charts, drawn by pilots for pilots. Free to use, no account needed.</p>
+          <div class="title-actions">
+            <a href="/app" class="btn primary">Open the chart viewer</a>
+            <a href="/academy" class="btn">AeroAcademy</a>
+          </div>
+          <p class="plate-caption" id="plateCaption">Shown: Saint Barthelemy (IBTH) 10-2A, DINER 1 RNAV arrival.</p>
+        </div>
+        <a class="plate" id="heroPlate" href="/app" aria-label="Open the DINER 1 RNAV arrival in the chart viewer">
+          <img id="plateImg" src="https://lh3.googleusercontent.com/d/1qnmyJcBAHwFrFCn5Zr_rziVGC3jB9xEk=w1400" crossorigin="anonymous" referrerpolicy="no-referrer" alt="DINER 1 RNAV arrival chart for Saint Barthelemy, IBTH 10-2A" width="1400" height="1980" fetchpriority="high">
+        </a>
+      </section>
 
-    <section class="features">
-      <h2 class="section-title">What you get</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <h3>Chart viewer</h3>
-          <p>Browse charts by airport, pin the ones you need, and keep the enroute chart open alongside them.</p>
+      <section class="band">
+        <div class="band-inner split">
+          <div class="split-lead">
+            <h2 class="band-title">Everything you need on one screen</h2>
+            <p class="band-text">Open an airport, pick a chart, and keep the ones you are flying pinned along the bottom while you go.</p>
+          </div>
+          <dl class="facts">
+            <div class="fact">
+              <dt>Every chart type</dt>
+              <dd>STARs, SIDs, approaches grouped by runway, taxi diagrams and reference pages.</dd>
+            </div>
+            <div class="fact">
+              <dt>Pinboard</dt>
+              <dd>Keep the enroute chart and today's procedures one tap away.</dd>
+            </div>
+            <div class="fact">
+              <dt>Live ATIS</dt>
+              <dd>Active runways, wind, clouds and QNH for each airport, refreshed every minute.</dd>
+            </div>
+            <div class="fact">
+              <dt>Scratchpads</dt>
+              <dd>Copy clearances and ATIS on CRAFT, ATIS and blank pads, saved on your device.</dd>
+            </div>
+          </dl>
         </div>
-        <div class="feature-card">
-          <h3>Search</h3>
-          <p>Type an ICAO code or a chart name to jump straight to it.</p>
+      </section>
+
+      <section class="band band-alt" aria-labelledby="indexTitle">
+        <div class="band-inner">
+          <div class="index-head">
+            <h2 class="band-title" id="indexTitle">Airports we chart</h2>
+            <p class="band-text" id="indexSummary">Every airport below has a full chart set in the viewer.</p>
+          </div>
+          <table class="airport-index">
+            <thead>
+              <tr>
+                <th scope="col">ICAO</th>
+                <th scope="col">Airport</th>
+                <th scope="col" class="num">Charts</th>
+              </tr>
+            </thead>
+            <tbody id="airportIndex"></tbody>
+          </table>
         </div>
-        <div class="feature-card">
-          <h3>Kept current</h3>
-          <p>Charts are revised when airport layouts or procedures change in game. Spot an error? Email us.</p>
+      </section>
+
+      <section class="band">
+        <div class="band-inner academy">
+          <div>
+            <h2 class="band-title">Learn to fly the charts</h2>
+            <p class="band-text">AeroAcademy is a set of short courses on reading plates and flying procedures in PTFS. The first courses are on the way.</p>
+          </div>
+          <a href="/academy" class="btn">See the courses</a>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
     <footer class="footer">
       <div class="footer-content">
         <div>
-          <img class="logo footer-logo" src="/assets/aerologo.webp" alt="Aeronav Charts Logo">
+          <img class="logo footer-logo" src="/assets/aerologo.webp" alt="AeroNav">
           <p class="footer-text">
             &copy; 2025 Aeronav. All rights reserved.
             Initial UI by <a href="https://discord.com/users/1028160951125557258" target="_blank" rel="noopener">sweet_kid</a>.<br>
@@ -63,12 +110,62 @@
           </p>
         </div>
         <div class="footer-links">
-          <a href="mailto:aeronavcartography@gmail.com">Contact Us</a>
-          <a href="/donate" target="_blank">Support Our Work</a>
+          <a href="mailto:aeronavcartography@gmail.com">Contact us</a>
+          <a href="/donate" target="_blank">Support our work</a>
         </div>
       </div>
     </footer>
   </div>
+
+  <script src="/js/data.js"></script>
+  <script>
+    (function () {
+      if (typeof AIRPORTS === 'undefined') return;
+      var body = document.getElementById('airportIndex');
+      var total = 0;
+      var cap = function (s) {
+        return String(s).toLowerCase().replace(/(^|[\s/(-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); })
+          .replace(/\bMc([a-z])/g, function (m, c) { return 'Mc' + c.toUpperCase(); }).replace(/\bAfb\b/g, 'AFB');
+      };
+      AIRPORTS.slice().sort(function (a, b) { return a.icao.localeCompare(b.icao); }).forEach(function (a) {
+        total += a.charts.length;
+        var tr = document.createElement('tr');
+        var icao = document.createElement('td');
+        icao.className = 'icao';
+        icao.textContent = a.icao;
+        var name = document.createElement('td');
+        name.textContent = cap(a.name);
+        var count = document.createElement('td');
+        count.className = 'num';
+        count.textContent = a.charts.length;
+        tr.append(icao, name, count);
+        body.appendChild(tr);
+      });
+      var hot = 0;
+      var found = 0;
+      AIRPORTS.forEach(function (a) {
+        a.charts.forEach(function (c) {
+          hot++;
+          if (!found && a.icao === 'IBTH' && c.id === '10-2A') found = hot;
+        });
+      });
+      if (found) document.getElementById('heroPlate').href = '/app#' + found;
+      var plateImg = document.getElementById('plateImg');
+      plateImg.addEventListener('error', function () {
+        if (!plateImg.dataset.retried) {
+          plateImg.dataset.retried = '1';
+          plateImg.removeAttribute('crossorigin');
+          plateImg.src = 'https://drive.google.com/thumbnail?id=1qnmyJcBAHwFrFCn5Zr_rziVGC3jB9xEk&sz=w1400';
+          return;
+        }
+        document.getElementById('heroPlate').hidden = true;
+        document.getElementById('plateCaption').hidden = true;
+      });
+      if (plateImg.complete && !plateImg.naturalWidth) plateImg.dispatchEvent(new Event('error'));
+      document.getElementById('indexSummary').textContent =
+        total + ' charts across ' + AIRPORTS.length + ' airports, plus the enroute chart.';
+    })();
+  </script>
 </body>
 
 </html>

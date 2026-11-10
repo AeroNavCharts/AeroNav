@@ -9,6 +9,9 @@
   <meta name="author" content="AeroNav" />
   <meta name="keywords" content="AeroNav Charts" />
   <meta property="og:image" content="/assets/aerologo.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/css/app.css">
   <title>AeroNavCharts</title>
 </head>
@@ -52,12 +55,12 @@
         </svg>
         <span>Charts</span>
       </button>
-      <button class="rail-btn" data-panel="pinned" aria-label="Pinned charts">
+      <button class="rail-btn" id="pinboardToggle" aria-label="Toggle pinboard" aria-pressed="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
           <path d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5Z" />
           <path d="M12 13v8" />
         </svg>
-        <span>Pinned</span>
+        <span>Pinboard</span>
       </button>
       <button class="rail-btn" data-panel="links" aria-label="Links">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -71,21 +74,40 @@
 
     <aside class="panel" id="leftCol" aria-label="Airports and charts">
       <section class="panel-view active" id="viewAirports">
-        <div class="panel-head">
-          <button class="ghost-btn hidden" id="backBtn" aria-label="Go back">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M15 5l-7 7 7 7" />
-            </svg>
-          </button>
+        <div class="panel-head airport-head">
+          <div class="head-bar">
+            <button class="head-btn hidden" id="backBtn" aria-label="Back to airports">Airports</button>
+            <button class="head-btn" id="hideBtn" aria-label="Hide panel">Hide</button>
+          </div>
           <div class="panel-heading">
-            <div class="panel-title" id="panelTitle">Airports</div>
+            <div class="panel-title-row">
+              <div class="panel-title" id="panelTitle">Airports</div>
+              <button class="fav-btn hidden" id="favBtn" aria-pressed="false" aria-label="Add to favorites" title="Add to favorites">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+                  <path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" />
+                </svg>
+              </button>
+            </div>
+            <div class="panel-name" id="panelName"></div>
             <div class="panel-sub" id="panelSub">Select an airport to see its charts</div>
           </div>
-          <button class="ghost-btn" id="hideBtn" aria-label="Hide panel">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          <div class="category-bar seg-bar hidden" id="airportTabs" role="tablist" aria-label="Airport sections">
+            <button class="cat-btn" data-tab="info" role="tab">Info</button>
+            <button class="cat-btn" data-tab="charts" role="tab">Charts</button>
+            <button class="cat-btn" data-tab="proc" role="tab">Proc</button>
+            <button class="cat-btn" data-tab="weather" role="tab" title="Current ATIS">Weather</button>
+            <button class="cat-btn" data-tab="networks" role="tab" disabled title="Online network data isn't available for PTFS">Networks</button>
+          </div>
+          <div class="category-bar seg-bar hidden" id="infoTabs" role="tablist" aria-label="Airport info">
+            <button class="cat-btn" data-info="general" role="tab">General</button>
+            <button class="cat-btn" data-info="runways" role="tab">Runways</button>
+            <button class="cat-btn" data-info="comms" role="tab">Comms</button>
+            <button class="cat-btn" data-info="notam" role="tab">NOTAM</button>
+          </div>
+          <div class="category-bar seg-bar hidden" id="weatherTabs" role="tablist" aria-label="Weather">
+            <button class="cat-btn" data-wx="metar" role="tab">METAR</button>
+            <button class="cat-btn" data-wx="atis" role="tab">ATIS</button>
+          </div>
         </div>
 
         <div class="search-wrap">
@@ -118,19 +140,6 @@
         </div>
       </section>
 
-      <section class="panel-view" id="viewPinned">
-        <div class="panel-head">
-          <div class="panel-heading">
-            <div class="panel-title">Pinned charts</div>
-            <div class="panel-sub">Kept between visits on this device</div>
-          </div>
-          <button class="ghost-btn text" id="clearPinned" style="display: none;">Clear</button>
-        </div>
-        <div class="list">
-          <div class="pinned-col" id="pinnedRow" role="list"></div>
-        </div>
-      </section>
-
       <section class="panel-view" id="viewLinks">
         <div class="panel-head">
           <div class="panel-heading">
@@ -153,10 +162,6 @@
     </aside>
 
     <main class="viewer">
-      <div class="notice-banner">
-        <strong>IGRV charts outdated</strong> — we will update them once the official enroute chart is revised.
-      </div>
-
       <div class="viewer-bar">
         <div class="viewer-heading">
           <div class="viewer-title" id="viewerTitle">ENR — ENROUTE - ENROUTE CHART</div>
@@ -219,9 +224,20 @@
         <iframe id="viewerFrame" src="about:blank" title="Aeronav chart viewer"></iframe>
       </div>
 
+      <div class="pinboard" id="pinboard" aria-label="Pinboard">
+        <button class="pinboard-new" id="newScratchpad" title="New scratchpad" aria-label="New scratchpad">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="5" y="4" width="14" height="17" rx="2" />
+            <path d="M9 2.5v3M12 2.5v3M15 2.5v3M8.5 10h7M8.5 13.5h7M8.5 17h4" />
+          </svg>
+        </button>
+        <div class="pinboard-scroll" id="pinnedRow" role="list"></div>
+        <button class="ghost-btn text pinboard-clear" id="clearPinned" style="display: none;" title="Unpin all charts">Clear</button>
+      </div>
+
       <div class="ad" id="siteAd" role="complementary" aria-label="Sponsored">
         <span class="ad-label">Sponsored</span>
-        <a href="/donate">Thank you for supporting AeroNav. Contact us to get an ad of your own.</a>
+        <a href="https://tally.so/r/nW6RKa" target="_blank" rel="noopener">Thank you for supporting AeroNav. Contact us to get an ad of your own.</a>
         <button class="ad-close" id="adCloseBtn" aria-label="Hide ad">&times;</button>
       </div>
     </main>
@@ -273,6 +289,7 @@
   </div>
 
   <script src="/js/data.js"></script>
+  <script src="/js/scratchpad.js"></script>
   <script src="/js/scripts.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>

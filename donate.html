@@ -9,84 +9,66 @@
     <meta name="author" content="AeroNav" />
     <meta name="keywords" content="AeroNav, donate, charts, PTFS, RoAv" />
     <meta property="og:image" content="/assets/aerologo.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=Inter:wght@400;500;600&display=swap">
     <link rel="stylesheet" href="/css/home.css" />
     <title>Donate to AeroNav</title>
 </head>
 
 <body>
-    <div class="notice-banner">
-        <strong>IGRV Charts Outdated</strong> — AeroNav is aware that IGRV charts are currently outdated. We will update the IGRV charts once the official enroute chart has been updated.
-    </div>
     <div class="landing-wrap">
         <header class="header">
-            <img class="logo" src="/assets/aerologo.webp" alt="Aeronav Charts Logo">
-            <nav class="nav">
-                <a href="/" class="nav-btn">Home</a>
-                <a href="app.html" class="nav-btn">Go to App</a>
+            <a href="/" class="logo-link"><img class="logo" src="/assets/aerologo.webp" alt="AeroNav"></a>
+            <nav class="nav" aria-label="Main">
+                <a href="/app" class="nav-btn">Chart viewer</a>
+                <a href="/academy" class="nav-btn">AeroAcademy</a>
                 <a href="/donate" class="nav-btn">Donate</a>
             </nav>
         </header>
 
-        <section class="hero" style="min-height: 30vh;">
-            <div class="hero-content">
-                <h1 class="hero-title">Support AeroNav</h1>
-                <p class="hero-sub">
-                    Donations go toward keeping the charts updated for PTFS and RoAv pilots.
-                </p>
-            </div>
-        </section>
-        <section class="cta">
-            <h2 class="section-title">Donate with Robux</h2>
-            <p class="cta-sub">Each link is a Roblox game pass.</p>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <a href="https://www.roblox.com/game-pass/1317716091/Aeronav-Secure-Payment-100-Robux"
-                        target="_blank" class="cta-btn">
-                        100 Robux
-                    </a>
+        <main>
+            <section class="band page-head">
+                <div class="band-inner">
+                    <h1 class="page-title">Support AeroNav</h1>
+                    <p class="band-text">Donations go toward keeping the charts updated for PTFS and RoAv pilots.</p>
                 </div>
-                <div class="feature-card">
-                    <a href="https://www.roblox.com/game-pass/1396477675/Aeronav-Secure-Payment-150-Robux"
-                        target="_blank" class="cta-btn">
-                        150 Robux
-                    </a>
-                </div>
-                <div class="feature-card">
-                    <a href="https://www.roblox.com/game-pass/1397155361/Aeronav-Secure-Payment-200-Robux"
-                        target="_blank" class="cta-btn">
-                        200 Robux
-                    </a>
-                </div>
-                <!-- <div class="feature-card">
-                    <a href="https://www.roblox.com/game-pass/1645920090/AeroNav-Ads"
-                        target="_blank" class="cta-btn">
-                        Advertise with us!
-                    </a>
-                </div> -->
-            </div>
-        </section>
-        <section class="features">
-            <h2 class="section-title">Before you donate</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <p>
-                        Any donations are greatly appreciated. Please contact
-                        <strong>sweet_kid</strong> with proof of donation to receive a
-                        shoutout in <strong>24Hub’s AeroNav Channel</strong>.
-                    </p>
-                    <p>
-                        Proof of donation is required for shoutouts. These donations, under
-                        certain circumstances, may be divided among active AeroNav Chart Makers.
-                    </p>
-                    <p>
-                        If you would like to donate to a specific person, please reach out
-                        to <strong>sweet_kid</strong>. This donation is to be treated as casual.
-                    </p>
-                </div>
-            </div>
-        </section>
+            </section>
 
+            <section class="band band-tight">
+                <div class="band-inner split">
+                    <div class="split-lead">
+                        <h2 class="band-title">Donate with Robux</h2>
+                        <p class="band-text">Each amount opens a Roblox game pass in a new tab.</p>
+                    </div>
+                    <div class="amounts">
+                        <a href="https://www.roblox.com/game-pass/1317716091/Aeronav-Secure-Payment-100-Robux" target="_blank" rel="noopener" class="amount">
+                            <span class="amount-value">100</span>
+                            <span class="amount-unit">Robux</span>
+                        </a>
+                        <a href="https://www.roblox.com/game-pass/1396477675/Aeronav-Secure-Payment-150-Robux" target="_blank" rel="noopener" class="amount">
+                            <span class="amount-value">150</span>
+                            <span class="amount-unit">Robux</span>
+                        </a>
+                        <a href="https://www.roblox.com/game-pass/1397155361/Aeronav-Secure-Payment-200-Robux" target="_blank" rel="noopener" class="amount">
+                            <span class="amount-value">200</span>
+                            <span class="amount-unit">Robux</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
 
+            <section class="band band-alt">
+                <div class="band-inner">
+                    <h2 class="band-title">Before you donate</h2>
+                    <div class="prose">
+                        <p>Any donations are greatly appreciated. Contact <strong>sweet_kid</strong> with proof of donation to receive a shoutout in <strong>24Hub's AeroNav channel</strong>.</p>
+                        <p>Proof of donation is required for shoutouts. Under certain circumstances, donations may be divided among active AeroNav chart makers.</p>
+                        <p>If you would like to donate to a specific person, reach out to <strong>sweet_kid</strong>. That donation is treated as casual.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
 
         <footer class="footer">
             <div class="footer-content">
@@ -102,8 +84,8 @@
                     </p>
                 </div>
                 <div class="footer-links">
-                    <a href="mailto:aeronavcartography@gmail.com">Contact Us</a>
-                    <a href="/donate.html">Support Our Work</a>
+                    <a href="mailto:aeronavcartography@gmail.com">Contact us</a>
+                    <a href="/academy">AeroAcademy</a>
                 </div>
             </div>
         </footer>
