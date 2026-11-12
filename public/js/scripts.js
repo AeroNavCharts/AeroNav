@@ -643,40 +643,6 @@ function init() {
     if (hn) loadedByHash = openChartByHotId(hn);
     if (!loadedByHash && pinned && pinned[0]) loadChartInViewer(pinned[0], { fromPinned: true });
     window.addEventListener('hashchange', navigateByHash);
-    if (!localStorage.getItem('botPromptDontAskAgain')) {
-        Swal.fire({
-            title: 'Enhance your experience!',
-            text: 'Get charts in Discord with our new bot!',
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Add Bot',
-            cancelButtonText: 'No thanks',
-            customClass: {
-                popup: 'swal-custom-popup',
-                confirmButton: 'swal-btn-confirm',
-                cancelButton: 'swal-btn-cancel'
-            },
-            didOpen: () => {
-                const btn = document.createElement('button');
-                btn.textContent = "Nah, and don't ask again";
-                btn.className = 'swal-btn-deny';
-                btn.style.display = 'block';
-                btn.style.margin = '12px auto 0';
-                btn.style.width = '60%';
-                btn.addEventListener('click', () => {
-                    localStorage.setItem('botPromptDontAskAgain', 'true');
-                    Swal.close();
-                });
-
-                const container = Swal.getPopup().querySelector('.swal2-actions');
-                container.parentNode.appendChild(btn);
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.open('https://discord.com/oauth2/authorize?client_id=1537343054237933638', '_blank');
-            }
-        });
-    }
 }
 
 
