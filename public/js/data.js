@@ -262,7 +262,7 @@ const AIRPORTS = [
         "charts": [
             {
                 "id": "30-2",
-                "title": "LARANCA 1 ARRIVAL",
+                "title": "LARNACA 1 ARRIVAL",
                 "category": "STAR",
                 "link": "https://drive.google.com/file/d/1q8E8zsvZ1TKq9lUGacZhoDeIoDKD3r0_/view?usp=drive_link"
             },
@@ -401,7 +401,7 @@ const AIRPORTS = [
             },
             {
                 "id": "VFR",
-                "title": "ILAR VFR Sectional",
+                "title": "ILAR VFR SECTIONAL",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1Jt6VwU6wt01TNASn9lPFo4p8ElJzniiU/view?usp=drive_link"
             },
@@ -1023,7 +1023,7 @@ const AIRPORTS = [
             },
             {
                 "id": "VFR",
-                "title": "IRFD VFR Sectional",
+                "title": "IRFD VFR SECTIONAL",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1CgVtu508WLQa-UVjiWa2vjEkYXQyG3Yk/view?usp=drive_link"
             },
@@ -1307,7 +1307,7 @@ const AIRPORTS = [
             },
             {
                 "id": "VFR",
-                "title": "ITKO VFR Sectional",
+                "title": "ITKO VFR SECTIONAL",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1yg0urxOYRm2goWV2Su5N89jrXz_0hDt7/view?usp=drive_link"
             },
