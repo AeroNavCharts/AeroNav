@@ -1015,12 +1015,14 @@ svg {
     font-weight: 500;
 }
 
-.link-note {
+.panel-note {
+    flex-shrink: 0;
     margin: 0;
-    padding: 14px 12px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--line);
     color: var(--muted);
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1.45;
 }
 
 .link-row:hover {
