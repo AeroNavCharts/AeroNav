@@ -9,9 +9,10 @@ interface Props {
   description: string;
   keywords: string;
   bodyClass?: string;
+  intro?: boolean;
 }
 
-const { title, description, keywords, bodyClass } = Astro.props;
+const { title, description, keywords, bodyClass, intro = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -26,7 +27,7 @@ const { title, description, keywords, bodyClass } = Astro.props;
     />
   </head>
   <body class={bodyClass}>
-    <IntroScreen />
+    {intro && <IntroScreen />}
     <div class="landing-wrap">
       <SiteHeader />
       <main>

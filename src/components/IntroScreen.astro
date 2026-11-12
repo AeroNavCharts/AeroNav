@@ -2,11 +2,6 @@
 import LoaderLogo from './LoaderLogo.astro';
 ---
 
-<script is:inline>
-  try {
-    if (sessionStorage.getItem('introSeen')) document.documentElement.classList.add('intro-skip');
-  } catch (e) {}
-</script>
 <noscript>
   <style>
     .intro-screen {
@@ -22,15 +17,12 @@ import LoaderLogo from './LoaderLogo.astro';
 <script is:inline>
   (function () {
     var intro = document.getElementById('introScreen');
-    if (!intro || document.documentElement.classList.contains('intro-skip')) return;
+    if (!intro) return;
     var started = performance.now();
     var done = false;
     var finish = function () {
       if (done) return;
       done = true;
-      try {
-        sessionStorage.setItem('introSeen', '1');
-      } catch (e) {}
       intro.classList.add('is-done');
       setTimeout(function () {
         intro.remove();
@@ -66,9 +58,5 @@ import LoaderLogo from './LoaderLogo.astro';
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-  }
-
-  .intro-skip .intro-screen {
-    display: none;
   }
 </style>
