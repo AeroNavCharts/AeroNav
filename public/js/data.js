@@ -1,5 +1,9 @@
 const ENROUTE_LINK = "https://drive.google.com/file/d/1mlh_JV_3X2vHl8y1gKXN3oNc7gX5IBRM/view?usp=sharing";
 
+const CHART_GEO = {
+    "1mlh_JV_3X2vHl8y1gKXN3oNc7gX5IBRM": [0.0000082549, 0, 0.5086, 0, 0.0000082549, 0.4054]
+};
+
 const AIRPORTS = [
     {
         "icao": "IBTH",
