@@ -791,3 +791,22 @@ a.course-card:hover {
         padding: 24px 16px;
     }
 }
+
+@view-transition {
+    navigation: auto;
+}
+
+.header {
+    view-transition-name: site-header;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.22s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition {
+        navigation: none;
+    }
+}
