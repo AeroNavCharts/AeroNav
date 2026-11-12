@@ -16,7 +16,15 @@ const chartViewer = new ChartViewer(chartWrap, {
         if (!drawBtn) return;
         drawBtn.classList.toggle('active', on);
         drawBtn.setAttribute('aria-pressed', String(on));
+    },
+    onLoad: () => {
+        if (typeof ownship !== 'undefined') ownship.refresh();
     }
+});
+const ownship = new Ownship(chartViewer, {
+    button: document.getElementById('ownshipBtn'),
+    chip: document.getElementById('ownshipChip'),
+    host: chartWrap
 });
 let chartLoadToken = 0;
 
