@@ -6,6 +6,8 @@ class ChartViewer {
         this.onZoom = opts.onZoom || (() => { });
         this.onDrawMode = opts.onDrawMode || (() => { });
         this.storageKey = 'aeronav_chart_marks';
+        this.rotationKey = 'aeronav_chart_rotation';
+        this.rotation = 0;
         this.stage = document.createElement('div');
         this.stage.className = 'chart-stage';
         this.stage.hidden = true;
@@ -67,6 +69,7 @@ class ChartViewer {
         this.commitText();
         this.chartId = id;
         this.marks = this.readMarks()[id] || [];
+        this.rotation = this.readRotations()[id] || 0;
         this.show(low, true);
         this.fetchImage(ChartViewer.imageUrl(id, 3200)).then((high) => {
             if (token !== this.token || high.naturalWidth <= this.img.naturalWidth) return;
@@ -102,6 +105,7 @@ class ChartViewer {
         this.natH = 0;
         this.chartId = null;
         this.marks = [];
+        this.rotation = 0;
     }
 
     get active() {
@@ -112,16 +116,89 @@ class ChartViewer {
         const pad = 16;
         const w = this.stage.clientWidth - pad * 2;
         const h = this.stage.clientHeight - pad * 2;
-        this.fitScale = Math.max(0.01, Math.min(w / this.natW, h / this.natH));
+        const sideways = this.rotation % 180 !== 0;
+        const natW = sideways ? this.natH : this.natW;
+        const natH = sideways ? this.natW : this.natH;
+        this.fitScale = Math.max(0.01, Math.min(w / natW, h / natH));
+    }
+
+    get turn() {
+        const r = (this.rotation * Math.PI) / 180;
+        return { c: Math.round(Math.cos(r)), s: Math.round(Math.sin(r)) };
+    }
+
+    spin(vx, vy) {
+        const { c, s } = this.turn;
+        return [vx * c - vy * s, vx * s + vy * c];
+    }
+
+    unspin(vx, vy) {
+        const { c, s } = this.turn;
+        return [vx * c + vy * s, vy * c - vx * s];
+    }
+
+    bounds() {
+        const [ax, ay] = this.spin(this.natW * this.scale, 0);
+        const [bx, by] = this.spin(0, this.natH * this.scale);
+        return {
+            left: Math.min(0, ax, bx, ax + bx),
+            top: Math.min(0, ay, by, ay + by),
+            width: Math.abs(ax) + Math.abs(bx),
+            height: Math.abs(ay) + Math.abs(by),
+        };
+    }
+
+    toLocal(p) {
+        return this.unspin(p.x - this.x, p.y - this.y);
     }
 
     fit() {
         if (!this.natW) return;
         this.measureFit();
         this.scale = this.fitScale;
-        this.x = (this.stage.clientWidth - this.natW * this.scale) / 2;
-        this.y = (this.stage.clientHeight - this.natH * this.scale) / 2;
+        const b = this.bounds();
+        this.x = (this.stage.clientWidth - b.width) / 2 - b.left;
+        this.y = (this.stage.clientHeight - b.height) / 2 - b.top;
         this.apply();
+    }
+
+    rotateBy(delta) {
+        if (!this.natW) return;
+        const wasFit = Math.abs(this.scale - this.fitScale) < 1e-6;
+        const cx = this.stage.clientWidth / 2;
+        const cy = this.stage.clientHeight / 2;
+        const dx = this.x - cx;
+        const dy = this.y - cy;
+        const clockwise = delta > 0;
+        this.rotation = (this.rotation + (clockwise ? 90 : 270)) % 360;
+        this.x = cx + (clockwise ? -dy : dy);
+        this.y = cy + (clockwise ? dx : -dx);
+        this.saveRotation();
+        if (wasFit) {
+            this.fit();
+            return;
+        }
+        this.measureFit();
+        this.apply();
+    }
+
+    readRotations() {
+        try {
+            const data = JSON.parse(localStorage.getItem(this.rotationKey) || '{}');
+            return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+        } catch {
+            return {};
+        }
+    }
+
+    saveRotation() {
+        if (!this.chartId) return;
+        const all = this.readRotations();
+        if (this.rotation) all[this.chartId] = this.rotation;
+        else delete all[this.chartId];
+        try {
+            localStorage.setItem(this.rotationKey, JSON.stringify(all));
+        } catch { }
     }
 
     zoomAt(px, py, factor) {
@@ -140,11 +217,10 @@ class ChartViewer {
 
     apply() {
         const keep = 80;
-        const w = this.natW * this.scale;
-        const h = this.natH * this.scale;
-        this.x = Math.min(this.stage.clientWidth - keep, Math.max(keep - w, this.x));
-        this.y = Math.min(this.stage.clientHeight - keep, Math.max(keep - h, this.y));
-        this.img.style.transform = `translate(${this.x}px, ${this.y}px) scale(${this.scale})`;
+        const b = this.bounds();
+        this.x = Math.min(this.stage.clientWidth - keep, Math.max(keep - b.width, this.x + b.left)) - b.left;
+        this.y = Math.min(this.stage.clientHeight - keep, Math.max(keep - b.height, this.y + b.top)) - b.top;
+        this.img.style.transform = `translate(${this.x}px, ${this.y}px) rotate(${this.rotation}deg) scale(${this.scale})`;
         this.onZoom(Math.round((this.scale / this.fitScale) * 100));
         this.placeInput();
         this.renderInk();
@@ -161,7 +237,8 @@ class ChartViewer {
 
     toChart(p) {
         const round = (n) => Math.round(n * 100000) / 100000;
-        return [round((p.x - this.x) / this.unit), round((p.y - this.y) / this.unit)];
+        const [lx, ly] = this.toLocal(p);
+        return [round(lx / this.unit), round(ly / this.unit)];
     }
 
     readMarks() {
@@ -270,8 +347,10 @@ class ChartViewer {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         const k = this.unit;
-        const sx = (u) => this.x + u * k;
-        const sy = (v) => this.y + v * k;
+        ctx.translate(this.x, this.y);
+        ctx.rotate((this.rotation * Math.PI) / 180);
+        const sx = (u) => u * k;
+        const sy = (v) => v * k;
         this.marks.forEach((m) => {
             if (this.editing && this.editing.item === m) return;
             ctx.strokeStyle = m.c;
@@ -311,20 +390,22 @@ class ChartViewer {
         this.inkCtx.font = `600 ${m.f * k}px Inter, sans-serif`;
         const w = this.inkCtx.measureText(m.s).width;
         this.inkCtx.restore();
-        const left = this.x + m.x * k;
-        const base = this.y + m.y * k;
+        const left = m.x * k;
+        const base = m.y * k;
         const h = m.f * k;
-        return p.x >= left - pad && p.x <= left + w + pad && p.y >= base - h - pad && p.y <= base + pad;
+        const [lx, ly] = this.toLocal(p);
+        return lx >= left - pad && lx <= left + w + pad && ly >= base - h - pad && ly <= base + pad;
     }
 
     eraseAt(p) {
         const radius = 12;
         const k = this.unit;
         const before = this.marks.length;
+        const [lx, ly] = this.toLocal(p);
         this.marks = this.marks.filter((m) => {
             if (m.k === 'text') return !this.textHit(m, p, radius);
             const reach = radius + (m.w * k) / 2;
-            return !m.p.some(([u, v]) => Math.hypot(this.x + u * k - p.x, this.y + v * k - p.y) < reach);
+            return !m.p.some(([u, v]) => Math.hypot(u * k - lx, v * k - ly) < reach);
         });
         if (this.marks.length !== before) this.renderInk();
     }
@@ -356,8 +437,10 @@ class ChartViewer {
         if (!ed) return;
         const k = this.unit;
         const size = ed.item.f * k;
-        ed.input.style.left = this.x + ed.item.x * k + 'px';
-        ed.input.style.top = this.y + ed.item.y * k - size * 0.95 + 'px';
+        ed.input.style.left = this.x + 'px';
+        ed.input.style.top = this.y + 'px';
+        ed.input.style.transformOrigin = '0 0';
+        ed.input.style.transform = `rotate(${this.rotation}deg) translate(${ed.item.x * k}px, ${ed.item.y * k - size * 0.95}px)`;
         ed.input.style.fontSize = size + 'px';
         ed.input.style.height = size * 1.25 + 'px';
         ed.input.style.width = Math.max(140, size * 12) + 'px';
