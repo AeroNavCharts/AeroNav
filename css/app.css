@@ -81,7 +81,75 @@ svg {
 }
 
 .loader-logo {
-    width: 140px;
+    display: flex;
+    align-items: center;
+    height: 44px;
+    margin-bottom: 4px;
+}
+
+.loader-mark,
+.loader-wordmark {
+    height: 100%;
+    width: auto;
+    display: block;
+}
+
+.loader-mark {
+    opacity: 0;
+    transform: translateY(6px) scale(0.92);
+    animation: loaderMarkIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.loader-wordmark {
+    margin-left: 2px;
+    clip-path: inset(0 100% 0 0);
+    -webkit-mask-image: linear-gradient(100deg, #000 42%, rgba(0, 0, 0, 0.4) 50%, #000 58%);
+    mask-image: linear-gradient(100deg, #000 42%, rgba(0, 0, 0, 0.4) 50%, #000 58%);
+    -webkit-mask-size: 300% 100%;
+    mask-size: 300% 100%;
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+    animation:
+        loaderWordmarkIn 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards,
+        loaderSheen 2.8s ease-in-out 1.6s infinite;
+}
+
+@keyframes loaderSheen {
+    0% {
+        -webkit-mask-position: 100% 0;
+        mask-position: 100% 0;
+    }
+
+    55%,
+    100% {
+        -webkit-mask-position: 0 0;
+        mask-position: 0 0;
+    }
+}
+
+@keyframes loaderMarkIn {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes loaderWordmarkIn {
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loader-mark,
+    .loader-wordmark {
+        animation: none;
+        opacity: 1;
+        transform: none;
+        clip-path: none;
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
 }
 
 .spinner {
@@ -1000,10 +1068,6 @@ svg {
     display: flex;
     align-items: center;
     gap: 4px;
-    padding: 4px;
-    background: var(--rail-bg);
-    border: 1px solid var(--line);
-    border-radius: 10px;
 }
 
 .icon-btn {
@@ -1029,6 +1093,75 @@ svg {
 .icon-btn.active {
     background: var(--accent);
     border-color: var(--accent-line);
+}
+
+.bar-group {
+    display: flex;
+    gap: 4px;
+}
+
+.bar-sep {
+    width: 1px;
+    height: 20px;
+    margin: 0 4px;
+    background: var(--line-strong);
+}
+
+.bar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-line);
+    border-radius: 6px;
+    color: var(--text);
+    font: 500 13px var(--font);
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.bar-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.bar-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent-line);
+    text-decoration: none;
+}
+
+.bar-btn.active {
+    background: var(--accent);
+    border-color: var(--accent-line);
+}
+
+.bar-btn:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.bar-btn.active:disabled:hover {
+    background: var(--accent);
+}
+
+.donate-btn {
+    padding: 0 16px;
+    border: 1px solid #c87a2a;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #d98a32 0%, #c06a1c 55%, #9c4f12 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+}
+
+.donate-btn:hover {
+    background: linear-gradient(90deg, #e69a42 0%, #cc7626 55%, #a85a18 100%);
+    border-color: #dd8c38;
 }
 
 .controls-more {
@@ -1095,6 +1228,10 @@ iframe {
     justify-content: center;
     z-index: 10;
     transition: opacity 0.3s ease;
+}
+
+.viewer-loading .loader-logo {
+    height: 34px;
 }
 
 .pinboard {
@@ -1524,6 +1661,27 @@ iframe {
     border-color: var(--accent-line);
 }
 
+.chart-tools {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px;
+    background: rgba(21, 29, 41, 0.85);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+}
+
+.chart-tools .controls-dropdown {
+    right: auto;
+    left: calc(100% + 10px);
+    top: 0;
+}
+
 .pad-mode .chart-tools,
 .pad-mode .zoom-readout {
     display: none;
@@ -1827,7 +1985,7 @@ iframe {
 
     .chart-tools {
         top: 8px;
-        right: 8px;
+        left: 8px;
     }
 
     .pinboard {
@@ -1922,5 +2080,19 @@ iframe {
         gap: 6px;
         font-size: 11.5px;
         cursor: pointer;
+    }
+}
+
+@media (max-width: 1100px) {
+    .bar-links,
+    .bar-links + .bar-sep,
+    .bar-report {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .bar-btn {
+        padding: 0 9px;
     }
 }

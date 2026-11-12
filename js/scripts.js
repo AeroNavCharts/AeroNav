@@ -389,7 +389,13 @@ window.addEventListener('resize', () => {
     }
 });
 
+const slowLoadTimer = setTimeout(() => {
+    const text = document.querySelector('#pageLoading .loading-text');
+    if (text) text.textContent = 'Still loading, slow connection...';
+}, 7000);
+
 window.addEventListener('load', () => {
+    clearTimeout(slowLoadTimer);
     const loader = document.getElementById('pageLoading');
     loader.style.opacity = 0;
     setTimeout(() => loader.style.display = 'none', 500);
@@ -603,9 +609,6 @@ function init() {
     const hn = parseHashNumber();
     if (hn) loadedByHash = openChartByHotId(hn);
     if (!loadedByHash && pinned && pinned[0]) loadChartInViewer(pinned[0], { fromPinned: true });
-    pinCurrentBtn.addEventListener('click', () => {
-        if (currentChart) pinCurrent();
-    });
     window.addEventListener('hashchange', navigateByHash);
     if (!localStorage.getItem('botPromptDontAskAgain')) {
         Swal.fire({
@@ -1224,9 +1227,13 @@ function loadChartInViewer(chartObj, opts = {}) {
     viewerTitle.textContent = `${icao} — ${chartObj.id || ''} ${chartObj.title ? '- ' + chartObj.title : ''}`;
     viewerSub.textContent = chartObj.category || '';
     pinCurrentBtn.onclick = () => {
-        if (chartObj && chartObj.id) pinChart(chartObj);
+        if (!chartObj || !chartObj.id) return;
+        const icao = chartIcao(chartObj);
+        if (isPinned(icao, chartObj.id)) unpin({ icao, id: chartObj.id });
+        else pinChart(chartObj);
     };
     currentChart = chartObj;
+    updatePinCurrent();
     markActivePin();
     viewerFrame.addEventListener('load', hideLoader);
     const hid = getHotId(chartObj);
@@ -1239,11 +1246,7 @@ function loadChartInViewer(chartObj, opts = {}) {
 function pinChart(chart) {
     if (!chart || !chart.id) return;
     if (String(chart.id).toUpperCase() === 'ENROUTE') return;
-    const icao =
-        chart.airportIcao ||
-        chart.icao ||
-        (AIRPORTS[chart.airportIndex] && AIRPORTS[chart.airportIndex].icao) ||
-        '';
+    const icao = chartIcao(chart);
     const rec = {
         icao: icao,
         id: chart.id,
@@ -1257,6 +1260,7 @@ function pinChart(chart) {
     savePinned();
     renderPinned();
     syncChartPinButtons();
+    setPinboardVisible(true);
 }
 
 function openPinnedChart(p) {
@@ -1283,7 +1287,28 @@ function unpin(p) {
     syncChartPinButtons();
 }
 
+function chartIcao(chart) {
+    return chart.airportIcao ||
+        chart.icao ||
+        (AIRPORTS[chart.airportIndex] && AIRPORTS[chart.airportIndex].icao) ||
+        '';
+}
+
+function updatePinCurrent() {
+    const chart = !currentPadId && currentChart;
+    const on = !!(chart && chart.id && isPinned(chartIcao(chart), chart.id));
+    const fixed = !!(chart && String(chart.id).toUpperCase() === 'ENROUTE');
+    pinCurrentBtn.classList.toggle('active', on || fixed);
+    pinCurrentBtn.disabled = !chart || fixed;
+    pinCurrentBtn.setAttribute('aria-pressed', String(on || fixed));
+    const label = pinCurrentBtn.querySelector('span');
+    if (label) label.textContent = fixed ? 'Pinned' : on ? 'Unpin' : 'Pin';
+    pinCurrentBtn.title = fixed ? 'Always pinned' : on ? 'Unpin chart' : 'Pin chart';
+    pinCurrentBtn.setAttribute('aria-label', pinCurrentBtn.title);
+}
+
 function syncChartPinButtons() {
+    updatePinCurrent();
     document.querySelectorAll('.chart-row').forEach(row => {
         const btn = row.querySelector('.chart-pin');
         if (btn) btn.classList.toggle('pinned', isPinned(row.dataset.icao, row.dataset.id));
@@ -1313,6 +1338,7 @@ function openScratchpad(id) {
     viewerTitle.textContent = pad.name;
     viewerSub.textContent = 'SCRATCHPAD';
     pinCurrentBtn.onclick = null;
+    updatePinCurrent();
     markActivePin();
 }
 
@@ -1444,6 +1470,8 @@ function renderPinned() {
     markActivePin();
 }
 
+let setPinboardVisible = () => {};
+
 function setupPinboardToggle() {
     const toggle = document.getElementById('pinboardToggle');
     const board = document.getElementById('pinboard');
@@ -1454,6 +1482,7 @@ function setupPinboardToggle() {
         toggle.setAttribute('aria-pressed', String(on));
         localStorage.setItem('pinboardVisible', String(on));
     };
+    setPinboardVisible = apply;
     apply(localStorage.getItem('pinboardVisible') !== 'false');
     toggle.addEventListener('click', () => apply(board.classList.contains('hidden')));
     const newPad = document.getElementById('newScratchpad');
@@ -1492,6 +1521,12 @@ function loadPinned() {
         for (const p of saved) {
             if (!p) continue;
             if (String(p.id).toUpperCase() === 'ENROUTE') continue;
+            if (p.id === 'N/A') {
+                const ap = AIRPORTS.find(a => a.icao === p.icao);
+                const ch = ap && ap.charts.find(c => c.link === p.link || c.title === p.title);
+                if (ch) p.id = ch.id;
+            }
+            if (pinned.some(x => x.icao === p.icao && x.id === p.id)) continue;
             pinned.push(p);
         }
     }

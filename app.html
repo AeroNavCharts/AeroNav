@@ -19,7 +19,10 @@
 <body>
   <div id="pageLoading" class="page-loading">
     <div class="loader-content">
-      <img src="/assets/aerologo.webp" alt="AeroNav Charts Logo" class="loader-logo" />
+      <div class="loader-logo" role="img" aria-label="AeroNav">
+        <img src="/assets/logo-mark.webp" alt="" class="loader-mark" width="224" height="177" />
+        <img src="/assets/logo-wordmark.webp" alt="" class="loader-wordmark" width="757" height="177" />
+      </div>
       <div class="spinner"></div>
       <div class="loading-text">Loading charts...</div>
     </div>
@@ -168,12 +171,28 @@
           <div class="viewer-sub" id="viewerSub">ENROUTE</div>
         </div>
         <div class="controls">
-          <button class="icon-btn" id="pinCurrent" aria-label="Pin this chart" title="Pin chart">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5Z" />
-              <path d="M12 13v8" />
-            </svg>
-          </button>
+          <div class="bar-group bar-links">
+            <a class="bar-btn" href="https://flighteye.awdevsoftware.org/" target="_blank" rel="noopener">FlightEye</a>
+            <a class="bar-btn" href="https://24pilot.ptfsrp.com" target="_blank" rel="noopener">24Pilot</a>
+          </div>
+          <span class="bar-sep" aria-hidden="true"></span>
+          <div class="bar-group">
+            <button class="bar-btn" id="pinCurrent" aria-label="Pin this chart" title="Pin chart">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M9 3h6l-1 5 3 3v2H7v-2l3-3-1-5Z" />
+                <path d="M12 13v8" />
+              </svg>
+              <span>Pin</span>
+            </button>
+            <a class="bar-btn bar-report" href="mailto:aeronavcartography@gmail.com">Report error</a>
+          </div>
+          <span class="bar-sep" aria-hidden="true"></span>
+          <a class="bar-btn donate-btn" href="/donate" target="_blank">Donate</a>
+        </div>
+      </div>
+
+      <div class="iframe-wrap">
+        <div class="chart-tools" aria-label="Chart tools">
           <button class="icon-btn" id="refreshBtn" aria-label="Reload chart" title="Reload">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M20 11a8 8 0 1 0-.7 4.5" />
@@ -212,11 +231,12 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="iframe-wrap">
         <div id="viewerLoading" class="viewer-loading" style="display: none;">
           <div class="loader-content">
+            <div class="loader-logo" role="img" aria-label="AeroNav">
+              <img src="/assets/logo-mark.webp" alt="" class="loader-mark" width="224" height="177" />
+              <img src="/assets/logo-wordmark.webp" alt="" class="loader-wordmark" width="757" height="177" />
+            </div>
             <div class="spinner"></div>
             <div class="loading-text">Loading chart...</div>
           </div>
