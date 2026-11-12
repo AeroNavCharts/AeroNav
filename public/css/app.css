@@ -1015,6 +1015,14 @@ svg {
     font-weight: 500;
 }
 
+.link-note {
+    margin: 0;
+    padding: 14px 12px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
 .link-row:hover {
     background: rgba(255, 255, 255, 0.05);
     text-decoration: none;
