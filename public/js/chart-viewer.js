@@ -23,7 +23,10 @@ class ChartViewer {
         this.planeEl = document.createElement('div');
         this.planeEl.className = 'chart-plane';
         this.planeEl.hidden = true;
-        this.planeEl.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 27.5 27.5Q16 19 4.5 27.5Z"/></svg>';
+        this.planeImg = document.createElement('img');
+        this.planeImg.alt = '';
+        this.planeImg.draggable = false;
+        this.planeEl.appendChild(this.planeImg);
         this.plane = null;
         this.picker = null;
         this.tapStart = null;
@@ -327,6 +330,11 @@ class ChartViewer {
         }
         const k = this.unit;
         const [sx, sy] = this.spin(p.u * k, p.v * k);
+        const kind = p.kind || 'airliner';
+        if (this.planeEl.dataset.kind !== kind) {
+            this.planeEl.dataset.kind = kind;
+            this.planeImg.src = `/assets/planes/${kind}.png`;
+        }
         this.planeEl.hidden = false;
         const size = Math.max(0.75, Math.min(1.9, Math.sqrt(this.scale / this.fitScale)));
         this.planeEl.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg) scale(${size})`;

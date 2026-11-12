@@ -96,6 +96,14 @@ class Ownship {
         return [a, b, mu - a * mx - b * my, d, e, mv - d * mx - e * my];
     }
 
+    static kind(type) {
+        const name = String(type || '').toLowerCase();
+        if (/concorde/.test(name)) return 'concorde';
+        if (/cessna|c172|c182|caravan|atr|dhc|otter|piper|cub|diamond|da\d|extra|p-?51|mustang|spitfire|hurricane|king air|q400|dash|c-?130|hercules|bearcat|corsair|stearman|pitts|kodiak|pc-?12|tbm|saab 340|fokker 50|cirrus sr/.test(name)) return 'prop';
+        if (/cirrus vision|learjet|citation|gulfstream|falcon|challenger|global|phenom|hondajet|\bf-?\d|mig|\bsu-?\d|hawk|eurofighter|typhoon|rafale|gripen|harrier|\ba-?10\b|t-?38|l-?39|phantom|tomcat|hornet|raptor|lightning|viper/.test(name)) return 'jet';
+        return 'airliner';
+    }
+
     geoFor(id) {
         if (!id) return null;
         const local = this.readJson(this.geoKey)[id];
@@ -113,7 +121,7 @@ class Ownship {
         const gy = Math.cos(h) * south;
         const px = a * gx + b * gy;
         const py = d * gx + e * gy;
-        return { u: a * x + b * y + c, v: d * x + e * y + f, heading: (Math.atan2(px, -py) * 180) / Math.PI };
+        return { u: a * x + b * y + c, v: d * x + e * y + f, heading: (Math.atan2(px, -py) * 180) / Math.PI, kind: Ownship.kind(entry.aircraftType) };
     }
 
     find() {
@@ -275,6 +283,7 @@ class Ownship {
                 u: from.u + (target.u - from.u) * t,
                 v: from.v + (target.v - from.v) * t,
                 heading: from.heading + swing * t,
+                kind: target.kind,
             };
             this.viewer.setPlane(this.shown);
             if (t < 1) this.frame = requestAnimationFrame(step);
