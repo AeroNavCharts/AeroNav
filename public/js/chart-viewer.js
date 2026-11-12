@@ -28,6 +28,7 @@ class ChartViewer {
         this.planeImg.draggable = false;
         this.planeEl.appendChild(this.planeImg);
         this.plane = null;
+        this.route = null;
         this.picker = null;
         this.tapStart = null;
         this.stage.append(this.img, this.ink, this.planeEl);
@@ -317,6 +318,38 @@ class ChartViewer {
         this.placePlane();
     }
 
+    setRoute(route) {
+        this.route = route && route.length > 1 ? route : null;
+        this.renderInk();
+    }
+
+    drawRoute(ctx, k) {
+        const route = this.route;
+        if (!route) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, this.natW * this.scale, this.natH * this.scale);
+        ctx.clip();
+        ctx.strokeStyle = 'rgba(150, 70, 210, 0.55)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        route.forEach(([u, v], i) => {
+            if (i) ctx.lineTo(u * k, v * k);
+            else ctx.moveTo(u * k, v * k);
+        });
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = 'rgba(120, 50, 180, 0.95)';
+        ctx.lineWidth = 2;
+        route.forEach(([u, v]) => {
+            ctx.beginPath();
+            ctx.arc(u * k, v * k, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        });
+        ctx.restore();
+    }
+
     setPlane(plane) {
         this.plane = plane;
         this.placePlane();
@@ -336,7 +369,7 @@ class ChartViewer {
             this.planeImg.src = `/assets/planes/${kind}.png`;
         }
         this.planeEl.hidden = false;
-        const size = Math.max(0.75, Math.min(1.9, Math.sqrt(this.scale / this.fitScale)));
+        const size = Math.max(0.8, Math.min(1.6, Math.sqrt(this.scale / this.fitScale)));
         this.planeEl.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg) scale(${size})`;
     }
 
@@ -463,13 +496,14 @@ class ChartViewer {
         const dpr = window.devicePixelRatio || 1;
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.ink.width, this.ink.height);
-        if (!this.natW || !this.marks.length) return;
+        if (!this.natW || (!this.marks.length && !this.route)) return;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         const k = this.unit;
         ctx.translate(this.x, this.y);
         ctx.rotate((this.rotation * Math.PI) / 180);
+        this.drawRoute(ctx, k);
         const sx = (u) => u * k;
         const sy = (v) => v * k;
         this.marks.forEach((m) => {

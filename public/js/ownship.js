@@ -15,6 +15,8 @@ class Ownship {
         this.retry = null;
         this.retryDelay = 2000;
         this.fleets = { main: {}, event: {} };
+        this.plans = { main: [], event: [] };
+        this.plan = null;
         this.mine = null;
         this.callsign = '';
         this.shown = null;
@@ -138,6 +140,36 @@ class Ownship {
         return null;
     }
 
+    findPlan(found) {
+        if (!found) return null;
+        const tidy = (value) => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const player = tidy(found.entry.playerName);
+        const callsign = tidy(found.callsign);
+        let best = null;
+        [...this.plans.main, ...this.plans.event].forEach((plan) => {
+            if (!plan) return;
+            const mine = tidy(plan.robloxName) === player || tidy(plan.realcallsign) === callsign;
+            if (mine && (!best || (plan.filedAt || 0) >= (best.filedAt || 0))) best = plan;
+        });
+        return best;
+    }
+
+    static routePoints(plan) {
+        if (!plan || typeof NAV_FIXES === 'undefined' || typeof NAV_AIRPORTS === 'undefined') return [];
+        const points = [];
+        const push = (pos) => {
+            const last = points[points.length - 1];
+            if (pos && !(last && last[0] === pos[0] && last[1] === pos[1])) points.push(pos);
+        };
+        const code = (value) => String(value || '').trim().toUpperCase();
+        push(NAV_AIRPORTS[code(plan.departing)]);
+        code(plan.route).split(/[^A-Z0-9]+/).forEach((token) => {
+            if (token) push(NAV_FIXES[token] || NAV_AIRPORTS[token] || NAV_FIXES[token.replace(/\d[A-Z]?$/, '')]);
+        });
+        push(NAV_AIRPORTS[code(plan.arriving)]);
+        return points;
+    }
+
     async askName() {
         const label = 'Your Roblox username or callsign on the ATC24 server';
         if (!window.Swal) {
@@ -188,6 +220,8 @@ class Ownship {
         else {
             this.disconnect();
             this.mine = null;
+            this.plan = null;
+            this.viewer.setRoute(null);
             this.place(null);
         }
         this.render();
@@ -217,6 +251,10 @@ class Ownship {
             if (!message || typeof message.d !== 'object' || !message.d) return;
             if (message.t === 'ACFT_DATA') this.fleets.main = message.d;
             else if (message.t === 'EVENT_ACFT_DATA') this.fleets.event = message.d;
+            else if (message.t === 'FLIGHT_PLAN_LIST' && Array.isArray(message.d)) this.plans.main = message.d;
+            else if (message.t === 'EVENT_FLIGHT_PLAN_LIST' && Array.isArray(message.d)) this.plans.event = message.d;
+            else if (message.t === 'FLIGHT_PLAN' && !Array.isArray(message.d)) this.plans.main = [...this.plans.main, message.d];
+            else if (message.t === 'EVENT_FLIGHT_PLAN' && !Array.isArray(message.d)) this.plans.event = [...this.plans.event, message.d];
             else return;
             this.update();
         });
@@ -255,6 +293,10 @@ class Ownship {
         this.callsign = found ? found.callsign : '';
         const id = this.viewer.chartId;
         const geo = this.geoFor(id);
+        this.plan = this.findPlan(found);
+        const [a, b, c, d, e, f] = geo || [];
+        const route = geo ? Ownship.routePoints(this.plan).map(([x, y]) => [a * x + b * y + c, d * x + e * y + f]) : [];
+        this.viewer.setRoute(route);
         this.place(found && geo ? this.project(geo, found.entry) : null, id);
         this.render();
     }
@@ -295,7 +337,9 @@ class Ownship {
         if (!this.enabled) return '';
         if (!this.mine) return `Looking for ${this.name} on ATC24`;
         if (!this.geoFor(this.viewer.chartId)) return `${this.callsign}: no position on this chart`;
-        return `Tracking ${this.callsign}`;
+        const plan = this.plan;
+        const leg = plan && plan.departing && plan.arriving ? `, ${plan.departing} to ${plan.arriving}` : '';
+        return `Tracking ${this.callsign}${leg}`;
     }
 
     render() {

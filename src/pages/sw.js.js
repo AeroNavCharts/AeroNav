@@ -10,6 +10,7 @@ const precache = [
   versioned('/js/data.js'),
   versioned('/js/scratchpad.js'),
   versioned('/js/chart-viewer.js'),
+  versioned('/js/navdata.js'),
   versioned('/js/ownship.js'),
   versioned('/js/install.js'),
   versioned('/js/scripts.js'),
