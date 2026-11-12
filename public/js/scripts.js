@@ -198,6 +198,12 @@ function updateFavButton(airport) {
     favBtn.setAttribute('aria-label', label);
 }
 
+function playPinDrop(button) {
+    button.classList.remove('pin-drop');
+    void button.offsetWidth;
+    button.classList.add('pin-drop');
+}
+
 function isPinned(icao, id) {
     return pinned.some(p => p.icao === icao && p.id === id);
 }
@@ -235,6 +241,7 @@ function buildChartRow(chart, airport) {
         } else {
             pinChart(chartObj);
             pin.classList.add('pinned');
+            playPinDrop(pin);
         }
     });
     row.appendChild(main);
@@ -570,7 +577,7 @@ function init() {
     const zoomFitBtn = document.getElementById('zoomFitBtn');
     if (zoomInBtn) zoomInBtn.addEventListener('click', () => chartViewer.zoomBy(1.4));
     if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => chartViewer.zoomBy(1 / 1.4));
-    if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => chartViewer.fit());
+    if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => chartViewer.fitSmooth());
     const rotateLeftBtn = document.getElementById('rotateLeftBtn');
     const rotateRightBtn = document.getElementById('rotateRightBtn');
     if (rotateLeftBtn) rotateLeftBtn.addEventListener('click', () => chartViewer.rotateBy(-90));
@@ -1268,8 +1275,12 @@ function loadChartInViewer(chartObj, opts = {}) {
     pinCurrentBtn.onclick = () => {
         if (!chartObj || !chartObj.id) return;
         const icao = chartIcao(chartObj);
-        if (isPinned(icao, chartObj.id)) unpin({ icao, id: chartObj.id });
-        else pinChart(chartObj);
+        if (isPinned(icao, chartObj.id)) {
+            unpin({ icao, id: chartObj.id });
+            return;
+        }
+        pinChart(chartObj);
+        playPinDrop(pinCurrentBtn);
     };
     currentChart = chartObj;
     updatePinCurrent();
