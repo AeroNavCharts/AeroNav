@@ -15,7 +15,11 @@
 
     const ua = navigator.userAgent;
     const isIos = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /android/i.test(ua);
+    const PITCH = 'Charts open instantly and work offline.';
     const IOS_STEPS = 'Tap the Share button, then "Add to Home Screen".';
+    const ANDROID_STEPS = 'Tap the browser menu (three dots), then "Install app" or "Add to Home screen".';
+    const manualSteps = isIos ? IOS_STEPS : isAndroid ? ANDROID_STEPS : '';
 
     let deferredPrompt = null;
 
@@ -26,18 +30,15 @@
         try { localStorage.setItem(key, value); } catch (error) { return; }
     };
 
-    const canInstall = () => Boolean(deferredPrompt) || isIos;
+    const canInstall = () => Boolean(deferredPrompt) || Boolean(manualSteps);
 
     const refresh = () => {
         linkRow.hidden = !canInstall();
         const earned = Number(read(OPENS_KEY) || 0) >= OPENS_NEEDED;
         nudge.hidden = !(canInstall() && earned && read(DISMISSED_KEY) !== '1');
-        if (isIos && !deferredPrompt) {
-            nudgeSub.textContent = IOS_STEPS;
-            nudgeGo.hidden = true;
-        } else {
-            nudgeGo.hidden = false;
-        }
+        const manual = !deferredPrompt && Boolean(manualSteps);
+        nudgeSub.textContent = manual ? manualSteps : PITCH;
+        nudgeGo.hidden = manual;
     };
 
     const dismiss = () => {
@@ -54,12 +55,11 @@
             dismiss();
             return;
         }
-        if (isIos) {
-            if (window.Swal) {
-                window.Swal.fire({ title: 'Install AeroNav', text: IOS_STEPS, confirmButtonText: 'Got it' });
-            } else {
-                window.alert(IOS_STEPS);
-            }
+        if (!manualSteps) return;
+        if (window.Swal) {
+            window.Swal.fire({ title: 'Install AeroNav', text: manualSteps, confirmButtonText: 'Got it' });
+        } else {
+            window.alert(manualSteps);
         }
     };
 
