@@ -10,6 +10,12 @@ const zoomReadout = document.getElementById('zoomReadout');
 const chartViewer = new ChartViewer(chartWrap, {
     onZoom: (percent) => {
         if (zoomReadout) zoomReadout.textContent = `${percent}%`;
+    },
+    onDrawMode: (on) => {
+        const drawBtn = document.getElementById('drawBtn');
+        if (!drawBtn) return;
+        drawBtn.classList.toggle('active', on);
+        drawBtn.setAttribute('aria-pressed', String(on));
     }
 });
 let chartLoadToken = 0;
@@ -296,6 +302,14 @@ function setupQuickActions() {
     const quickRefresh = document.getElementById('quickRefresh');
     const quickFullscreen = document.getElementById('quickFullscreen');
     const quickShare = document.getElementById('quickShare');
+    const quickDraw = document.getElementById('quickDraw');
+
+    if (quickDraw) {
+        quickDraw.addEventListener('click', () => {
+            chartViewer.setDrawMode(!chartViewer.drawMode);
+            closeQuickActions();
+        });
+    }
     
     if (quickHome) {
         quickHome.addEventListener('click', () => {
@@ -554,6 +568,8 @@ function init() {
     if (zoomInBtn) zoomInBtn.addEventListener('click', () => chartViewer.zoomBy(1.4));
     if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => chartViewer.zoomBy(1 / 1.4));
     if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => chartViewer.fit());
+    const drawBtn = document.getElementById('drawBtn');
+    if (drawBtn) drawBtn.addEventListener('click', () => chartViewer.setDrawMode(!chartViewer.drawMode));
     const refreshBtn = document.getElementById('refreshBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const shareBtn = document.getElementById('shareBtn');

@@ -1623,8 +1623,37 @@ iframe {
 
 .pad-mode .chart-tools,
 .pad-mode .zoom-readout,
-.pad-mode .chart-stage {
+.pad-mode .chart-stage,
+.pad-mode .chart-ink-tools {
     display: none;
+}
+
+.chart-ink {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.chart-ink-tools {
+    z-index: 5;
+}
+
+.chart-ink-tools[hidden] {
+    display: none;
+}
+
+.chart-stage.drawing-mode {
+    cursor: crosshair;
+}
+
+.chart-stage.drawing-mode[data-tool="eraser"] {
+    cursor: cell;
+}
+
+.chart-stage.drawing-mode[data-tool="text"] {
+    cursor: text;
 }
 
 .chart-stage {
@@ -2090,7 +2119,7 @@ iframe {
 
     .quick-actions-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 8px;
     }
 

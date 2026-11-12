@@ -222,6 +222,12 @@ import LoaderLogo from '../components/LoaderLogo.astro';
                 <path d="M9 12H7m0 0 1.5-1.5M7 12l1.5 1.5M15 12h2m0 0-1.5-1.5M17 12l-1.5 1.5" />
               </svg>
             </button>
+            <button class="icon-btn zoom-tool" id="drawBtn" aria-label="Draw on chart" title="Draw on chart" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 20l4-1 11-11-3-3L5 16l-1 4Z" />
+                <path d="m14 6 3 3" />
+              </svg>
+            </button>
             <button class="icon-btn" id="shareBtn" aria-label="Copy link" title="Copy link">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <circle cx="18" cy="5" r="2.5" />
@@ -310,6 +316,13 @@ import LoaderLogo from '../components/LoaderLogo.astro';
               <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
             </svg>
             <span>Fullscreen</span>
+          </button>
+          <button class="quick-action-btn" id="quickDraw">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M4 20l4-1 11-11-3-3L5 16l-1 4Z" />
+              <path d="m14 6 3 3" />
+            </svg>
+            <span>Draw</span>
           </button>
           <button class="quick-action-btn" id="quickShare">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
