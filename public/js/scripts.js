@@ -280,9 +280,16 @@ function toggleMobileSearch() {
 
 let listEnterTimer = null;
 
-function animateList() {
+function slideDirection(button) {
+    const siblings = Array.from(button.parentElement.children);
+    const previous = siblings.findIndex(el => el.classList.contains('active'));
+    return siblings.indexOf(button) < previous ? 'left' : 'right';
+}
+
+function animateList(direction) {
     clearTimeout(listEnterTimer);
     listInner.classList.remove('list-enter');
+    listInner.dataset.slide = direction || 'up';
     void listInner.offsetWidth;
     listInner.classList.add('list-enter');
     listEnterTimer = setTimeout(() => listInner.classList.remove('list-enter'), 600);
@@ -547,7 +554,7 @@ function init() {
             leftSearch.placeholder = 'Filter charts and airports';
         }
         renderAirportList();
-        animateList();
+        animateList('left');
     });
 
     railButtons.forEach(btn => {
@@ -558,24 +565,29 @@ function init() {
         b.style.setProperty('--c', 'var(--accent)');
         b.addEventListener('click', e => {
             e.stopPropagation();
-            if (!b.disabled) setAirportTab(b.dataset.tab);
+            if (b.disabled) return;
+            const direction = slideDirection(b);
+            setAirportTab(b.dataset.tab);
+            animateList(direction);
         });
     });
     weatherTabs.querySelectorAll('[data-wx]').forEach(b => {
         b.addEventListener('click', e => {
             e.stopPropagation();
+            const direction = slideDirection(b);
             weatherTab = b.dataset.wx;
             renderChartList();
-            animateList();
+            animateList(direction);
         });
     });
     infoTabs.querySelectorAll('[data-info]').forEach(b => {
         b.style.setProperty('--c', 'var(--accent)');
         b.addEventListener('click', e => {
             e.stopPropagation();
+            const direction = slideDirection(b);
             infoTab = b.dataset.info;
             renderChartList();
-            animateList();
+            animateList(direction);
         });
     });
 
@@ -706,7 +718,7 @@ function openAirport(idx) {
     currentCategory = cats.includes('STAR') ? 'STAR' : cats[0] || '';
     renderCategoryBar(cats);
     renderChartList();
-    animateList();
+    animateList('right');
 }
 
 function renderCategoryBar(cats) {
@@ -723,13 +735,14 @@ function renderCategoryBar(cats) {
         }
         btn.addEventListener('click', e => {
             e.stopPropagation();
+            const direction = slideDirection(btn);
             currentCategory = cat;
             Array.from(categoryBar.children).forEach(ch => {
                 ch.classList.remove('active');
             });
             btn.classList.add('active');
             renderChartList();
-            animateList();
+            animateList(direction);
         });
         categoryBar.appendChild(btn);
     });
@@ -1695,7 +1708,7 @@ function openAirportView(idx) {
     infoTab = 'general';
     renderCategoryBarView(cats);
     renderChartListView();
-    animateList();
+    animateList('right');
 }
 
 function renderCategoryBarView(cats) {
@@ -1712,13 +1725,14 @@ function renderCategoryBarView(cats) {
         }
         btn.addEventListener('click', e => {
             e.stopPropagation();
+            const direction = slideDirection(btn);
             currentCategory = cat;
             Array.from(categoryBar.children).forEach(ch => {
                 ch.classList.remove('active');
             });
             btn.classList.add('active');
             renderChartListView();
-            animateList();
+            animateList(direction);
         });
         categoryBar.appendChild(btn);
     });

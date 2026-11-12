@@ -791,6 +791,7 @@ svg {
 .list {
     flex: 1;
     min-height: 0;
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
 }
@@ -2279,8 +2280,16 @@ iframe {
 @keyframes list-row-in {
     from {
         opacity: 0;
-        translate: 0 8px;
+        translate: var(--list-shift, 0 8px);
     }
+}
+
+.list-enter[data-slide="right"] {
+    --list-shift: 28px 0;
+}
+
+.list-enter[data-slide="left"] {
+    --list-shift: -28px 0;
 }
 
 @keyframes pin-drop {
