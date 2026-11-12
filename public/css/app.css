@@ -2277,6 +2277,54 @@ iframe {
     }
 }
 
+@keyframes panel-in-right {
+    from {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes panel-in-left {
+    from {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes panel-out-left {
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes panel-out-right {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.panel.pushing {
+    overflow: hidden;
+}
+
+.panel-ghost {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    background: var(--panel-bg);
+    animation: panel-out-left 0.32s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+
+.panel-ghost[data-push="left"] {
+    animation-name: panel-out-right;
+}
+
+.panel-push-in {
+    animation: panel-in-right 0.32s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+
+.panel-push-in[data-push="left"] {
+    animation-name: panel-in-left;
+}
+
 @keyframes list-row-in {
     from {
         opacity: 0;

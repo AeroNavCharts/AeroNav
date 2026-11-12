@@ -280,6 +280,50 @@ function toggleMobileSearch() {
 
 let listEnterTimer = null;
 
+let panelPushTimer = null;
+let panelGhost = null;
+
+function endPanelPush() {
+    clearTimeout(panelPushTimer);
+    if (panelGhost) panelGhost.remove();
+    panelGhost = null;
+    const view = panelViews.airports;
+    if (view) view.classList.remove('panel-push-in');
+    if (leftCol) leftCol.classList.remove('pushing');
+}
+
+function pushPanel(direction, change) {
+    const view = panelViews.airports;
+    endPanelPush();
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!view || !leftCol || still || !view.classList.contains('active') || !view.offsetWidth) {
+        change();
+        return;
+    }
+    const list = view.querySelector('.list');
+    const scrolled = list ? list.scrollTop : 0;
+    const ghost = view.cloneNode(true);
+    ghost.classList.add('panel-ghost');
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.inert = true;
+    ghost.dataset.push = direction;
+    ghost.style.top = view.offsetTop + 'px';
+    ghost.style.left = view.offsetLeft + 'px';
+    ghost.style.width = view.offsetWidth + 'px';
+    ghost.style.height = view.offsetHeight + 'px';
+    leftCol.classList.add('pushing');
+    leftCol.appendChild(ghost);
+    const ghostList = ghost.querySelector('.list');
+    if (ghostList) ghostList.scrollTop = scrolled;
+    panelGhost = ghost;
+    change();
+    if (list) list.scrollTop = 0;
+    view.dataset.push = direction;
+    void view.offsetWidth;
+    view.classList.add('panel-push-in');
+    panelPushTimer = setTimeout(endPanelPush, 340);
+}
+
 function slideDirection(button) {
     const siblings = Array.from(button.parentElement.children);
     const previous = siblings.findIndex(el => el.classList.contains('active'));
@@ -539,7 +583,7 @@ function init() {
     if (mobileSearch) {
         mobileSearch.addEventListener('input', onSearch);
     }
-    backBtn.addEventListener('click', () => {
+    backBtn.addEventListener('click', () => pushPanel('left', () => {
         currentAirport = null;
         currentCategory = null;
         backBtn.classList.add('hidden');
@@ -554,8 +598,7 @@ function init() {
             leftSearch.placeholder = 'Filter charts and airports';
         }
         renderAirportList();
-        animateList('left');
-    });
+    }));
 
     railButtons.forEach(btn => {
         btn.addEventListener('click', () => showPanel(btn.dataset.panel));
@@ -1691,6 +1734,10 @@ function renderAirportList(filter) {
 }
 
 function openAirportView(idx) {
+    pushPanel('right', () => showAirportView(idx));
+}
+
+function showAirportView(idx) {
     currentAirport = idx;
     backBtn.classList.remove('hidden');
     showPanel('airports');
@@ -1708,7 +1755,6 @@ function openAirportView(idx) {
     infoTab = 'general';
     renderCategoryBarView(cats);
     renderChartListView();
-    animateList('right');
 }
 
 function renderCategoryBarView(cats) {
