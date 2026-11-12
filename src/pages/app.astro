@@ -199,6 +199,24 @@ import LoaderLogo from '../components/LoaderLogo.astro';
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
               </svg>
             </button>
+            <button class="icon-btn zoom-tool" id="zoomInBtn" aria-label="Zoom in" title="Zoom in">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.6-3.6M11 8v6M8 11h6" />
+              </svg>
+            </button>
+            <button class="icon-btn zoom-tool" id="zoomOutBtn" aria-label="Zoom out" title="Zoom out">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.6-3.6M8 11h6" />
+              </svg>
+            </button>
+            <button class="icon-btn zoom-tool" id="zoomFitBtn" aria-label="Fit chart to screen" title="Fit to screen">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="4" y="6" width="16" height="12" rx="1.5" />
+                <path d="M9 12H7m0 0 1.5-1.5M7 12l1.5 1.5M15 12h2m0 0-1.5-1.5M17 12l-1.5 1.5" />
+              </svg>
+            </button>
             <button class="icon-btn" id="shareBtn" aria-label="Copy link" title="Copy link">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <circle cx="18" cy="5" r="2.5" />
@@ -233,6 +251,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
               <div class="loading-text">Loading chart...</div>
             </div>
           </div>
+          <div class="zoom-readout" id="zoomReadout" aria-live="polite" hidden></div>
           <iframe id="viewerFrame" src="about:blank" title="Aeronav chart viewer"></iframe>
         </div>
 
@@ -302,6 +321,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
 
     <script is:inline src="/js/data.js"></script>
     <script is:inline src="/js/scratchpad.js"></script>
+    <script is:inline src="/js/chart-viewer.js"></script>
     <script is:inline src="/js/scripts.js" defer></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </body>

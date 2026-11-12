@@ -6,6 +6,29 @@ const categoryBar = document.getElementById('categoryBar');
 const viewerFrame = document.getElementById('viewerFrame');
 const chartWrap = document.querySelector('.iframe-wrap');
 const scratchpad = new Scratchpad(chartWrap, { onChange: () => renderPinned() });
+const zoomReadout = document.getElementById('zoomReadout');
+const chartViewer = new ChartViewer(chartWrap, {
+    onZoom: (percent) => {
+        if (zoomReadout) zoomReadout.textContent = `${percent}%`;
+    }
+});
+let chartLoadToken = 0;
+
+function setViewerMode(mode) {
+    chartWrap.classList.toggle('image-mode', mode === 'image');
+    if (zoomReadout) zoomReadout.hidden = mode !== 'image';
+    viewerFrame.hidden = mode === 'image';
+}
+
+function showChartInFrame(link) {
+    chartViewer.hide();
+    setViewerMode('frame');
+    viewerFrame.src = toPreview(link) || 'about:blank';
+}
+
+viewerFrame.addEventListener('load', () => {
+    if (!chartViewer.active) hideLoader();
+});
 let currentPadId = null;
 const viewerLoading = document.getElementById('viewerLoading');
 const viewerTitle = document.getElementById('viewerTitle');
@@ -424,7 +447,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+let loaderHideTimer = null;
+
 function showLoader() {
+    clearTimeout(loaderHideTimer);
     viewerLoading.style.display = 'flex';
     viewerLoading.style.opacity = '1';
 }
@@ -433,7 +459,8 @@ function showLoader() {
 
 function hideLoader() {
     viewerLoading.style.opacity = '0';
-    setTimeout(() => {
+    clearTimeout(loaderHideTimer);
+    loaderHideTimer = setTimeout(() => {
         viewerLoading.style.display = 'none';
     }, 500);
 
@@ -520,6 +547,12 @@ function init() {
         });
     }
 
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const zoomFitBtn = document.getElementById('zoomFitBtn');
+    if (zoomInBtn) zoomInBtn.addEventListener('click', () => chartViewer.zoomBy(1.4));
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => chartViewer.zoomBy(1 / 1.4));
+    if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => chartViewer.fit());
     const refreshBtn = document.getElementById('refreshBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const shareBtn = document.getElementById('shareBtn');
@@ -1222,7 +1255,20 @@ function loadChartInViewer(chartObj, opts = {}) {
     closeScratchpad();
     showLoader();
     const link = chartObj.link || null;
-    viewerFrame.src = toPreview(link) || 'about:blank';
+    const loadToken = ++chartLoadToken;
+    const driveId = ChartViewer.driveId(link);
+    if (driveId) {
+        chartViewer.load(driveId).then((shown) => {
+            if (!shown || loadToken !== chartLoadToken) return;
+            setViewerMode('image');
+            if (viewerFrame.getAttribute('src') !== 'about:blank') viewerFrame.src = 'about:blank';
+            hideLoader();
+        }).catch(() => {
+            if (loadToken === chartLoadToken) showChartInFrame(link);
+        });
+    } else {
+        showChartInFrame(link);
+    }
     const icao = chartObj.airportIcao || chartObj.icao || '';
     viewerTitle.textContent = `${icao} — ${chartObj.id || ''} ${chartObj.title ? '- ' + chartObj.title : ''}`;
     viewerSub.textContent = chartObj.category || '';
@@ -1235,7 +1281,6 @@ function loadChartInViewer(chartObj, opts = {}) {
     currentChart = chartObj;
     updatePinCurrent();
     markActivePin();
-    viewerFrame.addEventListener('load', hideLoader);
     const hid = getHotId(chartObj);
     if (hid) {
         const targetHash = `#${hid}`;
