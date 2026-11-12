@@ -31,6 +31,10 @@ body {
     overflow-x: hidden;
 }
 
+body.home {
+    overflow-x: clip;
+}
+
 a {
     color: var(--blue-text);
     text-decoration: none;
@@ -78,12 +82,43 @@ h3 {
 
 .logo-link {
     display: flex;
+    align-items: center;
+}
+
+.logo-mark,
+.logo-wordmark {
+    --logo-h: 34px;
+    display: block;
+    height: var(--logo-h);
+}
+
+.logo-mark {
+    width: auto;
+}
+
+.logo-wordmark {
+    width: calc(var(--logo-h) * 757 / 177);
+    object-fit: cover;
+    object-position: left center;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.header.is-scrolled .logo-wordmark {
+    width: 0;
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .logo-wordmark {
+        transition: none;
+    }
 }
 
 .logo {
     width: 132px;
     height: 48px;
     object-fit: contain;
+    object-position: left center;
 }
 
 .nav {
@@ -92,6 +127,7 @@ h3 {
 }
 
 .nav-btn {
+    white-space: nowrap;
     padding: 8px 14px;
     border-radius: 6px;
     color: var(--text);
@@ -102,6 +138,77 @@ h3 {
 .nav-btn:hover {
     background: rgba(255, 255, 255, 0.07);
     text-decoration: none;
+}
+
+.nav-toggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: #333f52;
+    border: 1px solid #3b495e;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--text);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .nav-toggle span {
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+}
+
+.nav-open .nav-toggle span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.nav-open .nav-toggle span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-open .nav-toggle span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 640px) {
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 12px 14px;
+        background: var(--header);
+        border-bottom: 1px solid var(--line);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-open .nav {
+        display: flex;
+    }
+
+    .nav .nav-btn {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
 }
 
 .btn {
@@ -134,8 +241,8 @@ h3 {
 
 .hero-chart {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
-    gap: 56px;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 48px;
     align-items: center;
     max-width: 1180px;
     margin: 0 auto;
@@ -161,21 +268,79 @@ h3 {
     gap: 10px;
 }
 
+.plate-wrap {
+    position: relative;
+    margin: 0;
+}
+
+.plate-wrap[hidden] {
+    display: none;
+}
+
 .plate-caption {
-    margin: 28px 0 0;
+    margin: 14px 0 0;
     font-size: 13px;
     color: var(--muted);
 }
 
 .plate {
     display: block;
-    height: 560px;
     overflow: hidden;
-    background: #d8ebf5;
+    background: #fff;
     border: 1px solid var(--line);
     border-radius: 4px;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
-    transform: rotate(1.5deg);
+    transform: rotate(1deg);
+}
+
+.plate {
+    position: relative;
+}
+
+.plate img {
+    transition: opacity 0.5s ease;
+}
+
+.plate.building {
+    transform: none;
+}
+
+.plate.building > img {
+    opacity: 0;
+}
+
+.plate.settling {
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.plate-build {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.plate-build.done {
+    opacity: 0;
+}
+
+.plate-build img {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    animation: band-in 0.45s ease-out forwards;
+}
+
+@keyframes band-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 .plate:hover {
@@ -527,8 +692,9 @@ a.course-card:hover {
 }
 
 .footer-logo {
-    width: 100px;
-    height: 36px;
+    display: block;
+    width: auto;
+    height: 30px;
 }
 
 .footer-text {
@@ -550,8 +716,11 @@ a.course-card:hover {
         padding: 36px 20px 48px;
     }
 
+    .plate-wrap {
+        width: 100%;
+    }
+
     .plate {
-        height: 380px;
         transform: none;
     }
 
@@ -575,9 +744,9 @@ a.course-card:hover {
         height: 40px;
     }
 
-    .nav-btn {
-        padding: 8px 9px;
-        font-size: 13px;
+    .logo-mark,
+    .logo-wordmark {
+        --logo-h: 28px;
     }
 
     .facts {
@@ -585,7 +754,29 @@ a.course-card:hover {
     }
 
     .amounts {
-        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .amount {
+        padding: 14px;
+    }
+
+    .amount-value {
+        font-size: 24px;
+    }
+
+    .title-actions .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+
+    .course-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .course-card {
+        padding: 14px;
     }
 
     .airport-index .icao {

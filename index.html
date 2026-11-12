@@ -18,8 +18,14 @@
 <body class="home">
   <div class="landing-wrap">
     <header class="header">
-      <a href="/" class="logo-link"><img class="logo" src="/assets/aerologo.webp" alt="AeroNav"></a>
-      <nav class="nav" aria-label="Main">
+      <a href="/" class="logo-link" aria-label="AeroNav home">
+        <img class="logo-mark" src="/assets/logo-mark.webp" alt="" width="224" height="177">
+        <img class="logo-wordmark" src="/assets/logo-wordmark.webp" alt="" width="757" height="177">
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open menu">
+              <span></span><span></span><span></span>
+            </button>
+            <nav class="nav" id="siteNav" aria-label="Main">
         <a href="/app" class="nav-btn">Chart viewer</a>
         <a href="/academy" class="nav-btn">AeroAcademy</a>
         <a href="/donate" class="nav-btn">Donate</a>
@@ -35,11 +41,13 @@
             <a href="/app" class="btn primary">Open the chart viewer</a>
             <a href="/academy" class="btn">AeroAcademy</a>
           </div>
-          <p class="plate-caption" id="plateCaption">Shown: Saint Barthelemy (IBTH) 10-2A, DINER 1 RNAV arrival.</p>
         </div>
-        <a class="plate" id="heroPlate" href="/app" aria-label="Open the DINER 1 RNAV arrival in the chart viewer">
-          <img id="plateImg" src="https://lh3.googleusercontent.com/d/1qnmyJcBAHwFrFCn5Zr_rziVGC3jB9xEk=w1400" crossorigin="anonymous" referrerpolicy="no-referrer" alt="DINER 1 RNAV arrival chart for Saint Barthelemy, IBTH 10-2A" width="1400" height="1980" fetchpriority="high">
-        </a>
+        <figure class="plate-wrap" id="plateWrap">
+          <a class="plate" id="heroPlate" href="/app" aria-label="Open the PERTH 2 departure in the chart viewer">
+            <img id="plateImg" src="https://lh3.googleusercontent.com/d/1GgJ0HLRRpu25ZGVWuhG_EX-xdByFveic=w1600" crossorigin="anonymous" referrerpolicy="no-referrer" alt="PERTH 2 RNAV departure chart for Perth Intl, IPPH 10-3C" width="1600" height="958" fetchpriority="high">
+          </a>
+          <figcaption class="plate-caption">Perth Intl (IPPH) 10-3C, PERTH 2 RNAV departure</figcaption>
+        </figure>
       </section>
 
       <section class="band">
@@ -102,7 +110,7 @@
     <footer class="footer">
       <div class="footer-content">
         <div>
-          <img class="logo footer-logo" src="/assets/aerologo.webp" alt="AeroNav">
+          <img class="footer-logo" src="/assets/logo-full.webp" alt="AeroNav" width="942" height="133">
           <p class="footer-text">
             &copy; 2025 Aeronav. All rights reserved.
             Initial UI by <a href="https://discord.com/users/1028160951125557258" target="_blank" rel="noopener">sweet_kid</a>.<br>
@@ -146,7 +154,7 @@
       AIRPORTS.forEach(function (a) {
         a.charts.forEach(function (c) {
           hot++;
-          if (!found && a.icao === 'IBTH' && c.id === '10-2A') found = hot;
+          if (!found && a.icao === 'IPPH' && c.id === '10-3C') found = hot;
         });
       });
       if (found) document.getElementById('heroPlate').href = '/app#' + found;
@@ -155,17 +163,18 @@
         if (!plateImg.dataset.retried) {
           plateImg.dataset.retried = '1';
           plateImg.removeAttribute('crossorigin');
-          plateImg.src = 'https://drive.google.com/thumbnail?id=1qnmyJcBAHwFrFCn5Zr_rziVGC3jB9xEk&sz=w1400';
+          plateImg.src = 'https://drive.google.com/thumbnail?id=1GgJ0HLRRpu25ZGVWuhG_EX-xdByFveic&sz=w1600';
           return;
         }
-        document.getElementById('heroPlate').hidden = true;
-        document.getElementById('plateCaption').hidden = true;
+        document.getElementById('plateWrap').hidden = true;
       });
       if (plateImg.complete && !plateImg.naturalWidth) plateImg.dispatchEvent(new Event('error'));
       document.getElementById('indexSummary').textContent =
         total + ' charts across ' + AIRPORTS.length + ' airports, plus the enroute chart.';
     })();
   </script>
+  <script src="/js/hero-draw.js"></script>
+  <script src="/js/site-nav.js"></script>
 </body>
 
 </html>

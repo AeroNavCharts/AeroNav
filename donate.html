@@ -20,7 +20,10 @@
     <div class="landing-wrap">
         <header class="header">
             <a href="/" class="logo-link"><img class="logo" src="/assets/aerologo.webp" alt="AeroNav"></a>
-            <nav class="nav" aria-label="Main">
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open menu">
+              <span></span><span></span><span></span>
+            </button>
+            <nav class="nav" id="siteNav" aria-label="Main">
                 <a href="/app" class="nav-btn">Chart viewer</a>
                 <a href="/academy" class="nav-btn">AeroAcademy</a>
                 <a href="/donate" class="nav-btn">Donate</a>
@@ -73,7 +76,7 @@
         <footer class="footer">
             <div class="footer-content">
                 <div>
-                    <img class="logo footer-logo" src="/assets/aerologo.webp" alt="Aeronav Charts Logo">
+                    <img class="footer-logo" src="/assets/logo-full.webp" alt="AeroNav" width="942" height="133">
                     <p class="footer-text">
                         &copy; 2025 AeroNav. All rights reserved.
                         Initial UI by
@@ -90,6 +93,7 @@
             </div>
         </footer>
     </div>
+  <script src="/js/site-nav.js"></script>
 </body>
 
 </html>

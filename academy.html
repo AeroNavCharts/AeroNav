@@ -19,7 +19,10 @@
     <div class="landing-wrap">
         <header class="header">
             <a href="/" class="logo-link"><img class="logo" src="/assets/aerologo.webp" alt="AeroNav"></a>
-            <nav class="nav" aria-label="Main">
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Open menu">
+              <span></span><span></span><span></span>
+            </button>
+            <nav class="nav" id="siteNav" aria-label="Main">
                 <a href="/app" class="nav-btn">Chart viewer</a>
                 <a href="/academy" class="nav-btn">AeroAcademy</a>
                 <a href="/donate" class="nav-btn">Donate</a>
@@ -39,43 +42,35 @@
                     <h2 class="band-title">Courses</h2>
                     <div class="course-grid">
                 <div class="course-card is-soon">
-                    <div class="course-num">Course 1</div>
-                    <h3>Coming soon</h3>
+                    <h3>Course 1</h3>
                     <span class="course-badge">Coming soon</span>
                 </div>
                 <div class="course-card is-soon">
-                    <div class="course-num">Course 2</div>
-                    <h3>Coming soon</h3>
+                    <h3>Course 2</h3>
                     <span class="course-badge">Coming soon</span>
                 </div>
                 <div class="course-card is-soon">
-                    <div class="course-num">Course 3</div>
-                    <h3>Coming soon</h3>
+                    <h3>Course 3</h3>
                     <span class="course-badge">Coming soon</span>
                 </div>
                 <div class="course-card is-soon">
-                    <div class="course-num">Course 4</div>
-                    <h3>Coming soon</h3>
+                    <h3>Course 4</h3>
                     <span class="course-badge">Coming soon</span>
                 </div>
                 <div class="course-card is-soon">
-                    <div class="course-num">Course 5</div>
-                    <h3>Coming soon</h3>
+                    <h3>Course 5</h3>
                     <span class="course-badge">Coming soon</span>
                 </div>
                 <div class="course-card is-soon">
-                    <div class="course-num">Course 6</div>
-                    <h3>Coming soon</h3>
+                    <h3>Course 6</h3>
                     <span class="course-badge">Coming soon</span>
                 </div>
                 <div class="course-card is-soon">
-                    <div class="course-num">Course 7</div>
-                    <h3>Coming soon</h3>
+                    <h3>Course 7</h3>
                     <span class="course-badge">Coming soon</span>
                 </div>
                 <div class="course-card is-soon">
-                    <div class="course-num">Course 8</div>
-                    <h3>Coming soon</h3>
+                    <h3>Course 8</h3>
                     <span class="course-badge">Coming soon</span>
                 </div>
                     </div>
@@ -86,7 +81,7 @@
         <footer class="footer">
             <div class="footer-content">
                 <div>
-                    <img class="logo footer-logo" src="/assets/aerologo.webp" alt="Aeronav Charts Logo">
+                    <img class="footer-logo" src="/assets/logo-full.webp" alt="AeroNav" width="942" height="133">
                     <p class="footer-text">&copy; 2025 Aeronav. All rights reserved.</p>
                 </div>
                 <div class="footer-links">
@@ -96,6 +91,7 @@
             </div>
         </footer>
     </div>
+  <script src="/js/site-nav.js"></script>
 </body>
 
 </html>
