@@ -1225,13 +1225,17 @@ function loadChartInViewer(chartObj, opts = {}) {
     const loadToken = ++chartLoadToken;
     const driveId = ChartViewer.driveId(link);
     if (driveId) {
-        chartViewer.load(driveId).then((shown) => {
+        const onShown = (shown) => {
             if (!shown || loadToken !== chartLoadToken) return;
             setViewerMode('image');
             if (viewerFrame.getAttribute('src') !== 'about:blank') viewerFrame.src = 'about:blank';
             hideLoader();
-        }).catch(() => {
-            if (loadToken === chartLoadToken) showChartInFrame(link);
+        };
+        chartViewer.load(driveId).then(onShown).catch(() => {
+            if (loadToken !== chartLoadToken) return;
+            chartViewer.loadPdf(driveId).then(onShown).catch(() => {
+                if (loadToken === chartLoadToken) showChartInFrame(link);
+            });
         });
     } else {
         showChartInFrame(link);

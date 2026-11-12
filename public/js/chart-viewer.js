@@ -56,7 +56,69 @@ class ChartViewer {
         return true;
     }
 
+    static pdfUrl(id) {
+        return `/chart-file/${id}`;
+    }
+
+    static pdfLib() {
+        if (!ChartViewer.pdfLibPromise) {
+            const base = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/';
+            ChartViewer.pdfLibPromise = Promise.all([
+                import(`${base}pdf.min.mjs`),
+                fetch(`${base}pdf.worker.min.mjs`).then((res) => res.blob())
+            ]).then(([lib, worker]) => {
+                const script = new Blob([worker], { type: 'text/javascript' });
+                lib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(script);
+                return lib;
+            }).catch((err) => {
+                ChartViewer.pdfLibPromise = null;
+                throw err;
+            });
+        }
+        return ChartViewer.pdfLibPromise;
+    }
+
+    async loadPdf(id) {
+        const token = ++this.token;
+        const [lib, data] = await Promise.all([
+            ChartViewer.pdfLib(),
+            fetch(ChartViewer.pdfUrl(id)).then((res) => {
+                if (!res.ok) throw new Error('download failed');
+                return res.arrayBuffer();
+            })
+        ]);
+        const doc = await lib.getDocument({ data }).promise;
+        if (doc.numPages !== 1) throw new Error('multi page document');
+        const page = await doc.getPage(1);
+        const base = page.getViewport({ scale: 1 });
+        const scale = Math.min(3200 / base.width, Math.sqrt(12000000 / (base.width * base.height)));
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(viewport.width);
+        canvas.height = Math.round(viewport.height);
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+        doc.destroy();
+        if (!blob) throw new Error('render failed');
+        const url = URL.createObjectURL(blob);
+        const rendered = await this.fetchImage(url);
+        if (token !== this.token) {
+            URL.revokeObjectURL(url);
+            return false;
+        }
+        this.show(rendered, true);
+        this.blobUrl = url;
+        return true;
+    }
+
+    releaseBlob() {
+        if (!this.blobUrl) return;
+        URL.revokeObjectURL(this.blobUrl);
+        this.blobUrl = null;
+    }
+
     show(source, reset) {
+        this.releaseBlob();
         const previous = this.natW || source.naturalWidth;
         this.natW = source.naturalWidth;
         this.natH = source.naturalHeight;
@@ -76,6 +138,7 @@ class ChartViewer {
     hide() {
         this.token++;
         this.stage.hidden = true;
+        this.releaseBlob();
         this.img.removeAttribute('src');
         this.natW = 0;
         this.natH = 0;
