@@ -2116,6 +2116,19 @@ iframe {
     }
 
     .chart-tools {
+        top: 8px;
+        left: 8px;
+        gap: 5px;
+    }
+
+    .chart-tools .icon-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .chart-tools #zoomInBtn,
+    .chart-tools #zoomOutBtn,
+    .chart-tools #rotateLeftBtn {
         display: none;
     }
 
