@@ -2,6 +2,7 @@
 import { versioned } from '../lib/assets.js';
 import BaseHead from '../components/BaseHead.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import IntroScreen from '../components/IntroScreen.astro';
 
 interface Props {
   title: string;
@@ -25,6 +26,7 @@ const { title, description, keywords, bodyClass } = Astro.props;
     />
   </head>
   <body class={bodyClass}>
+    <IntroScreen />
     <div class="landing-wrap">
       <SiteHeader />
       <main>
