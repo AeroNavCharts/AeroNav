@@ -1794,22 +1794,22 @@ iframe {
     position: absolute;
     top: 0;
     left: 0;
-    height: 46px;
+    height: 30px;
     max-width: none;
     transform: translate(-50%, -50%);
     filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.9)) drop-shadow(0 2px 4px rgba(20, 10, 40, 0.5));
 }
 
 .chart-plane[data-kind="concorde"] img {
-    height: 52px;
-}
-
-.chart-plane[data-kind="jet"] img {
     height: 34px;
 }
 
+.chart-plane[data-kind="jet"] img {
+    height: 22px;
+}
+
 .chart-plane[data-kind="prop"] img {
-    height: 32px;
+    height: 22px;
 }
 
 .chart-stage.picking {
