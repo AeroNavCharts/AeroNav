@@ -36,6 +36,8 @@ class ChartViewer {
         this.drawing = null;
         this.editing = null;
         this.swatches = [];
+        this.glideState = null;
+        this.settling = false;
         this.toolbar = this.buildToolbar();
         this.toolbar.hidden = true;
         wrap.insertBefore(this.toolbar, wrap.querySelector('iframe'));
@@ -79,6 +81,7 @@ class ChartViewer {
     }
 
     show(source, reset) {
+        this.stopGlide();
         const previous = this.natW || source.naturalWidth;
         this.natW = source.naturalWidth;
         this.natH = source.naturalHeight;
@@ -89,6 +92,9 @@ class ChartViewer {
         this.sizeInk();
         if (reset) {
             this.fit();
+            this.stage.classList.remove('chart-enter');
+            void this.stage.offsetWidth;
+            this.stage.classList.add('chart-enter');
             return;
         }
         this.scale *= previous / this.natW;
@@ -97,6 +103,7 @@ class ChartViewer {
     }
 
     hide() {
+        this.stopGlide();
         this.token++;
         this.setDrawMode(false);
         this.stage.hidden = true;
@@ -124,6 +131,7 @@ class ChartViewer {
 
     get turn() {
         const r = (this.rotation * Math.PI) / 180;
+        if (this.rotation % 90 !== 0) return { c: Math.cos(r), s: Math.sin(r) };
         return { c: Math.round(Math.cos(r)), s: Math.round(Math.sin(r)) };
     }
 
@@ -162,7 +170,72 @@ class ChartViewer {
         this.apply();
     }
 
+    pose() {
+        const [ox, oy] = this.spin((this.natW * this.scale) / 2, (this.natH * this.scale) / 2);
+        return { cx: this.x + ox, cy: this.y + oy, s: this.scale, r: this.rotation };
+    }
+
+    setPose(p) {
+        this.scale = p.s;
+        this.rotation = p.r;
+        const [ox, oy] = this.spin((this.natW * p.s) / 2, (this.natH * p.s) / 2);
+        this.x = p.cx - ox;
+        this.y = p.cy - oy;
+    }
+
+    glide(change) {
+        if (!this.natW) return;
+        this.stopGlide();
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            change();
+            return;
+        }
+        const from = this.pose();
+        this.settling = true;
+        change();
+        this.settling = false;
+        const end = { x: this.x, y: this.y, scale: this.scale, rotation: this.rotation };
+        const to = this.pose();
+        const swing = ((to.r - from.r + 540) % 360) - 180;
+        const started = performance.now();
+        const duration = 240;
+        const mix = (a, b, e) => a + (b - a) * e;
+        const step = (now) => {
+            const t = (now - started) / duration;
+            if (t >= 1) {
+                this.stopGlide();
+                return;
+            }
+            const e = 1 - Math.pow(1 - Math.max(0, t), 3);
+            this.setPose({ cx: mix(from.cx, to.cx, e), cy: mix(from.cy, to.cy, e), s: mix(from.s, to.s, e), r: from.r + swing * e });
+            this.paint();
+            this.glideState.frame = requestAnimationFrame(step);
+        };
+        this.setPose(from);
+        this.glideState = { end, frame: requestAnimationFrame(step) };
+    }
+
+    stopGlide() {
+        const g = this.glideState;
+        if (!g) return;
+        this.glideState = null;
+        cancelAnimationFrame(g.frame);
+        this.x = g.end.x;
+        this.y = g.end.y;
+        this.scale = g.end.scale;
+        this.rotation = g.end.rotation;
+        this.paint();
+    }
+
+    fitSmooth() {
+        this.glide(() => this.fit());
+    }
+
     rotateBy(delta) {
+        this.glide(() => this.turnBy(delta));
+    }
+
+    turnBy(delta) {
         if (!this.natW) return;
         const wasFit = Math.abs(this.scale - this.fitScale) < 1e-6;
         const cx = this.stage.clientWidth / 2;
@@ -212,7 +285,7 @@ class ChartViewer {
     }
 
     zoomBy(factor) {
-        this.zoomAt(this.stage.clientWidth / 2, this.stage.clientHeight / 2, factor);
+        this.glide(() => this.zoomAt(this.stage.clientWidth / 2, this.stage.clientHeight / 2, factor));
     }
 
     apply() {
@@ -220,6 +293,11 @@ class ChartViewer {
         const b = this.bounds();
         this.x = Math.min(this.stage.clientWidth - keep, Math.max(keep - b.width, this.x + b.left)) - b.left;
         this.y = Math.min(this.stage.clientHeight - keep, Math.max(keep - b.height, this.y + b.top)) - b.top;
+        this.paint();
+    }
+
+    paint() {
+        if (this.settling) return;
         this.img.style.transform = `translate(${this.x}px, ${this.y}px) rotate(${this.rotation}deg) scale(${this.scale})`;
         this.onZoom(Math.round((this.scale / this.fitScale) * 100));
         this.placeInput();
@@ -521,6 +599,7 @@ class ChartViewer {
 
         stage.addEventListener('wheel', (e) => {
             e.preventDefault();
+            this.stopGlide();
             const p = this.point(e);
             const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
             this.zoomAt(p.x, p.y, Math.exp(-delta * 0.0015));
@@ -529,12 +608,13 @@ class ChartViewer {
         stage.addEventListener('dblclick', (e) => {
             if (this.drawMode) return;
             const p = this.point(e);
-            if (this.scale > this.fitScale * 1.05) this.fit();
-            else this.zoomAt(p.x, p.y, 2.5);
+            if (this.scale > this.fitScale * 1.05) this.fitSmooth();
+            else this.glide(() => this.zoomAt(p.x, p.y, 2.5));
         });
 
         stage.addEventListener('pointerdown', (e) => {
             if (e.pointerType === 'mouse' && e.button !== 0) return;
+            this.stopGlide();
             stage.setPointerCapture(e.pointerId);
             this.pointers.set(e.pointerId, this.point(e));
             this.pinch = null;
@@ -598,6 +678,7 @@ class ChartViewer {
 
         new ResizeObserver(() => {
             if (!this.active || !this.natW || !stage.clientWidth) return;
+            this.stopGlide();
             this.sizeInk();
             const wasFit = Math.abs(this.scale - this.fitScale) < 1e-6;
             if (wasFit) this.fit();
