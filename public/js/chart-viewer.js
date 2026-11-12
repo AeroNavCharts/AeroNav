@@ -23,7 +23,7 @@ class ChartViewer {
         this.planeEl = document.createElement('div');
         this.planeEl.className = 'chart-plane';
         this.planeEl.hidden = true;
-        this.planeEl.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2c1.3 0 2.2 1.6 2.2 3.6v6.6l10.3 6.4v3l-10.3-3.1v5.4l3.3 2.5v2.4L16 27.4l-5.5 1.4v-2.4l3.3-2.5v-5.4L3.5 21.6v-3l10.3-6.4V5.6C13.8 3.6 14.7 2 16 2Z"/></svg>';
+        this.planeEl.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5 28 28.5 16 20 4 28.5Z"/></svg>';
         this.plane = null;
         this.picker = null;
         this.tapStart = null;

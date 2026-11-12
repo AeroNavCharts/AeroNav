@@ -1792,16 +1792,16 @@ iframe {
 
 .chart-plane svg {
     position: absolute;
-    top: -17px;
-    left: -17px;
-    width: 34px;
-    height: 34px;
-    fill: #f2a413;
-    stroke: #111111;
-    stroke-width: 1.6;
+    top: -20px;
+    left: -20px;
+    width: 40px;
+    height: 40px;
+    fill: #e0218a;
+    stroke: #ffffff;
+    stroke-width: 2.2;
     stroke-linejoin: round;
     paint-order: stroke;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
 }
 
 .chart-stage.picking {
