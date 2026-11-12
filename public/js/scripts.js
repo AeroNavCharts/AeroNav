@@ -658,7 +658,7 @@ function init() {
     let loadedByHash = false;
     const hn = parseHashNumber();
     if (hn) loadedByHash = openChartByHotId(hn);
-    if (!loadedByHash && pinned && pinned[0]) loadChartInViewer(pinned[0], { fromPinned: true });
+    if (!loadedByHash && pinned && pinned[0]) loadChartInViewer(pinned[0], { fromPinned: true, auto: true });
     window.addEventListener('hashchange', navigateByHash);
 }
 
@@ -1235,7 +1235,7 @@ function getCatColor(cat) {
 }
 
 function loadChartInViewer(chartObj, opts = {}) {
-    document.dispatchEvent(new CustomEvent('aeronav:chart-open'));
+    if (!opts.auto) document.dispatchEvent(new CustomEvent('aeronav:chart-open'));
     closeScratchpad();
     showLoader();
     const link = chartObj.link || null;
