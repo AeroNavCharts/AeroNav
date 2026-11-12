@@ -4,6 +4,7 @@ interface Props {
 }
 
 const { credits = true } = Astro.props;
+const year = new Date().getFullYear();
 ---
 
 <footer class="footer">
@@ -11,7 +12,7 @@ const { credits = true } = Astro.props;
     <div>
       <img class="footer-logo" src="/assets/logo-full.webp" alt="AeroNav" width="212" height="30" />
       <p class="footer-text">
-        &copy; 2025 AeroNav. All rights reserved.
+        &copy; {year} AeroNav. All rights reserved.
         {credits && (
           <Fragment>
             Initial UI by <a href="https://discord.com/users/1028160951125557258" target="_blank" rel="noopener">sweet_kid</a>.<br />
