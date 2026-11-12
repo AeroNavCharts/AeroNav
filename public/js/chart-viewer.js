@@ -26,12 +26,17 @@ class ChartViewer {
         this.planeImg = document.createElement('img');
         this.planeImg.alt = '';
         this.planeImg.draggable = false;
+        this.planeImg.src = '/assets/ownship.png';
         this.planeEl.appendChild(this.planeImg);
         this.plane = null;
         this.route = null;
         this.picker = null;
         this.tapStart = null;
-        this.stage.append(this.img, this.ink, this.planeEl);
+        this.trafficEl = document.createElement('div');
+        this.trafficEl.className = 'chart-traffic';
+        this.traffic = [];
+        this.trafficPool = [];
+        this.stage.append(this.img, this.ink, this.trafficEl, this.planeEl);
         wrap.insertBefore(this.stage, wrap.querySelector('iframe'));
         this.x = 0;
         this.y = 0;
@@ -315,7 +320,44 @@ class ChartViewer {
         this.onZoom(Math.round((this.scale / this.fitScale) * 100));
         this.placeInput();
         this.renderInk();
+        this.placeTraffic();
         this.placePlane();
+    }
+
+    setTraffic(traffic) {
+        this.traffic = traffic || [];
+        this.placeTraffic();
+    }
+
+    placeTraffic() {
+        const list = this.natW ? this.traffic : [];
+        const k = this.unit;
+        const size = Math.max(0.8, Math.min(1.6, Math.sqrt(this.scale / this.fitScale)));
+        while (this.trafficPool.length < list.length) {
+            const el = document.createElement('div');
+            el.className = 'chart-plane chart-other';
+            const img = document.createElement('img');
+            img.alt = '';
+            img.draggable = false;
+            el.appendChild(img);
+            this.trafficEl.appendChild(el);
+            this.trafficPool.push({ el, img });
+        }
+        this.trafficPool.forEach(({ el, img }, i) => {
+            const p = list[i];
+            if (!p) {
+                el.hidden = true;
+                return;
+            }
+            if (el.dataset.kind !== p.kind) {
+                el.dataset.kind = p.kind;
+                img.src = `/assets/planes/${p.kind}.png`;
+            }
+            el.title = p.label || '';
+            const [sx, sy] = this.spin(p.u * k, p.v * k);
+            el.hidden = false;
+            el.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg) scale(${size})`;
+        });
     }
 
     setRoute(route) {
@@ -363,11 +405,6 @@ class ChartViewer {
         }
         const k = this.unit;
         const [sx, sy] = this.spin(p.u * k, p.v * k);
-        const kind = p.kind || 'airliner';
-        if (this.planeEl.dataset.kind !== kind) {
-            this.planeEl.dataset.kind = kind;
-            this.planeImg.src = `/assets/planes/${kind}.png`;
-        }
         this.planeEl.hidden = false;
         const size = Math.max(0.8, Math.min(1.6, Math.sqrt(this.scale / this.fitScale)));
         this.planeEl.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg) scale(${size})`;

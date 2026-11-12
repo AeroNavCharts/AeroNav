@@ -106,6 +106,21 @@ class Ownship {
         return 'airliner';
     }
 
+    others(geo, mine) {
+        if (!geo) return [];
+        const ratio = this.viewer.natW ? this.viewer.natH / this.viewer.natW : 1;
+        const list = [];
+        [this.fleets.main, this.fleets.event].forEach((fleet) => {
+            Object.entries(fleet).forEach(([callsign, entry]) => {
+                if (!entry || !entry.position || entry === mine) return;
+                const spot = this.project(geo, entry);
+                if (spot.u < 0 || spot.u > 1 || spot.v < 0 || spot.v > ratio) return;
+                list.push({ ...spot, kind: Ownship.kind(entry.aircraftType), label: `${callsign} (${entry.aircraftType || 'aircraft'})` });
+            });
+        });
+        return list;
+    }
+
     geoFor(id) {
         if (!id) return null;
         const local = this.readJson(this.geoKey)[id];
@@ -123,7 +138,7 @@ class Ownship {
         const gy = Math.cos(h) * south;
         const px = a * gx + b * gy;
         const py = d * gx + e * gy;
-        return { u: a * x + b * y + c, v: d * x + e * y + f, heading: (Math.atan2(px, -py) * 180) / Math.PI, kind: Ownship.kind(entry.aircraftType) };
+        return { u: a * x + b * y + c, v: d * x + e * y + f, heading: (Math.atan2(px, -py) * 180) / Math.PI };
     }
 
     find() {
@@ -222,6 +237,7 @@ class Ownship {
             this.mine = null;
             this.plan = null;
             this.viewer.setRoute(null);
+            this.viewer.setTraffic([]);
             this.place(null);
         }
         this.render();
@@ -297,6 +313,7 @@ class Ownship {
         const [a, b, c, d, e, f] = geo || [];
         const route = geo ? Ownship.routePoints(this.plan).map(([x, y]) => [a * x + b * y + c, d * x + e * y + f]) : [];
         this.viewer.setRoute(route);
+        this.viewer.setTraffic(this.others(geo, this.mine));
         this.place(found && geo ? this.project(geo, found.entry) : null, id);
         this.render();
     }
@@ -325,7 +342,6 @@ class Ownship {
                 u: from.u + (target.u - from.u) * t,
                 v: from.v + (target.v - from.v) * t,
                 heading: from.heading + swing * t,
-                kind: target.kind,
             };
             this.viewer.setPlane(this.shown);
             if (t < 1) this.frame = requestAnimationFrame(step);
