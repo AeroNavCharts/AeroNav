@@ -270,11 +270,22 @@ function closeMobileMenu() {
 }
 
 function toggleMobileSearch() {
-    if (!mobileSearchOverlay) return;
-    const isActive = mobileSearchOverlay.classList.toggle('active');
-    if (isActive && mobileSearch) {
-        setTimeout(() => mobileSearch.focus(), 100);
-    }
+    if (!leftSearch) return;
+    showPanel('airports');
+    if (menuToggle) menuToggle.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    leftSearch.focus();
+    leftSearch.select();
+}
+
+let listEnterTimer = null;
+
+function animateList() {
+    clearTimeout(listEnterTimer);
+    listInner.classList.remove('list-enter');
+    void listInner.offsetWidth;
+    listInner.classList.add('list-enter');
+    listEnterTimer = setTimeout(() => listInner.classList.remove('list-enter'), 600);
 }
 
 function closeMobileSearch() {
@@ -516,6 +527,7 @@ function init() {
     buildHotlinks();
     setupPinboardToggle();
     renderAirportList();
+    animateList();
     leftSearch.addEventListener('input', onSearch);
     if (mobileSearch) {
         mobileSearch.addEventListener('input', onSearch);
@@ -535,6 +547,7 @@ function init() {
             leftSearch.placeholder = 'Filter charts and airports';
         }
         renderAirportList();
+        animateList();
     });
 
     railButtons.forEach(btn => {
@@ -553,6 +566,7 @@ function init() {
             e.stopPropagation();
             weatherTab = b.dataset.wx;
             renderChartList();
+            animateList();
         });
     });
     infoTabs.querySelectorAll('[data-info]').forEach(b => {
@@ -561,6 +575,7 @@ function init() {
             e.stopPropagation();
             infoTab = b.dataset.info;
             renderChartList();
+            animateList();
         });
     });
 
@@ -642,7 +657,7 @@ function init() {
         const path = e.composedPath();
         const inside = el => !!el && path.includes(el);
         if (leftCol && leftCol.classList.contains('active') &&
-            !inside(leftCol) && !inside(menuToggle) && !inside(document.querySelector('.rail'))) {
+            !inside(leftCol) && !inside(menuToggle) && !inside(mobileSearchToggle) && !inside(document.querySelector('.rail'))) {
             closeMobileMenu();
         }
         if (controlsDropdown && controlsDropdown.classList.contains('active') &&
@@ -691,6 +706,7 @@ function openAirport(idx) {
     currentCategory = cats.includes('STAR') ? 'STAR' : cats[0] || '';
     renderCategoryBar(cats);
     renderChartList();
+    animateList();
 }
 
 function renderCategoryBar(cats) {
@@ -713,6 +729,7 @@ function renderCategoryBar(cats) {
             });
             btn.classList.add('active');
             renderChartList();
+            animateList();
         });
         categoryBar.appendChild(btn);
     });
@@ -1678,6 +1695,7 @@ function openAirportView(idx) {
     infoTab = 'general';
     renderCategoryBarView(cats);
     renderChartListView();
+    animateList();
 }
 
 function renderCategoryBarView(cats) {
@@ -1700,6 +1718,7 @@ function renderCategoryBarView(cats) {
             });
             btn.classList.add('active');
             renderChartListView();
+            animateList();
         });
         categoryBar.appendChild(btn);
     });
