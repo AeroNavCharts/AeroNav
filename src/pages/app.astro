@@ -135,6 +135,19 @@ import LoaderLogo from '../components/LoaderLogo.astro';
             <div class="list-inner" id="listInner"></div>
           </div>
 
+          <div class="install-nudge" id="installNudge" hidden>
+            <div class="install-nudge-text">
+              <strong>Install AeroNav</strong>
+              <span id="installNudgeSub">Charts open instantly and work offline.</span>
+            </div>
+            <button class="install-nudge-go" id="installNudgeGo" type="button">Install</button>
+            <button class="install-nudge-close" id="installNudgeClose" type="button" aria-label="Dismiss install suggestion">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
+
           <p class="panel-note">Does something look broken? Hard refresh (Ctrl+Shift+R) or clear your cache.</p>
 
           <div class="mobile-search-overlay" id="mobileSearchOverlay">
@@ -151,6 +164,12 @@ import LoaderLogo from '../components/LoaderLogo.astro';
           </div>
           <div class="list">
             <div class="link-list">
+              <button class="link-row link-row-install" id="installLink" type="button" hidden>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
+                </svg>
+                Install the AeroNav app
+              </button>
               <a class="link-row" href="/donate" target="_blank">Donate to AeroNav</a>
               <a class="link-row" href="https://tico09.com/24SPY" target="_blank">24Spy</a>
               <a class="link-row" href="https://24pilot.ptfsrp.com" target="_blank">24Pilot</a>
@@ -337,6 +356,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
     <script is:inline src={versioned("/js/data.js")}></script>
     <script is:inline src={versioned("/js/scratchpad.js")}></script>
     <script is:inline src={versioned("/js/chart-viewer.js")}></script>
+    <script is:inline src={versioned("/js/install.js")}></script>
     <script is:inline src={versioned("/js/scripts.js")} defer></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </body>

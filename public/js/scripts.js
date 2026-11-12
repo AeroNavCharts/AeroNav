@@ -1235,6 +1235,7 @@ function getCatColor(cat) {
 }
 
 function loadChartInViewer(chartObj, opts = {}) {
+    document.dispatchEvent(new CustomEvent('aeronav:chart-open'));
     closeScratchpad();
     showLoader();
     const link = chartObj.link || null;

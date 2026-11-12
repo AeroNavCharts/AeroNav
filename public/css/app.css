@@ -954,6 +954,88 @@ svg {
     line-height: 1.45;
 }
 
+.link-row-install {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.link-row-install svg {
+    color: #f2a413;
+}
+
+.install-nudge {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+    margin: 8px;
+    padding: 10px 8px 10px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--panel-alt);
+}
+
+.install-nudge[hidden],
+.link-row-install[hidden],
+.install-nudge-go[hidden] {
+    display: none;
+}
+
+.install-nudge-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.install-nudge-text span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.install-nudge-go {
+    flex-shrink: 0;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--accent-line);
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.install-nudge-close {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.install-nudge-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+}
+
 .link-row:hover {
     background: rgba(255, 255, 255, 0.05);
     text-decoration: none;
