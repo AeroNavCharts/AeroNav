@@ -248,7 +248,7 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/1iwpW8YiaBgXRctfPcnkW-4nji2haG6Oc/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "SOP",
                 "title": "KEFLAVIK SOP",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1Bfo8f49mktOGYWi28XMRJIHUbzBqVgt0/view?usp=drive_link"
@@ -400,7 +400,7 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/1oNRNjw3ZiuBEAwjdILq_8gtvn3zJfzOP/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "VFR",
                 "title": "ILAR VFR Sectional",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1Jt6VwU6wt01TNASn9lPFo4p8ElJzniiU/view?usp=drive_link"
@@ -430,7 +430,7 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/1Hb4dppIdzFiYVjfJTaSmQGHfnKCKk1F9/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "SOP",
                 "title": "LARNACA SOP",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1v7P3b1B_xZe9UuLsMnepvaim8jcRBSQj/view?usp=drive_link"
@@ -793,13 +793,13 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/1d941-AD-yq4N5pOkQhwFniDXvfJ5lwrh/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "SOP",
                 "title": "PERTH SOP",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1NhlfZlTg9GkMjb6qoKbtUGcRIgIboEZp/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "LOA",
                 "title": "PER-ZLR LOA",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1JEHBRTLv9qmyLA_80f_eSMto9PZ0nDOM/view?usp=drive_link"
@@ -1022,7 +1022,7 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/1Bm4KX5DGG93kjG0rBu3vX7QmtoO8QWjy/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "VFR",
                 "title": "IRFD VFR Sectional",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1CgVtu508WLQa-UVjiWa2vjEkYXQyG3Yk/view?usp=drive_link"
@@ -1070,7 +1070,7 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/15JG1Wv3Syi8cvmcBzOU7QXBq9MLWTN_0/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "SOP",
                 "title": "ROCKFORD SOP",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/189G_A8bTjY29tFJ1JqQi54OHh8c5dtWX/view?usp=sharing"
@@ -1306,7 +1306,7 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/1Hi6vfeMybluOrBxIdogek9vKC-Zas8-g/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "VFR",
                 "title": "ITKO VFR Sectional",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1yg0urxOYRm2goWV2Su5N89jrXz_0hDt7/view?usp=drive_link"
@@ -1348,7 +1348,7 @@ const AIRPORTS = [
                 "link": "https://drive.google.com/file/d/1bSOQOkMBDrqMm285nqe3jVTvM4bLRdYG/view?usp=drive_link"
             },
             {
-                "id": "N/A",
+                "id": "SOP",
                 "title": "TOKYO SOP",
                 "category": "REF",
                 "link": "https://drive.google.com/file/d/1Q1oUuljCSLwsfCY97TlVgrBO9rpkzRW4/view?usp=sharing"
