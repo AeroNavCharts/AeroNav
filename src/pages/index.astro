@@ -1,4 +1,5 @@
 ---
+import { versioned } from '../lib/assets.js';
 import LandingLayout from '../layouts/LandingLayout.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 ---
@@ -88,7 +89,7 @@ import SiteFooter from '../components/SiteFooter.astro';
   </SiteFooter>
 
   <Fragment slot="scripts">
-    <script is:inline src="/js/data.js"></script>
+    <script is:inline src={versioned("/js/data.js")}></script>
     <script is:inline>
     (function () {
       if (typeof AIRPORTS === 'undefined') return;
@@ -136,6 +137,6 @@ import SiteFooter from '../components/SiteFooter.astro';
         total + ' charts across ' + AIRPORTS.length + ' airports, plus the enroute chart.';
     })();
     </script>
-    <script is:inline src="/js/hero-draw.js"></script>
+    <script is:inline src={versioned("/js/hero-draw.js")}></script>
   </Fragment>
 </LandingLayout>

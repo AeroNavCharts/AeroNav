@@ -1,4 +1,5 @@
 ---
+import { versioned } from '../lib/assets.js';
 import BaseHead from '../components/BaseHead.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 
@@ -32,6 +33,6 @@ const { title, description, keywords, bodyClass } = Astro.props;
       <slot name="footer" />
     </div>
     <slot name="scripts" />
-    <script is:inline src="/js/site-nav.js"></script>
+    <script is:inline src={versioned("/js/site-nav.js")}></script>
   </body>
 </html>

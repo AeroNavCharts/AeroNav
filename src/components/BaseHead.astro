@@ -1,4 +1,5 @@
 ---
+import { versioned } from '../lib/assets.js';
 interface Props {
   title: string;
   description: string;
@@ -16,9 +17,9 @@ const { title, description, keywords, fonts, stylesheet } = Astro.props;
 <meta name="author" content="AeroNav" />
 <meta name="keywords" content={keywords} />
 <meta property="og:image" content="/assets/aerologo.webp" />
-<link rel="preload" href={stylesheet} as="style" />
+<link rel="preload" href={versioned(stylesheet)} as="style" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?${fonts}&display=swap`} />
-<link rel="stylesheet" href={stylesheet} />
+<link rel="stylesheet" href={versioned(stylesheet)} />
 <title>{title}</title>
