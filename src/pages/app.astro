@@ -239,6 +239,20 @@ import LoaderLogo from '../components/LoaderLogo.astro';
                 <path d="M9 12H7m0 0 1.5-1.5M7 12l1.5 1.5M15 12h2m0 0-1.5-1.5M17 12l-1.5 1.5" />
               </svg>
             </button>
+            <button class="icon-btn zoom-tool" id="rotateLeftBtn" aria-label="Rotate chart left" title="Rotate left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="11" width="11" height="9" rx="1.5" />
+                <path d="M15 5.5A8.5 8.5 0 0 0 4.5 12" />
+                <path d="m2 9.5 2.5 2.7 2.8-2.4" />
+              </svg>
+            </button>
+            <button class="icon-btn zoom-tool" id="rotateRightBtn" aria-label="Rotate chart right" title="Rotate right">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="11" width="11" height="9" rx="1.5" />
+                <path d="M9 5.5A8.5 8.5 0 0 1 19.5 12" />
+                <path d="m22 9.5-2.5 2.7-2.8-2.4" />
+              </svg>
+            </button>
             <button class="icon-btn zoom-tool" id="drawBtn" aria-label="Draw on chart" title="Draw on chart" aria-pressed="false">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M4 20l4-1 11-11-3-3L5 16l-1 4Z" />
@@ -332,6 +346,14 @@ import LoaderLogo from '../components/LoaderLogo.astro';
               <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
             </svg>
             <span>Fullscreen</span>
+          </button>
+          <button class="quick-action-btn" id="quickRotate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="11" width="11" height="9" rx="1.5" />
+              <path d="M9 5.5A8.5 8.5 0 0 1 19.5 12" />
+              <path d="m22 9.5-2.5 2.7-2.8-2.4" />
+            </svg>
+            <span>Rotate</span>
           </button>
           <button class="quick-action-btn" id="quickDraw">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">

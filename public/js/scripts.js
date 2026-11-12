@@ -304,6 +304,9 @@ function setupQuickActions() {
     const quickShare = document.getElementById('quickShare');
     const quickDraw = document.getElementById('quickDraw');
 
+    const quickRotate = document.getElementById('quickRotate');
+    if (quickRotate) quickRotate.addEventListener('click', () => chartViewer.rotateBy(90));
+
     if (quickDraw) {
         quickDraw.addEventListener('click', () => {
             chartViewer.setDrawMode(!chartViewer.drawMode);
@@ -568,6 +571,10 @@ function init() {
     if (zoomInBtn) zoomInBtn.addEventListener('click', () => chartViewer.zoomBy(1.4));
     if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => chartViewer.zoomBy(1 / 1.4));
     if (zoomFitBtn) zoomFitBtn.addEventListener('click', () => chartViewer.fit());
+    const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+    const rotateRightBtn = document.getElementById('rotateRightBtn');
+    if (rotateLeftBtn) rotateLeftBtn.addEventListener('click', () => chartViewer.rotateBy(-90));
+    if (rotateRightBtn) rotateRightBtn.addEventListener('click', () => chartViewer.rotateBy(90));
     const drawBtn = document.getElementById('drawBtn');
     if (drawBtn) drawBtn.addEventListener('click', () => chartViewer.setDrawMode(!chartViewer.drawMode));
     const refreshBtn = document.getElementById('refreshBtn');
