@@ -24,6 +24,14 @@ const embedJson = discordEmbed({ heading: shareTitle, text: description, image: 
 <meta name="author" content="AeroNav" />
 <meta name="keywords" content={keywords} />
 <meta name="theme-color" content="#1f2a38" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="AeroNav" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="canonical" href={pageUrl} />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="AeroNav" />
@@ -41,3 +49,10 @@ const embedJson = discordEmbed({ heading: shareTitle, text: description, image: 
 <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?${fonts}&display=swap`} />
 <link rel="stylesheet" href={versioned(stylesheet)} />
 <title>{title}</title>
+{import.meta.env.PROD && (
+  <script is:inline>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+    }
+  </script>
+)}
