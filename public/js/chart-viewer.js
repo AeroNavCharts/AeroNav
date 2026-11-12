@@ -5,6 +5,7 @@ class ChartViewer {
         this.wrap = wrap;
         this.onZoom = opts.onZoom || (() => { });
         this.onDrawMode = opts.onDrawMode || (() => { });
+        this.onLoad = opts.onLoad || (() => { });
         this.storageKey = 'aeronav_chart_marks';
         this.rotationKey = 'aeronav_chart_rotation';
         this.rotation = 0;
@@ -19,7 +20,14 @@ class ChartViewer {
         this.ink = document.createElement('canvas');
         this.ink.className = 'chart-ink';
         this.inkCtx = this.ink.getContext('2d');
-        this.stage.append(this.img, this.ink);
+        this.planeEl = document.createElement('div');
+        this.planeEl.className = 'chart-plane';
+        this.planeEl.hidden = true;
+        this.planeEl.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2c1.3 0 2.2 1.6 2.2 3.6v6.6l10.3 6.4v3l-10.3-3.1v5.4l3.3 2.5v2.4L16 27.4l-5.5 1.4v-2.4l3.3-2.5v-5.4L3.5 21.6v-3l10.3-6.4V5.6C13.8 3.6 14.7 2 16 2Z"/></svg>';
+        this.plane = null;
+        this.picker = null;
+        this.tapStart = null;
+        this.stage.append(this.img, this.ink, this.planeEl);
         wrap.insertBefore(this.stage, wrap.querySelector('iframe'));
         this.x = 0;
         this.y = 0;
@@ -73,6 +81,7 @@ class ChartViewer {
         this.marks = this.readMarks()[id] || [];
         this.rotation = this.readRotations()[id] || 0;
         this.show(low, true);
+        this.onLoad(id);
         this.fetchImage(ChartViewer.imageUrl(id, 3200)).then((high) => {
             if (token !== this.token || high.naturalWidth <= this.img.naturalWidth) return;
             this.show(high, false);
@@ -302,6 +311,31 @@ class ChartViewer {
         this.onZoom(Math.round((this.scale / this.fitScale) * 100));
         this.placeInput();
         this.renderInk();
+        this.placePlane();
+    }
+
+    setPlane(plane) {
+        this.plane = plane;
+        this.placePlane();
+    }
+
+    placePlane() {
+        const p = this.plane;
+        if (!p || !this.natW) {
+            this.planeEl.hidden = true;
+            return;
+        }
+        const k = this.unit;
+        const [sx, sy] = this.spin(p.u * k, p.v * k);
+        this.planeEl.hidden = false;
+        this.planeEl.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg)`;
+    }
+
+    pickPoint() {
+        return new Promise((resolve) => {
+            this.picker = resolve;
+            this.stage.classList.add('picking');
+        });
     }
 
     point(e) {
@@ -617,6 +651,7 @@ class ChartViewer {
             this.stopGlide();
             stage.setPointerCapture(e.pointerId);
             this.pointers.set(e.pointerId, this.point(e));
+            this.tapStart = this.pointers.size === 1 ? this.point(e) : null;
             this.pinch = null;
             if (this.drawMode && this.natW) {
                 if (this.pointers.size === 1) {
@@ -656,6 +691,14 @@ class ChartViewer {
         });
 
         const release = (e) => {
+            const start = this.tapStart;
+            const end = this.point(e);
+            if (this.picker && e.type === 'pointerup' && start && Math.hypot(end.x - start.x, end.y - start.y) < 6) {
+                const done = this.picker;
+                this.picker = null;
+                stage.classList.remove('picking');
+                done(this.toChart(end));
+            }
             this.pointers.delete(e.pointerId);
             this.pinch = null;
             if (this.drawing && this.drawing.id === e.pointerId) {
