@@ -8,7 +8,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
 <html lang="en">
   <head>
     <BaseHead
-      title="AeroNavCharts"
+      title="AeroNav Charts"
       shareTitle="AeroNav Chart Viewer"
       description="Browse every AeroNav chart for PTFS: STARs, SIDs, approaches and taxi diagrams, with live ATIS, a pinboard and scratchpads."
       keywords="AeroNav Charts"
@@ -135,7 +135,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
             <div class="list-inner" id="listInner"></div>
           </div>
 
-          <p class="panel-note">Something look broken? Hard refresh (Ctrl+Shift+R) or clear your cache.</p>
+          <p class="panel-note">Does something look broken? Hard refresh (Ctrl+Shift+R) or clear your cache.</p>
 
           <div class="mobile-search-overlay" id="mobileSearchOverlay">
             <input id="mobileSearch" class="search mobile-search-input" placeholder="Search airports and charts..." />
@@ -155,9 +155,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
               <a class="link-row" href="https://tico09.com/24SPY" target="_blank">24Spy</a>
               <a class="link-row" href="https://24pilot.ptfsrp.com" target="_blank">24Pilot</a>
               <a class="link-row" href="https://flighteye.awdevsoftware.org/" target="_blank">FlightEye</a>
-              <a class="link-row" href="https://discord.com/oauth2/authorize?client_id=1426101225056632959"
-                target="_blank">Discord bot</a>
-              <a class="link-row" href="https://discord.com/oauth2/authorize?client_id=1537343054237933638" target="_blank" rel="noopener">Get charts in Discord with our new bot</a>
+              <a class="link-row" href="https://discord.com/oauth2/authorize?client_id=1537343054237933638" target="_blank" rel="noopener">Discord bot</a>
               <a class="link-row" href="https://tally.so/r/RWdl7J" target="_blank" rel="noopener">Report a chart error</a>
             </div>
           </div>
@@ -167,7 +165,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
       <main class="viewer">
         <div class="viewer-bar">
           <div class="viewer-heading">
-            <div class="viewer-title" id="viewerTitle">ENR — ENROUTE - ENROUTE CHART</div>
+            <div class="viewer-title" id="viewerTitle">ENROUTE CHART</div>
             <div class="viewer-sub" id="viewerSub">ENROUTE</div>
           </div>
           <div class="controls">
@@ -249,8 +247,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
                 <a class="dropdown-item" href="https://tico09.com/24SPY" target="_blank">24Spy</a>
                 <a class="dropdown-item" href="https://24pilot.ptfsrp.com" target="_blank">24Pilot</a>
                 <a class="dropdown-item" href="https://flighteye.awdevsoftware.org/" target="_blank">FlightEye</a>
-                <a class="dropdown-item" href="https://discord.com/oauth2/authorize?client_id=1426101225056632959"
-                  target="_blank">Discord Bot</a>
+                <a class="dropdown-item" href="https://discord.com/oauth2/authorize?client_id=1537343054237933638" target="_blank" rel="noopener">Discord bot</a>
                 <a class="dropdown-item" href="https://tally.so/r/RWdl7J" target="_blank" rel="noopener">Report an error</a>
               </div>
             </div>
@@ -263,7 +260,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
             </div>
           </div>
           <div class="zoom-readout" id="zoomReadout" aria-live="polite" hidden></div>
-          <iframe id="viewerFrame" src="about:blank" title="Aeronav chart viewer"></iframe>
+          <iframe id="viewerFrame" src="about:blank" title="AeroNav chart viewer"></iframe>
         </div>
 
         <div class="pinboard" id="pinboard" aria-label="Pinboard">

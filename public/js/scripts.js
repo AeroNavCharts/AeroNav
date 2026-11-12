@@ -354,7 +354,7 @@ function setupQuickActions() {
                 if (navigator.clipboard) {
                     navigator.clipboard.writeText(url).then(() => {
                         Swal.fire({
-                            title: 'Link Copied!',
+                            title: 'Link copied',
                             text: 'Chart link copied to clipboard',
                             icon: 'success',
                             timer: 2000,
@@ -385,7 +385,7 @@ function clearAllPinned() {
         text: 'This will remove all pinned charts except the enroute chart.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Clear All',
+        confirmButtonText: 'Clear all',
         cancelButtonText: 'Cancel',
         customClass: {
             popup: 'swal-custom-popup',
@@ -1253,7 +1253,9 @@ function loadChartInViewer(chartObj, opts = {}) {
         showChartInFrame(link);
     }
     const icao = chartObj.airportIcao || chartObj.icao || '';
-    viewerTitle.textContent = `${icao} — ${chartObj.id || ''} ${chartObj.title ? '- ' + chartObj.title : ''}`;
+    const isEnroute = String(chartObj.id || '').toUpperCase() === 'ENROUTE';
+    const titleLead = isEnroute ? '' : [icao, chartObj.id].filter(Boolean).join(' ');
+    viewerTitle.textContent = [titleLead, chartObj.title].filter(Boolean).join(' - ');
     viewerSub.textContent = chartObj.category || '';
     pinCurrentBtn.onclick = () => {
         if (!chartObj || !chartObj.id) return;
