@@ -23,7 +23,7 @@ class ChartViewer {
         this.planeEl = document.createElement('div');
         this.planeEl.className = 'chart-plane';
         this.planeEl.hidden = true;
-        this.planeEl.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5 28 28.5 16 20 4 28.5Z"/></svg>';
+        this.planeEl.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.5 27.5 27.5Q16 19 4.5 27.5Z"/></svg>';
         this.plane = null;
         this.picker = null;
         this.tapStart = null;
@@ -328,7 +328,8 @@ class ChartViewer {
         const k = this.unit;
         const [sx, sy] = this.spin(p.u * k, p.v * k);
         this.planeEl.hidden = false;
-        this.planeEl.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg)`;
+        const size = Math.max(0.75, Math.min(1.9, Math.sqrt(this.scale / this.fitScale)));
+        this.planeEl.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg) scale(${size})`;
     }
 
     pickPoint() {
