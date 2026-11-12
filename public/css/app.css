@@ -103,6 +103,7 @@ svg {
 .app {
     display: flex;
     height: 100vh;
+    height: 100dvh;
     width: 100%;
     overflow: hidden;
 }
@@ -1901,6 +1902,7 @@ iframe {
 
     .app {
         height: calc(100vh - var(--mobile-header-height));
+        height: calc(100dvh - var(--mobile-header-height));
     }
 
     :root {
@@ -1909,6 +1911,31 @@ iframe {
 
     .rail {
         width: var(--rail-width);
+        position: fixed;
+        top: var(--mobile-header-height);
+        bottom: 0;
+        left: 0;
+        z-index: 810;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+    }
+
+    .app:has(.panel.active) .rail {
+        transform: none;
+    }
+
+    body:has(.panel.active) .fab {
+        display: none;
+    }
+
+    .search,
+    .mobile-search-input {
+        font-size: 16px;
+    }
+
+    .cat-btn {
+        height: 36px;
+        font-size: 13px;
     }
 
     .rail-btn span {
@@ -1978,8 +2005,13 @@ iframe {
     }
 
     .chart-tools {
-        top: 8px;
+        display: none;
+    }
+
+    .zoom-readout {
         left: 8px;
+        right: auto;
+        bottom: 8px;
     }
 
     .pinboard {
@@ -2000,8 +2032,8 @@ iframe {
         align-items: center;
         justify-content: center;
         position: fixed;
-        right: 16px;
-        bottom: 76px;
+        right: 14px;
+        bottom: 112px;
         width: 48px;
         height: 48px;
         border: 0;
@@ -2088,5 +2120,23 @@ iframe {
 @media (max-width: 600px) {
     .bar-btn {
         padding: 0 9px;
+    }
+
+    #pinCurrent span {
+        display: none;
+    }
+
+    .viewer-bar {
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    .viewer-title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        white-space: normal;
+        font-size: 12.5px;
+        line-height: 1.3;
     }
 }

@@ -134,6 +134,7 @@ function openChartByHotId(n) {
         link: ref.link
     };
     loadChartInViewer(chartObj, { fromPinned: false });
+    if (window.innerWidth <= 900) closeMobileMenu();
     return true;
 }
 
@@ -611,7 +612,7 @@ function init() {
         const path = e.composedPath();
         const inside = el => !!el && path.includes(el);
         if (leftCol && leftCol.classList.contains('active') &&
-            !inside(leftCol) && !inside(menuToggle)) {
+            !inside(leftCol) && !inside(menuToggle) && !inside(document.querySelector('.rail'))) {
             closeMobileMenu();
         }
         if (controlsDropdown && controlsDropdown.classList.contains('active') &&
