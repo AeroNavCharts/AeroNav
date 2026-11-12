@@ -1,0 +1,37 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  keywords: string;
+  bodyClass?: string;
+}
+
+const { title, description, keywords, bodyClass } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title={title}
+      description={description}
+      keywords={keywords}
+      fonts="family=B612:wght@400;700&family=Inter:wght@400;500;600"
+      stylesheet="/css/home.css"
+    />
+  </head>
+  <body class={bodyClass}>
+    <div class="landing-wrap">
+      <SiteHeader />
+      <main>
+        <slot />
+      </main>
+      <slot name="footer" />
+    </div>
+    <slot name="scripts" />
+    <script is:inline src="/js/site-nav.js"></script>
+  </body>
+</html>

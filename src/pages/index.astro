@@ -1,0 +1,141 @@
+---
+import LandingLayout from '../layouts/LandingLayout.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+---
+
+<LandingLayout
+  title="AeroNavCharts"
+  description="AeroNav - Your dedicated team to making professional aeronautical charts for RoAv Games for Roblox since 2024"
+  keywords="AeroNav Charts"
+  bodyClass="home"
+>
+  <section class="hero-chart" aria-labelledby="heroTitle">
+    <div class="hero-copy">
+      <h1 class="title-main" id="heroTitle">Charts for every PTFS airport</h1>
+      <p class="title-sub">Departures, arrivals, approaches and taxi charts, drawn by pilots for pilots. Free to use, no account needed.</p>
+      <div class="title-actions">
+        <a href="/app" class="btn primary">Open the chart viewer</a>
+        <a href="/academy" class="btn">AeroAcademy</a>
+      </div>
+    </div>
+    <figure class="plate-wrap" id="plateWrap">
+      <a class="plate" id="heroPlate" href="/app" aria-label="Open the PERTH 2 departure in the chart viewer">
+        <img id="plateImg" src="https://lh3.googleusercontent.com/d/1GgJ0HLRRpu25ZGVWuhG_EX-xdByFveic=w1600" crossorigin="anonymous" referrerpolicy="no-referrer" alt="PERTH 2 RNAV departure chart for Perth Intl, IPPH 10-3C" width="1600" height="958" fetchpriority="high" />
+      </a>
+      <figcaption class="plate-caption">Perth Intl (IPPH) 10-3C, PERTH 2 RNAV departure</figcaption>
+    </figure>
+  </section>
+
+  <section class="band">
+    <div class="band-inner split">
+      <div class="split-lead">
+        <h2 class="band-title">Everything you need on one screen</h2>
+        <p class="band-text">Open an airport, pick a chart, and keep the ones you are flying pinned along the bottom while you go.</p>
+      </div>
+      <dl class="facts">
+        <div class="fact">
+          <dt>Every chart type</dt>
+          <dd>STARs, SIDs, approaches grouped by runway, taxi diagrams and reference pages.</dd>
+        </div>
+        <div class="fact">
+          <dt>Pinboard</dt>
+          <dd>Keep the enroute chart and today's procedures one tap away.</dd>
+        </div>
+        <div class="fact">
+          <dt>Live ATIS</dt>
+          <dd>Active runways, wind, clouds and QNH for each airport, refreshed every minute.</dd>
+        </div>
+        <div class="fact">
+          <dt>Scratchpads</dt>
+          <dd>Copy clearances and ATIS on CRAFT, ATIS and blank pads, saved on your device.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="band band-alt" aria-labelledby="indexTitle">
+    <div class="band-inner">
+      <div class="index-head">
+        <h2 class="band-title" id="indexTitle">Airports we chart</h2>
+        <p class="band-text" id="indexSummary">Every airport below has a full chart set in the viewer.</p>
+      </div>
+      <table class="airport-index">
+        <thead>
+          <tr>
+            <th scope="col">ICAO</th>
+            <th scope="col">Airport</th>
+            <th scope="col" class="num">Charts</th>
+          </tr>
+        </thead>
+        <tbody id="airportIndex"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="band-inner academy">
+      <div>
+        <h2 class="band-title">Learn to fly the charts</h2>
+        <p class="band-text">AeroAcademy is a set of short courses on reading plates and flying procedures in PTFS. The first courses are on the way.</p>
+      </div>
+      <a href="/academy" class="btn">See the courses</a>
+    </div>
+  </section>
+
+  <SiteFooter slot="footer" brand="Aeronav">
+    <a href="mailto:aeronavcartography@gmail.com">Contact us</a>
+    <a href="/donate" target="_blank">Support our work</a>
+  </SiteFooter>
+
+  <Fragment slot="scripts">
+    <script is:inline src="/js/data.js"></script>
+    <script is:inline>
+    (function () {
+      if (typeof AIRPORTS === 'undefined') return;
+      var body = document.getElementById('airportIndex');
+      var total = 0;
+      var cap = function (s) {
+        return String(s).toLowerCase().replace(/(^|[\s/(-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); })
+          .replace(/\bMc([a-z])/g, function (m, c) { return 'Mc' + c.toUpperCase(); }).replace(/\bAfb\b/g, 'AFB');
+      };
+      AIRPORTS.slice().sort(function (a, b) { return a.icao.localeCompare(b.icao); }).forEach(function (a) {
+        total += a.charts.length;
+        var tr = document.createElement('tr');
+        var icao = document.createElement('td');
+        icao.className = 'icao';
+        icao.textContent = a.icao;
+        var name = document.createElement('td');
+        name.textContent = cap(a.name);
+        var count = document.createElement('td');
+        count.className = 'num';
+        count.textContent = a.charts.length;
+        tr.append(icao, name, count);
+        body.appendChild(tr);
+      });
+      var hot = 0;
+      var found = 0;
+      AIRPORTS.forEach(function (a) {
+        a.charts.forEach(function (c) {
+          hot++;
+          if (!found && a.icao === 'IPPH' && c.id === '10-3C') found = hot;
+        });
+      });
+      if (found) document.getElementById('heroPlate').href = '/app#' + found;
+      var plateImg = document.getElementById('plateImg');
+      plateImg.addEventListener('error', function () {
+        if (!plateImg.dataset.retried) {
+          plateImg.dataset.retried = '1';
+          plateImg.removeAttribute('crossorigin');
+          plateImg.src = 'https://drive.google.com/thumbnail?id=1GgJ0HLRRpu25ZGVWuhG_EX-xdByFveic&sz=w1600';
+          return;
+        }
+        document.getElementById('plateWrap').hidden = true;
+      });
+      if (plateImg.complete && !plateImg.naturalWidth) plateImg.dispatchEvent(new Event('error'));
+      document.getElementById('indexSummary').textContent =
+        total + ' charts across ' + AIRPORTS.length + ' airports, plus the enroute chart.';
+    })();
+    </script>
+    <script is:inline src="/js/hero-draw.js"></script>
+  </Fragment>
+</LandingLayout>

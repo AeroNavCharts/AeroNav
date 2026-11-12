@@ -1,0 +1,38 @@
+---
+import LandingLayout from '../layouts/LandingLayout.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+const courses = Array.from({ length: 8 }, (_, i) => `Course ${i + 1}`);
+---
+
+<LandingLayout
+  title="AeroAcademy by AeroNav"
+  description="AeroAcademy by AeroNav: free courses on reading and flying aeronautical charts in PTFS."
+  keywords="AeroNav, AeroAcademy, courses, charts, PTFS"
+>
+    <section class="band page-head">
+        <div class="band-inner">
+            <h1 class="page-title">AeroAcademy by AeroNav</h1>
+            <p class="band-text">Short courses on reading charts and flying procedures in PTFS. New courses are on the way.</p>
+        </div>
+    </section>
+
+    <section class="band band-tight">
+        <div class="band-inner">
+            <h2 class="band-title">Courses</h2>
+            <div class="course-grid">
+                {courses.map((course) => (
+                    <div class="course-card is-soon">
+                        <h3>{course}</h3>
+                        <span class="course-badge">Coming soon</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
+
+  <SiteFooter slot="footer" brand="Aeronav" credits={false}>
+    <a href="mailto:aeronavcartography@gmail.com">Contact Us</a>
+    <a href="/donate" target="_blank">Support Our Work</a>
+  </SiteFooter>
+</LandingLayout>

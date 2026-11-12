@@ -1,0 +1,56 @@
+---
+import LandingLayout from '../layouts/LandingLayout.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+---
+
+<LandingLayout
+  title="Donate to AeroNav"
+  description="Support AeroNav Charts: donations help our team continue creating professional aeronautical charts for PTFS and RoAv pilots."
+  keywords="AeroNav, donate, charts, PTFS, RoAv"
+>
+    <section class="band page-head">
+        <div class="band-inner">
+            <h1 class="page-title">Support AeroNav</h1>
+            <p class="band-text">Donations go toward keeping the charts updated for PTFS and RoAv pilots.</p>
+        </div>
+    </section>
+
+    <section class="band band-tight">
+        <div class="band-inner split">
+            <div class="split-lead">
+                <h2 class="band-title">Donate with Robux</h2>
+                <p class="band-text">Each amount opens a Roblox game pass in a new tab.</p>
+            </div>
+            <div class="amounts">
+                <a href="https://www.roblox.com/game-pass/1317716091/Aeronav-Secure-Payment-100-Robux" target="_blank" rel="noopener" class="amount">
+                    <span class="amount-value">100</span>
+                    <span class="amount-unit">Robux</span>
+                </a>
+                <a href="https://www.roblox.com/game-pass/1396477675/Aeronav-Secure-Payment-150-Robux" target="_blank" rel="noopener" class="amount">
+                    <span class="amount-value">150</span>
+                    <span class="amount-unit">Robux</span>
+                </a>
+                <a href="https://www.roblox.com/game-pass/1397155361/Aeronav-Secure-Payment-200-Robux" target="_blank" rel="noopener" class="amount">
+                    <span class="amount-value">200</span>
+                    <span class="amount-unit">Robux</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="band band-alt">
+        <div class="band-inner">
+            <h2 class="band-title">Before you donate</h2>
+            <div class="prose">
+                <p>Any donations are greatly appreciated. Contact <strong>sweet_kid</strong> with proof of donation to receive a shoutout in <strong>24Hub's AeroNav channel</strong>.</p>
+                <p>Proof of donation is required for shoutouts. Under certain circumstances, donations may be divided among active AeroNav chart makers.</p>
+                <p>If you would like to donate to a specific person, reach out to <strong>sweet_kid</strong>. That donation is treated as casual.</p>
+            </div>
+        </div>
+    </section>
+
+  <SiteFooter slot="footer">
+    <a href="mailto:aeronavcartography@gmail.com">Contact us</a>
+    <a href="/academy">AeroAcademy</a>
+  </SiteFooter>
+</LandingLayout>
