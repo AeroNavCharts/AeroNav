@@ -10,9 +10,10 @@ interface Props {
   keywords: string;
   bodyClass?: string;
   intro?: boolean;
+  shareTitle?: string;
 }
 
-const { title, description, keywords, bodyClass, intro = false } = Astro.props;
+const { title, description, keywords, bodyClass, intro = false, shareTitle } = Astro.props;
 ---
 
 <!doctype html>
@@ -22,6 +23,7 @@ const { title, description, keywords, bodyClass, intro = false } = Astro.props;
       title={title}
       description={description}
       keywords={keywords}
+      shareTitle={shareTitle}
       fonts="family=B612:wght@400;700&family=Inter:wght@400;500;600"
       stylesheet="/css/home.css"
     />
