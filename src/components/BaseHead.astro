@@ -14,7 +14,8 @@ const { title, description, keywords, fonts, stylesheet, shareTitle = title } = 
 
 const pageUrl = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/'), Astro.site).href;
 const shareImage = new URL('/assets/og-banner.png', Astro.site).href;
-const embedJson = discordEmbed({ heading: shareTitle, text: description, image: shareImage, site: Astro.site });
+const embedImage = new URL('/assets/og-banner.gif', Astro.site).href;
+const embedJson = discordEmbed({ heading: shareTitle, text: description, image: embedImage, site: Astro.site });
 ---
 
 <meta charset="utf-8" />
