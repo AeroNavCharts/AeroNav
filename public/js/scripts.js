@@ -368,7 +368,6 @@ function closeQuickActions() {
 
 function setupQuickActions() {
     const quickHome = document.getElementById('quickHome');
-    const quickRefresh = document.getElementById('quickRefresh');
     const quickFullscreen = document.getElementById('quickFullscreen');
     const quickShare = document.getElementById('quickShare');
     const quickDraw = document.getElementById('quickDraw');
@@ -389,14 +388,6 @@ function setupQuickActions() {
         });
     }
     
-    if (quickRefresh) {
-        quickRefresh.addEventListener('click', () => {
-            if (currentChart) {
-                loadChartInViewer(currentChart, { fromPinned: false });
-            }
-            closeQuickActions();
-        });
-    }
     
     if (quickFullscreen) {
         quickFullscreen.addEventListener('click', () => {
@@ -654,14 +645,8 @@ function init() {
     if (rotateRightBtn) rotateRightBtn.addEventListener('click', () => chartViewer.rotateBy(90));
     const drawBtn = document.getElementById('drawBtn');
     if (drawBtn) drawBtn.addEventListener('click', () => chartViewer.setDrawMode(!chartViewer.drawMode));
-    const refreshBtn = document.getElementById('refreshBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const shareBtn = document.getElementById('shareBtn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            if (currentChart) loadChartInViewer(currentChart, { fromPinned: false });
-        });
-    }
     if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', () => {
             const wrap = document.querySelector('.iframe-wrap');
