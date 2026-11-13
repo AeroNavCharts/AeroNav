@@ -188,6 +188,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
             </button>
           </div>
           <label class="route-speed-row">Cruise speed <input id="routeSpeed" class="route-speed" type="number" min="40" max="2000" step="10" inputmode="numeric" aria-label="Cruise speed in knots" /> kt</label>
+          <p class="route-atis" id="routeAtis" hidden></p>
           <div class="list">
             <p class="route-empty" id="routeEmpty"></p>
             <ol class="route-list" id="routeList"></ol>

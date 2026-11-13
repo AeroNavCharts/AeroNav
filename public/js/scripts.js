@@ -41,8 +41,10 @@ const routePlanner = new RoutePlanner(chartViewer, ownship, {
     actions: document.getElementById('routeActions'),
     copy: document.getElementById('routeCopy'),
     enroute: document.getElementById('routeEnroute'),
-    shuffle: document.getElementById('routeShuffle')
+    shuffle: document.getElementById('routeShuffle'),
+    atis: document.getElementById('routeAtis')
 }, {
+    atis: (icao) => new Promise((resolve) => setTimeout(resolve)).then(() => atisFor(icao)),
     openEnroute: () => {
         const chart = pinned.find(p => p.id === 'ENROUTE');
         if (!chart) return;

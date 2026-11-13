@@ -8,6 +8,8 @@ class RoutePlanner {
         this.options = [];
         this.picked = 0;
         this.seed = 1;
+        this.run = 0;
+        this.active = {};
         const saved = this.read();
         this.from = saved.from || '';
         this.to = saved.to || '';
@@ -29,9 +31,17 @@ class RoutePlanner {
         return name.replace(/\s+/g, '');
     }
 
-    static procedures(icao, kind) {
+    static procedures(icao, kind, runways) {
         const all = typeof NAV_PROCEDURES !== 'undefined' ? NAV_PROCEDURES[icao] : null;
-        return ((all && all[kind]) || []).map(([name, fixes]) => ({ name, fixes: fixes.filter((fix) => NAV_FIXES[fix]) }));
+        const list = ((all && all[kind]) || []).map(([name, fixes, serves]) => ({ name, fixes: fixes.filter((fix) => NAV_FIXES[fix]), serves: serves || null }));
+        if (!runways || !runways.length) return list;
+        const usable = list.filter((proc) => !proc.serves || proc.serves.some((runway) => runways.includes(runway)));
+        return usable.length ? usable : list;
+    }
+
+    static gates(proc) {
+        const own = proc.fixes.filter((fix) => proc.name.startsWith(`${fix} `));
+        return own.length ? own : proc.fixes;
     }
 
     static random(seed) {
@@ -45,7 +55,7 @@ class RoutePlanner {
         };
     }
 
-    static network(from, to) {
+    static network(from, to, active) {
         const seen = new Set();
         const nodes = [];
         Object.entries(NAV_FIXES).forEach(([name, pos]) => {
@@ -69,10 +79,7 @@ class RoutePlanner {
         });
         const gate = (icao, kind) => {
             const pos = NAV_AIRPORTS[icao];
-            const named = new Set(RoutePlanner.procedures(icao, kind).flatMap((proc) => {
-                const own = proc.fixes.filter((fix) => proc.name.startsWith(`${fix} `));
-                return own.length ? own : proc.fixes;
-            }).filter((fix) => index.has(fix)));
+            const named = new Set(RoutePlanner.procedures(icao, kind, kind === 'SID' ? active.dep : active.arr).flatMap(RoutePlanner.gates).filter((fix) => index.has(fix)));
             const picks = named.size ? [...named].map((fix) => index.get(fix)) : nodes.map((node, i) => [span(pos, node.pos), i]).sort((a, b) => a[0] - b[0]).slice(0, 5).map(([, i]) => i);
             return new Map(picks.map((i) => [i, span(pos, nodes[i].pos)]));
         };
@@ -152,11 +159,11 @@ class RoutePlanner {
         return total / (samples || 1);
     }
 
-    static build(from, to, seed = 1) {
+    static build(from, to, seed = 1, active = {}) {
         const start = NAV_AIRPORTS[from];
         const end = NAV_AIRPORTS[to];
         if (!start || !end || from === to) return [];
-        const net = RoutePlanner.network(from, to);
+        const net = RoutePlanner.network(from, to, active);
         const random = RoutePlanner.random(seed * 7919 + from.charCodeAt(1) * 131 + to.charCodeAt(2));
         const wear = new Map();
         const found = new Map();
@@ -203,8 +210,8 @@ class RoutePlanner {
             chosen.push(pool.splice(pick, 1)[0]);
         }
         const label = (kind, icao, fix) => {
-            const list = RoutePlanner.procedures(icao, kind).filter((proc) => proc.fixes.includes(fix));
-            return list.find((proc) => proc.name.startsWith(fix)) || list[0] || null;
+            const list = RoutePlanner.procedures(icao, kind, kind === 'SID' ? active.dep : active.arr);
+            return list.find((proc) => RoutePlanner.gates(proc).includes(fix)) || null;
         };
         return (chosen.length ? chosen : [direct]).sort((a, b) => a.distance - b.distance).map((option) => {
             const sid = option.names.length ? label('SID', from, option.names[0]) : null;
@@ -250,11 +257,12 @@ class RoutePlanner {
 
     bind() {
         const { from, to, swap, speed, list, copy, enroute, shuffle } = this.els;
-        from.addEventListener('change', () => { this.from = from.value; this.seed = 1; this.plan(); });
-        to.addEventListener('change', () => { this.to = to.value; this.seed = 1; this.plan(); });
+        from.addEventListener('change', () => { this.from = from.value; this.seed = 1; this.active = {}; this.plan(); });
+        to.addEventListener('change', () => { this.to = to.value; this.seed = 1; this.active = {}; this.plan(); });
         shuffle.addEventListener('click', () => { this.seed += 1; this.plan(); });
         swap.addEventListener('click', () => {
             [this.from, this.to] = [this.to, this.from];
+            this.active = {};
             from.value = this.from;
             to.value = this.to;
             this.plan();
@@ -279,10 +287,40 @@ class RoutePlanner {
 
     plan() {
         this.save();
-        this.options = typeof NAV_AIRPORTS === 'undefined' ? [] : RoutePlanner.build(this.from, this.to, this.seed);
+        const run = ++this.run;
+        this.compute();
+        const ready = this.actions.atis && this.from && this.to && this.from !== this.to;
+        if (!ready) {
+            this.renderAtis(null);
+            return;
+        }
+        const ask = (icao) => this.actions.atis(icao).catch(() => null);
+        Promise.all([ask(this.from), ask(this.to)]).then(([origin, target]) => {
+            if (run !== this.run) return;
+            const numbers = (list) => (list || []).map((runway) => parseInt(runway, 10)).filter((runway) => runway > 0);
+            const info = { origin, target, depNames: origin ? origin.dep : [], arrNames: target ? target.arr : [] };
+            this.active = { dep: numbers(info.depNames), arr: numbers(info.arrNames) };
+            this.compute();
+            this.renderAtis(info);
+        });
+    }
+
+    compute() {
+        this.options = typeof NAV_AIRPORTS === 'undefined' ? [] : RoutePlanner.build(this.from, this.to, this.seed, this.active);
         this.picked = 0;
         this.renderList();
         this.draw();
+    }
+
+    renderAtis(info) {
+        const { atis } = this.els;
+        if (!info) {
+            atis.hidden = true;
+            return;
+        }
+        const side = (icao, names, verb) => names.length ? `${icao} ${verb} ${names.join(' ')}` : `${icao} has no ATIS, all procedures shown`;
+        atis.textContent = `${side(this.from, info.depNames, 'departing')} \u00b7 ${side(this.to, info.arrNames, 'landing')}`;
+        atis.hidden = false;
     }
 
     minutes(option) {

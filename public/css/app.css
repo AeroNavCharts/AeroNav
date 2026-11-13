@@ -1030,6 +1030,16 @@ svg {
     padding: 2px 5px;
 }
 
+.route-atis {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
 .route-empty {
     margin: 0;
     padding: 14px;
