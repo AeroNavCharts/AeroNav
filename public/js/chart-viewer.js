@@ -30,6 +30,7 @@ class ChartViewer {
         this.planeEl.appendChild(this.planeImg);
         this.plane = null;
         this.route = null;
+        this.planned = null;
         this.picker = null;
         this.tapStart = null;
         this.trafficEl = document.createElement('div');
@@ -365,15 +366,25 @@ class ChartViewer {
         this.renderInk();
     }
 
+    setPlanned(route) {
+        this.planned = route && route.length > 1 ? route : null;
+        this.renderInk();
+    }
+
     drawRoute(ctx, k) {
-        const route = this.route;
+        this.strokeRoute(ctx, k, this.planned, 'rgba(20, 150, 95, 0.6)', 'rgba(10, 110, 70, 0.95)');
+        this.strokeRoute(ctx, k, this.route, 'rgba(150, 70, 210, 0.55)', 'rgba(120, 50, 180, 0.95)');
+    }
+
+    strokeRoute(ctx, k, route, line, edge) {
         if (!route) return;
         ctx.save();
         ctx.beginPath();
         ctx.rect(0, 0, this.natW * this.scale, this.natH * this.scale);
         ctx.clip();
-        ctx.strokeStyle = 'rgba(150, 70, 210, 0.55)';
+        ctx.strokeStyle = line;
         ctx.lineWidth = 9;
+        ctx.lineJoin = 'round';
         ctx.beginPath();
         route.forEach(([u, v], i) => {
             if (i) ctx.lineTo(u * k, v * k);
@@ -381,7 +392,7 @@ class ChartViewer {
         });
         ctx.stroke();
         ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = 'rgba(120, 50, 180, 0.95)';
+        ctx.strokeStyle = edge;
         ctx.lineWidth = 2;
         route.forEach(([u, v]) => {
             ctx.beginPath();
@@ -533,7 +544,7 @@ class ChartViewer {
         const dpr = window.devicePixelRatio || 1;
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.ink.width, this.ink.height);
-        if (!this.natW || (!this.marks.length && !this.route)) return;
+        if (!this.natW || (!this.marks.length && !this.route && !this.planned)) return;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
