@@ -463,6 +463,7 @@ class RoutePlanner {
         const ready = this.options.length > 0;
         actions.hidden = !ready;
         this.els.details.hidden = !ready;
+        this.els.tools.hidden = !ready;
         empty.hidden = ready;
         if (!ready) {
             empty.textContent = this.from && this.to && this.from === this.to ? 'Pick two different airports.' : 'Pick a departure and an arrival airport to see route options, fastest first.';
@@ -477,9 +478,9 @@ class RoutePlanner {
                 <button type="button" class="route-card${index === this.picked ? ' active' : ''}" data-index="${index}" aria-pressed="${index === this.picked}">
                     <span class="route-card-top">
                         <span class="route-card-time">${RoutePlanner.clock(minutes)}</span>
+                        <span class="route-card-via">${option.distance.toFixed(1)} NM \u00b7 ${option.via}</span>
                         <span class="route-card-tag${index === 0 ? ' best' : ''}">${extra}</span>
                     </span>
-                    <span class="route-card-via">${option.via} · ${option.distance.toFixed(1)} NM</span>
                     <span class="route-card-text">${option.text}</span>
                 </button>
             </li>`;

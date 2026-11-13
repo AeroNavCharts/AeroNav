@@ -44,6 +44,7 @@ const routePlanner = new RoutePlanner(chartViewer, ownship, {
     shuffle: document.getElementById('routeShuffle'),
     atis: document.getElementById('routeAtis'),
     details: document.getElementById('routeDetails'),
+    tools: document.getElementById('routeTools'),
     command: document.getElementById('routeCommand'),
     clear: document.getElementById('routeClear'),
     fields: {
