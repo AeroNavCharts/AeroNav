@@ -183,7 +183,7 @@ class RoutePlanner {
         const direct = { names: [], points: [start, end], distance: RoutePlanner.distance(start, end) };
         const pool = [...found.values()].filter((option) => option.distance <= direct.distance * 1.5).sort((a, b) => a.distance - b.distance);
         const chosen = pool.length ? [pool.splice(seed > 1 ? Math.floor(random() * Math.min(3, pool.length)) : 0, 1)[0]] : [];
-        while (chosen.length < 4 && pool.length) {
+        while (chosen.length < 5 && pool.length) {
             let pick = 0;
             let score = -1;
             pool.forEach((option, i) => {
@@ -201,7 +201,7 @@ class RoutePlanner {
             const list = RoutePlanner.procedures(icao, kind).filter((proc) => proc.fixes.includes(fix));
             return list.find((proc) => proc.name.startsWith(fix)) || list[0] || null;
         };
-        return [...chosen, direct].sort((a, b) => a.distance - b.distance).map((option) => {
+        return (chosen.length ? chosen : [direct]).sort((a, b) => a.distance - b.distance).map((option) => {
             const sid = option.names.length ? label('SID', from, option.names[0]) : null;
             const star = option.names.length ? label('STAR', to, option.names[option.names.length - 1]) : null;
             return {
