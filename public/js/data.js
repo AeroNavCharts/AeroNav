@@ -563,7 +563,7 @@ const AIRPORTS = [
             },
             {
                 "id": "29-1",
-                "title": "MELLOR BRIDGE VISUAL RWY 7",
+                "title": "MELLOR BRIDGE VISUAL RWY 25",
                 "category": "APP",
                 "link": "https://drive.google.com/file/d/1h2hxfTzvZxT1qu9OTGZv2yPD9LLO1y4v/view?usp=drive_link"
             },
