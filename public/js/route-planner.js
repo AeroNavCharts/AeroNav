@@ -20,6 +20,22 @@ class RoutePlanner {
         this.plan();
     }
 
+    static get DISCORD_AIRPORTS() {
+        return {
+            IRFD: 'Greater Rockford',
+            IPPH: 'Perth',
+            IZOL: 'Izolirani',
+            ITKO: 'Tokyo',
+            ILAR: 'Larnaca',
+            IIAB: 'McConnell AFB',
+            IKFL: 'Keflavik',
+            IPAP: 'Paphos',
+            ISAU: 'Sauthemptona',
+            IMLR: 'Mellor',
+            IBTH: 'Saint Barthelemy'
+        };
+    }
+
     static get STUDS_PER_NM() {
         return 3307.14286;
     }
@@ -373,8 +389,8 @@ class RoutePlanner {
             ['callsign', value('callsign').toUpperCase()],
             ['aircraft', value('aircraft')],
             ['flightrules', value('flightrules')],
-            ['departing', this.from],
-            ['arriving', this.to],
+            ['departing', RoutePlanner.DISCORD_AIRPORTS[this.from] || this.from],
+            ['arriving', RoutePlanner.DISCORD_AIRPORTS[this.to] || this.to],
             ['flightlevel', level ? level.padStart(3, '0') : ''],
             ['ingamename', value('ingamename')],
             ['route', option.text.split(' ').slice(1, -1).join(' ')]
