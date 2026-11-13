@@ -32,7 +32,16 @@ class RoutePlanner {
             IPAP: 'Paphos',
             ISAU: 'Sauthemptona',
             IMLR: 'Mellor',
-            IBTH: 'Saint Barthelemy'
+            IBTH: 'Saint Barth\u00e9lemy',
+            IDCS: 'Saba',
+            ITRC: 'Training Centre',
+            ILKL: 'Lukla',
+            IJAF: 'Al Najaf',
+            IGAR: 'Airbase Garry',
+            ISCM: 'RAF Scampton',
+            IHEN: 'Hentsridge Airfield',
+            ISKP: 'Skopelos',
+            IBLT: 'Boltic Airfield'
         };
     }
 
