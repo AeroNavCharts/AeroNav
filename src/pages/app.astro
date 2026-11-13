@@ -62,6 +62,14 @@ import LoaderLogo from '../components/LoaderLogo.astro';
           </svg>
           <span>Pinboard</span>
         </button>
+        <button class="rail-btn" data-panel="route" aria-label="Route planner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5.5" cy="18.5" r="2.2" />
+            <circle cx="18.5" cy="5.5" r="2.2" />
+            <path d="M7.5 17.5 11 14l2-4 3.5-3" />
+          </svg>
+          <span>Route</span>
+        </button>
         <button class="rail-btn" data-panel="links" aria-label="Links">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M10 13a4 4 0 0 0 5.7.3l3-3A4 4 0 0 0 13 4.6l-1.4 1.4" />
@@ -152,6 +160,41 @@ import LoaderLogo from '../components/LoaderLogo.astro';
 
           <div class="mobile-search-overlay" id="mobileSearchOverlay">
             <input id="mobileSearch" class="search mobile-search-input" placeholder="Search airports and charts..." />
+          </div>
+        </section>
+
+        <section class="panel-view" id="viewRoute">
+          <div class="panel-head">
+            <div class="panel-heading">
+              <div class="panel-title">Route</div>
+              <div class="panel-sub">Plan a route and see it on the charts</div>
+            </div>
+          </div>
+          <form class="search-wrap route-form" id="routeForm" autocomplete="off">
+            <input id="routeInput" class="search" list="routeOptions" placeholder="Add points, e.g. IRFD KENED IPPH" autocapitalize="characters" spellcheck="false" aria-label="Add airports or waypoints" />
+            <button class="route-add" type="submit">Add</button>
+            <datalist id="routeOptions"></datalist>
+          </form>
+          <div class="list">
+            <p class="route-empty" id="routeEmpty">Type airport codes and waypoint names in order. You can paste a whole route at once.</p>
+            <ol class="route-list" id="routeList"></ol>
+          </div>
+          <div class="route-summary" id="routeSummary" hidden>
+            <div class="route-stat">
+              <span class="route-stat-label">Distance</span>
+              <span class="route-stat-value" id="routeTotal"></span>
+            </div>
+            <div class="route-stat">
+              <span class="route-stat-label">Time at <input id="routeSpeed" class="route-speed" type="number" min="40" max="2000" step="10" inputmode="numeric" aria-label="Ground speed in knots" /> kt</span>
+              <span class="route-stat-value" id="routeTime"></span>
+            </div>
+          </div>
+          <p class="panel-note" id="routeNote" hidden></p>
+          <div class="route-actions">
+            <button class="route-btn" id="routeEnroute" type="button">Enroute chart</button>
+            <button class="route-btn" id="routeFiled" type="button">Use filed plan</button>
+            <button class="route-btn" id="routeCopy" type="button">Copy</button>
+            <button class="route-btn" id="routeClear" type="button">Clear</button>
           </div>
         </section>
 
@@ -374,6 +417,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
     <script is:inline src={versioned("/js/chart-viewer.js")}></script>
     <script is:inline src={versioned("/js/navdata.js")}></script>
     <script is:inline src={versioned("/js/ownship.js")}></script>
+    <script is:inline src={versioned("/js/route-planner.js")}></script>
     <script is:inline src={versioned("/js/install.js")}></script>
     <script is:inline src={versioned("/js/scripts.js")} defer></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

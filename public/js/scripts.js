@@ -19,12 +19,36 @@ const chartViewer = new ChartViewer(chartWrap, {
     },
     onLoad: () => {
         if (typeof ownship !== 'undefined') ownship.refresh();
+        if (typeof routePlanner !== 'undefined') routePlanner.draw();
     }
 });
 const ownship = new Ownship(chartViewer, {
     button: document.getElementById('ownshipBtn'),
     chip: document.getElementById('ownshipChip'),
     host: chartWrap
+});
+const routePlanner = new RoutePlanner(chartViewer, ownship, {
+    form: document.getElementById('routeForm'),
+    input: document.getElementById('routeInput'),
+    options: document.getElementById('routeOptions'),
+    list: document.getElementById('routeList'),
+    empty: document.getElementById('routeEmpty'),
+    summary: document.getElementById('routeSummary'),
+    total: document.getElementById('routeTotal'),
+    time: document.getElementById('routeTime'),
+    speed: document.getElementById('routeSpeed'),
+    note: document.getElementById('routeNote'),
+    enroute: document.getElementById('routeEnroute'),
+    filed: document.getElementById('routeFiled'),
+    copy: document.getElementById('routeCopy'),
+    clear: document.getElementById('routeClear')
+}, {
+    openEnroute: () => {
+        const chart = pinned.find(p => p.id === 'ENROUTE');
+        if (!chart) return;
+        loadChartInViewer(chart, { fromPinned: true });
+        if (window.innerWidth <= 900) closeMobileMenu();
+    }
 });
 let chartLoadToken = 0;
 
@@ -67,6 +91,7 @@ const favBtn = document.getElementById('favBtn');
 const railButtons = Array.from(document.querySelectorAll('.rail-btn[data-panel]'));
 const panelViews = {
     airports: document.getElementById('viewAirports'),
+    route: document.getElementById('viewRoute'),
     links: document.getElementById('viewLinks')
 };
 
