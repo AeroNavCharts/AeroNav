@@ -77,8 +77,6 @@ const menuToggle = document.getElementById('menuToggle');
 const mobileSearchToggle = document.getElementById('mobileSearchToggle');
 const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
 const leftCol = document.getElementById('leftCol');
-const moreBtn = document.getElementById('moreBtn');
-const controlsDropdown = document.getElementById('controlsDropdown');
 const skeletonLoader = document.getElementById('skeletonLoader');
 const emptyState = document.getElementById('emptyState');
 const quickActionsBtn = document.getElementById('quickActionsBtn');
@@ -375,16 +373,6 @@ function animateList(direction) {
 function closeMobileSearch() {
     if (!mobileSearchOverlay) return;
     mobileSearchOverlay.classList.remove('active');
-}
-
-function toggleMoreMenu() {
-    if (!controlsDropdown) return;
-    controlsDropdown.classList.toggle('active');
-}
-
-function closeMoreMenu() {
-    if (!controlsDropdown) return;
-    controlsDropdown.classList.remove('active');
 }
 
 function toggleQuickActions() {
@@ -712,10 +700,6 @@ function init() {
         mobileSearchToggle.addEventListener('click', toggleMobileSearch);
     }
     
-    if (moreBtn) {
-        moreBtn.addEventListener('click', toggleMoreMenu);
-    }
-    
     if (quickActionsBtn) {
         quickActionsBtn.addEventListener('click', toggleQuickActions);
     }
@@ -732,10 +716,6 @@ function init() {
         if (leftCol && leftCol.classList.contains('active') &&
             !inside(leftCol) && !inside(menuToggle) && !inside(mobileSearchToggle) && !inside(document.querySelector('.rail'))) {
             closeMobileMenu();
-        }
-        if (controlsDropdown && controlsDropdown.classList.contains('active') &&
-            !inside(moreBtn) && !inside(controlsDropdown)) {
-            closeMoreMenu();
         }
         if (mobileSearchOverlay && mobileSearchOverlay.classList.contains('active') &&
             !inside(mobileSearchOverlay) && !inside(mobileSearchToggle)) {
