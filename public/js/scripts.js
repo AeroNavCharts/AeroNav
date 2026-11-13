@@ -42,7 +42,11 @@ const routePlanner = new RoutePlanner(chartViewer, ownship, {
     copy: document.getElementById('routeCopy'),
     enroute: document.getElementById('routeEnroute'),
     shuffle: document.getElementById('routeShuffle'),
-    atis: document.getElementById('routeAtis'),
+    count: document.getElementById('routeCount'),
+    ends: {
+        from: { code: document.getElementById('routeFromCode'), name: document.getElementById('routeFromName'), runway: document.getElementById('routeFromRwy') },
+        to: { code: document.getElementById('routeToCode'), name: document.getElementById('routeToName'), runway: document.getElementById('routeToRwy') }
+    },
     details: document.getElementById('routeDetails'),
     tools: document.getElementById('routeTools'),
     command: document.getElementById('routeCommand'),

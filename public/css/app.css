@@ -955,85 +955,115 @@ svg {
     right: 10px;
 }
 
-.route-pick {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 12px 10px;
+.route-ends {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: start;
+    gap: 4px;
+    padding: 18px 14px 14px;
+    border-bottom: 1px solid var(--line);
 }
 
-.route-fields {
-    flex: 1;
-    min-width: 0;
+.route-end {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-}
-
-.route-field {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 36px;
-    padding: 0 10px;
-    background: var(--rail-bg);
-    border: 1px solid var(--line);
+    gap: 2px;
+    min-width: 0;
+    padding: 4px 6px 6px;
     border-radius: 8px;
+    cursor: pointer;
 }
 
-.route-field:focus-within {
-    border-color: var(--accent-line);
+.route-end-to {
+    align-items: flex-end;
+    text-align: right;
 }
 
-.route-field span {
-    width: 34px;
+.route-end:hover,
+.route-end:focus-within {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.route-end:focus-within {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 1px;
+}
+
+.route-end select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.route-end-code {
+    font-family: 'Fira Code', monospace;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--text);
+}
+
+.route-end-code.idle {
+    color: var(--line-strong);
+}
+
+.route-end-name {
+    max-width: 100%;
     color: var(--muted);
     font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.route-field select {
-    flex: 1;
-    min-width: 0;
-    background: var(--rail-bg);
-    border: 0;
-    outline: none;
-    color: var(--text);
-    font: inherit;
-    font-size: 14px;
+.route-end-rwy {
+    min-height: 16px;
+    color: #4fc79a;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 
 .route-swap {
-    width: 34px;
-    height: 34px;
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0;
     background: none;
-    border: 1px solid var(--line);
-    border-radius: 8px;
+    border: 0;
     color: var(--muted);
     cursor: pointer;
 }
 
-.route-swap:hover {
-    color: var(--text);
-    border-color: var(--line-strong);
+.route-swap::before,
+.route-swap::after {
+    content: '';
+    width: 18px;
+    border-top: 1px dashed var(--line-strong);
 }
 
-.route-atis {
-    margin: 0 12px 4px;
-    padding: 7px 10px;
-    background: rgba(31, 157, 107, 0.1);
-    border: 1px solid rgba(31, 157, 107, 0.35);
-    border-radius: 8px;
+.route-swap svg {
+    transition: transform 0.25s ease;
+}
+
+.route-swap:hover {
     color: var(--text);
-    font-size: 12px;
-    line-height: 1.45;
+}
+
+.route-swap:hover svg {
+    transform: rotate(180deg);
 }
 
 .route-empty {
     margin: 0;
-    padding: 6px 14px 14px;
+    padding: 16px 16px 14px;
     color: var(--muted);
     font-size: 13px;
     line-height: 1.5;
@@ -1043,7 +1073,7 @@ svg {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 12px 12px 6px;
+    padding: 14px 14px 8px;
 }
 
 .route-section[hidden] {
@@ -1053,10 +1083,7 @@ svg {
 .route-section-title {
     flex: 1;
     color: var(--muted);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 12px;
 }
 
 .route-tool {
@@ -1064,97 +1091,123 @@ svg {
     align-items: center;
     gap: 5px;
     height: 26px;
-    padding: 0 9px;
+    padding: 0 8px;
     background: none;
-    border: 1px solid var(--line);
+    border: 0;
     border-radius: 6px;
-    color: var(--text);
+    color: var(--accent-text);
     font: inherit;
     font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
 }
 
 .route-tool:hover {
-    border-color: var(--line-strong);
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text);
 }
 
 .route-list {
     list-style: none;
     margin: 0;
-    padding: 0 10px;
+    padding: 0 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
-.route-card {
+.strip {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 9px 12px;
-    background: var(--rail-bg);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    color: var(--text);
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    padding: 0;
+    background: #cdd7e0;
+    border: 0;
+    border-radius: 3px;
+    outline: 2px solid transparent;
+    outline-offset: 1px;
+    color: #14202c;
     font: inherit;
     text-align: left;
     cursor: pointer;
+    transition: background-color 0.15s ease;
 }
 
-.route-card:hover {
-    border-color: var(--line-strong);
+.strip:hover,
+.strip:focus-visible {
+    background: #dde5ec;
 }
 
-.route-card.active {
-    border-color: #1f9d6b;
-    background: rgba(31, 157, 107, 0.1);
+.strip.active {
+    background: #f6fafc;
+    outline-color: #23b67c;
 }
 
-.route-card-top {
+.strip-time {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
+    flex-direction: column;
+    gap: 1px;
+    padding: 8px 8px 8px 10px;
+    border-right: 1px solid #b4c1cd;
 }
 
-.route-card-time {
-    font-size: 15px;
-    font-weight: 600;
+.strip-clock {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.15;
     font-variant-numeric: tabular-nums;
 }
 
-.route-card-via {
-    flex: 1;
+.strip-miles,
+.strip-delta {
+    font-size: 11px;
+    color: #4d5d6c;
+    font-variant-numeric: tabular-nums;
+}
+
+.strip-delta.best {
+    color: #0d7a50;
+    font-weight: 700;
+}
+
+.strip-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
     min-width: 0;
-    color: var(--muted);
+    padding: 8px 10px;
+}
+
+.strip-procs {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.strip-proc {
+    color: #1b5e9b;
     font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.route-card-tag {
-    color: var(--muted);
-    font-size: 12px;
-    font-variant-numeric: tabular-nums;
+    font-weight: 700;
     white-space: nowrap;
 }
 
-.route-card-tag.best {
-    color: #3fc28d;
-    font-weight: 600;
+.strip-rule {
+    flex: 1;
+    min-width: 10px;
+    border-top: 1px solid #9fb0bf;
 }
 
-.route-card-text {
+.strip-fixes {
     font-family: 'Fira Code', monospace;
     font-size: 12px;
-    line-height: 1.45;
+    font-weight: 500;
+    line-height: 1.4;
     overflow-wrap: anywhere;
 }
 
 .route-note {
-    margin: 8px 12px 0;
+    margin: 10px 12px 0;
     padding: 8px 10px;
     border: 1px solid var(--line);
     border-radius: 8px;
@@ -1164,45 +1217,55 @@ svg {
     display: none;
 }
 
-.route-details-grid {
+.route-form {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-    padding: 0 12px 14px;
+    margin: 0 12px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .route-detail {
     grid-column: span 3;
     display: flex;
     flex-direction: column;
-    gap: 3px;
     min-width: 0;
+    padding: 6px 9px 5px;
     color: var(--muted);
     font-size: 11px;
+    box-shadow: 1px 0 0 var(--line), 0 1px 0 var(--line);
 }
 
 .route-detail-third {
     grid-column: span 2;
 }
 
+.route-detail:focus-within {
+    background: rgba(40, 123, 204, 0.12);
+    color: var(--accent-text);
+}
+
 .route-detail input,
 .route-detail select {
     width: 100%;
     min-width: 0;
-    height: 30px;
-    padding: 0 8px;
-    background: var(--rail-bg);
-    border: 1px solid var(--line);
-    border-radius: 6px;
+    height: 24px;
+    padding: 0;
+    background: none;
+    border: 0;
     outline: none;
     color: var(--text);
-    font: inherit;
+    font-family: 'Fira Code', monospace;
     font-size: 13px;
 }
 
-.route-detail input:focus,
-.route-detail select:focus {
-    border-color: var(--accent-line);
+.route-detail select {
+    background: var(--panel-bg);
+}
+
+.route-detail input::placeholder {
+    color: var(--line-strong);
 }
 
 .route-actions {

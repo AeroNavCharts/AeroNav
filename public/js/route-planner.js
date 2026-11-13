@@ -268,17 +268,28 @@ class RoutePlanner {
 
     fill() {
         if (typeof NAV_AIRPORTS === 'undefined') return;
-        const names = {};
-        if (typeof AIRPORTS !== 'undefined') AIRPORTS.forEach((airport) => { names[airport.icao] = airport.name; });
-        const title = (text) => text.toLowerCase().replace(/(^|[\s(])\w/g, (letter) => letter.toUpperCase());
-        const codes = Object.keys(NAV_AIRPORTS).sort((a, b) => Boolean(names[b]) - Boolean(names[a]) || a.localeCompare(b));
-        const html = codes.map((icao) => `<option value="${icao}">${icao}${names[icao] ? ` · ${title(names[icao])}` : ''}</option>`).join('');
+        const names = RoutePlanner.DISCORD_AIRPORTS;
+        const charted = typeof NAV_PROCEDURES !== 'undefined' ? NAV_PROCEDURES : {};
+        const codes = Object.keys(NAV_AIRPORTS).sort((a, b) => Boolean(charted[b]) - Boolean(charted[a]) || a.localeCompare(b));
+        const html = codes.map((icao) => `<option value="${icao}">${icao} ${names[icao] || ''}</option>`).join('');
         [this.els.from, this.els.to].forEach((select) => {
             select.innerHTML = `<option value="">Choose airport</option>${html}`;
         });
         this.els.from.value = this.from;
         this.els.to.value = this.to;
         this.els.speed.value = this.speed;
+    }
+
+    renderEnds(info) {
+        const names = RoutePlanner.DISCORD_AIRPORTS;
+        const paint = (end, icao, idle, runways, verb, known) => {
+            end.code.textContent = icao || '\u2013\u2013\u2013\u2013';
+            end.code.classList.toggle('idle', !icao);
+            end.name.textContent = icao ? names[icao] || icao : idle;
+            end.runway.textContent = !icao || !info ? '' : runways.length ? `${verb} ${runways.join(' ')}` : known ? '' : 'no ATIS';
+        };
+        paint(this.els.ends.from, this.from, 'Choose departure', info ? info.depNames : [], 'departing', info && info.origin);
+        paint(this.els.ends.to, this.to, 'Choose arrival', info ? info.arrNames : [], 'landing', info && info.target);
     }
 
     bind() {
@@ -317,6 +328,7 @@ class RoutePlanner {
     plan() {
         this.save();
         const run = ++this.run;
+        this.renderEnds(null);
         this.compute();
         const ready = this.actions.atis && this.from && this.to && this.from !== this.to;
         if (!ready) {
@@ -342,14 +354,7 @@ class RoutePlanner {
     }
 
     renderAtis(info) {
-        const { atis } = this.els;
-        if (!info) {
-            atis.hidden = true;
-            return;
-        }
-        const side = (icao, names, verb) => names.length ? `${icao} ${verb} ${names.join(' ')}` : `${icao} has no ATIS, all procedures shown`;
-        atis.textContent = `${side(this.from, info.depNames, 'departing')} \u00b7 ${side(this.to, info.arrNames, 'landing')}`;
-        atis.hidden = false;
+        this.renderEnds(info);
     }
 
     minutes(option) {
@@ -459,29 +464,38 @@ class RoutePlanner {
     }
 
     renderList() {
-        const { list, empty, actions } = this.els;
+        const { list, empty, actions, count } = this.els;
         const ready = this.options.length > 0;
         actions.hidden = !ready;
         this.els.details.hidden = !ready;
         this.els.tools.hidden = !ready;
         empty.hidden = ready;
         if (!ready) {
-            empty.textContent = this.from && this.to && this.from === this.to ? 'Pick two different airports.' : 'Pick a departure and an arrival airport to see route options, fastest first.';
+            empty.textContent = this.from && this.to && this.from === this.to ? 'Departure and arrival are the same airport. Change one of them.' : 'Tap the two airport codes above to choose where you are flying from and to.';
             list.innerHTML = '';
             return;
         }
+        count.textContent = `${this.options.length} ${this.options.length === 1 ? 'route' : 'routes'}, fastest first`;
         const fastest = this.minutes(this.options[0]);
         list.innerHTML = this.options.map((option, index) => {
             const minutes = this.minutes(option);
-            const extra = index === 0 ? 'Fastest' : minutes === fastest ? 'Same time' : `+${RoutePlanner.clock(minutes - fastest)}`;
+            const extra = index === 0 ? 'fastest' : minutes === fastest ? 'same time' : `+${RoutePlanner.clock(minutes - fastest)}`;
+            const on = index === this.picked;
             return `<li>
-                <button type="button" class="route-card${index === this.picked ? ' active' : ''}" data-index="${index}" aria-pressed="${index === this.picked}">
-                    <span class="route-card-top">
-                        <span class="route-card-time">${RoutePlanner.clock(minutes)}</span>
-                        <span class="route-card-via">${option.distance.toFixed(1)} NM \u00b7 ${option.via}</span>
-                        <span class="route-card-tag${index === 0 ? ' best' : ''}">${extra}</span>
+                <button type="button" class="strip${on ? ' active' : ''}" data-index="${index}" aria-pressed="${on}">
+                    <span class="strip-time">
+                        <span class="strip-clock">${RoutePlanner.clock(minutes)}</span>
+                        <span class="strip-miles">${option.distance.toFixed(1)} NM</span>
+                        <span class="strip-delta${index === 0 ? ' best' : ''}">${extra}</span>
                     </span>
-                    <span class="route-card-text">${option.text}</span>
+                    <span class="strip-body">
+                        <span class="strip-procs">
+                            <span class="strip-proc">${option.sid ? option.sid.name : this.from}</span>
+                            <span class="strip-rule"></span>
+                            <span class="strip-proc">${option.star ? option.star.name : this.to}</span>
+                        </span>
+                        <span class="strip-fixes">${option.names.join(' ') || 'direct'}</span>
+                    </span>
                 </button>
             </li>`;
         }).join('');
