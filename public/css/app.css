@@ -174,26 +174,6 @@ svg {
     display: none;
 }
 
-.panel-restore {
-    position: fixed;
-    left: calc(var(--rail-width) + 8px);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 26px;
-    height: 44px;
-    align-items: center;
-    justify-content: center;
-    background: var(--panel-bg);
-    border: 1px solid var(--line);
-    border-radius: 0 4px 4px 0;
-    color: var(--muted);
-    cursor: pointer;
-    z-index: 700;
-}
-
-.panel-restore:hover {
-    color: var(--text);
-}
 
 
 .panel-view {
@@ -2396,10 +2376,6 @@ iframe {
 
     #hideBtn {
         visibility: hidden;
-    }
-
-    .panel-restore {
-        display: none !important;
     }
 
     .mobile-search-overlay {

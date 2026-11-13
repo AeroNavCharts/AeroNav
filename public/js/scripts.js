@@ -213,8 +213,6 @@ function showPanel(name) {
     });
     railButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.panel === name));
     if (leftCol) leftCol.classList.remove('collapsed');
-    const restore = document.querySelector('.panel-restore');
-    if (restore) restore.style.display = 'none';
     if (window.innerWidth <= 900 && leftCol) leftCol.classList.add('active');
 }
 
@@ -1828,21 +1826,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const doneBtn = document.getElementById('doneBtn');
     const listInnerDiv = document.getElementById('listInner');
 
-    const showPanelBtn = document.createElement('button');
-    showPanelBtn.className = 'panel-restore';
-    showPanelBtn.setAttribute('aria-label', 'Show panel');
-    showPanelBtn.innerHTML = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M9 5l7 7-7 7\"/></svg>";
-    showPanelBtn.style.display = 'none';
-    document.body.appendChild(showPanelBtn);
-
     function setPanelCollapsed(collapsed) {
         if (!panel) return;
         panel.classList.toggle('collapsed', collapsed);
-        showPanelBtn.style.display = collapsed ? 'flex' : 'none';
     }
 
     if (hideBtn) hideBtn.addEventListener('click', () => setPanelCollapsed(true));
-    showPanelBtn.addEventListener('click', () => setPanelCollapsed(false));
 
     const siteAd = document.getElementById('siteAd');
     const adCloseBtn = document.getElementById('adCloseBtn');
