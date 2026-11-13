@@ -7,6 +7,7 @@ class RoutePlanner {
         this.key = 'aeronav_route_plan';
         this.options = [];
         this.picked = 0;
+        this.seed = 1;
         const saved = this.read();
         this.from = saved.from || '';
         this.to = saved.to || '';
@@ -30,45 +31,187 @@ class RoutePlanner {
 
     static procedures(icao, kind) {
         const all = typeof NAV_PROCEDURES !== 'undefined' ? NAV_PROCEDURES[icao] : null;
-        const list = (all && all[kind]) || [];
-        return [null, ...list.map(([name, fixes]) => ({ name, fixes: fixes.filter((fix) => NAV_FIXES[fix]) }))];
+        return ((all && all[kind]) || []).map(([name, fixes]) => ({ name, fixes: fixes.filter((fix) => NAV_FIXES[fix]) }));
     }
 
-    static build(from, to) {
+    static random(seed) {
+        let state = seed >>> 0;
+        return () => {
+            state = (state + 0x6D2B79F5) >>> 0;
+            let t = state;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+
+    static network(from, to) {
+        const seen = new Set();
+        const nodes = [];
+        Object.entries(NAV_FIXES).forEach(([name, pos]) => {
+            const key = pos.join(',');
+            if (name.length < 4 || seen.has(key)) return;
+            seen.add(key);
+            nodes.push({ name, pos });
+        });
+        const index = new Map(nodes.map((node, i) => [node.name, i]));
+        const span = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+        const links = nodes.map(() => new Map());
+        nodes.forEach((node, i) => {
+            nodes.map((other, j) => [span(node.pos, other.pos), j])
+                .filter(([, j]) => j !== i)
+                .sort((a, b) => a[0] - b[0])
+                .slice(0, 6)
+                .forEach(([length, j]) => {
+                    links[i].set(j, length);
+                    links[j].set(i, length);
+                });
+        });
+        const gate = (icao, kind) => {
+            const pos = NAV_AIRPORTS[icao];
+            const named = new Set(RoutePlanner.procedures(icao, kind).flatMap((proc) => proc.fixes).filter((fix) => index.has(fix)));
+            const picks = named.size ? [...named].map((fix) => index.get(fix)) : nodes.map((node, i) => [span(pos, node.pos), i]).sort((a, b) => a[0] - b[0]).slice(0, 5).map(([, i]) => i);
+            return new Map(picks.map((i) => [i, span(pos, nodes[i].pos)]));
+        };
+        return { nodes, links, exits: gate(from, 'SID'), entries: gate(to, 'STAR') };
+    }
+
+    static shortest(net, cost) {
+        const count = net.nodes.length;
+        const best = new Array(count).fill(Infinity);
+        const prev = new Array(count).fill(-1);
+        const done = new Array(count).fill(false);
+        net.exits.forEach((length, i) => { best[i] = cost(-1, i, length); });
+        for (let step = 0; step < count; step += 1) {
+            let at = -1;
+            for (let i = 0; i < count; i += 1) if (!done[i] && (at < 0 || best[i] < best[at])) at = i;
+            if (at < 0 || best[at] === Infinity) break;
+            done[at] = true;
+            net.links[at].forEach((length, next) => {
+                const total = best[at] + cost(at, next, length);
+                if (total < best[next]) {
+                    best[next] = total;
+                    prev[next] = at;
+                }
+            });
+        }
+        let end = -1;
+        let total = Infinity;
+        net.entries.forEach((length, i) => {
+            const value = best[i] + cost(i, -2, length);
+            if (value < total) {
+                total = value;
+                end = i;
+            }
+        });
+        if (end < 0) return null;
+        const path = [];
+        for (let i = end; i >= 0; i = prev[i]) path.unshift(i);
+        return path;
+    }
+
+    static tidy(points, names) {
+        const keep = [0];
+        for (let i = 1; i < points.length - 1; i += 1) {
+            const a = points[keep[keep.length - 1]];
+            const b = points[i];
+            const c = points[i + 1];
+            const turn = Math.abs(Math.atan2(c[1] - b[1], c[0] - b[0]) - Math.atan2(b[1] - a[1], b[0] - a[0]));
+            const bend = Math.min(turn, Math.PI * 2 - turn);
+            if (bend > 0.12 || i === 1 || i === points.length - 2) keep.push(i);
+        }
+        keep.push(points.length - 1);
+        return { points: keep.map((i) => points[i]), names: keep.slice(1, -1).map((i) => names[i - 1]) };
+    }
+
+    static spread(a, b) {
+        const near = (p, line) => {
+            let best = Infinity;
+            for (let i = 1; i < line.length; i += 1) {
+                const [x1, y1] = line[i - 1];
+                const [x2, y2] = line[i];
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const t = Math.max(0, Math.min(1, ((p[0] - x1) * dx + (p[1] - y1) * dy) / (dx * dx + dy * dy || 1)));
+                best = Math.min(best, Math.hypot(p[0] - x1 - t * dx, p[1] - y1 - t * dy));
+            }
+            return best;
+        };
+        let total = 0;
+        let samples = 0;
+        for (let i = 1; i < a.length; i += 1) {
+            for (let step = 0; step < 6; step += 1) {
+                const t = step / 6;
+                total += near([a[i - 1][0] + (a[i][0] - a[i - 1][0]) * t, a[i - 1][1] + (a[i][1] - a[i - 1][1]) * t], b);
+                samples += 1;
+            }
+        }
+        return total / (samples || 1);
+    }
+
+    static build(from, to, seed = 1) {
         const start = NAV_AIRPORTS[from];
         const end = NAV_AIRPORTS[to];
         if (!start || !end || from === to) return [];
+        const net = RoutePlanner.network(from, to);
+        const random = RoutePlanner.random(seed * 7919 + from.charCodeAt(1) * 131 + to.charCodeAt(2));
+        const wear = new Map();
         const found = new Map();
-        RoutePlanner.procedures(from, 'SID').forEach((sid) => {
-            RoutePlanner.procedures(to, 'STAR').forEach((star) => {
-                const exits = sid ? sid.fixes : [null];
-                const entries = star ? star.fixes : [null];
-                let best = null;
-                exits.forEach((exit) => {
-                    entries.forEach((entry) => {
-                        const names = [exit, entry].filter((fix, i, list) => fix && list.indexOf(fix) === i);
-                        const points = [start, ...names.map((fix) => NAV_FIXES[fix]), end];
-                        let distance = 0;
-                        for (let i = 1; i < points.length; i += 1) distance += RoutePlanner.distance(points[i - 1], points[i]);
-                        const named = (sid && sid.name.startsWith(exit) ? 0 : 1) + (star && star.name.startsWith(entry) ? 0 : 1);
-                        if (!best || distance < best.distance - 1e-6) best = { sid, star, names, points, distance, named };
-                    });
-                });
-                if (!best) return;
-                const shape = best.names.join(' ') || 'DCT';
-                const old = found.get(shape);
-                const better = !old || best.named < old.named || (best.named === old.named && Boolean(best.sid) + Boolean(best.star) > Boolean(old.sid) + Boolean(old.star));
-                if (better) found.set(shape, best);
+        const measure = (points) => {
+            let distance = 0;
+            for (let i = 1; i < points.length; i += 1) distance += RoutePlanner.distance(points[i - 1], points[i]);
+            return distance;
+        };
+        for (let round = 0; round < 36; round += 1) {
+            const noise = new Map();
+            const cost = (a, b, length) => {
+                const key = `${a}>${b}`;
+                if (!noise.has(key)) noise.set(key, round || seed > 1 ? 1 + random() * 0.5 : 1);
+                return (length + 900) * noise.get(key) * (wear.get(key) || 1);
+            };
+            const path = RoutePlanner.shortest(net, cost);
+            if (!path) break;
+            [-1, ...path, -2].forEach((node, i, list) => {
+                if (!i) return;
+                const key = `${list[i - 1]}>${node}`;
+                wear.set(key, (wear.get(key) || 1) * 1.25);
             });
+            const tidy = RoutePlanner.tidy([start, ...path.map((i) => net.nodes[i].pos), end], path.map((i) => net.nodes[i].name));
+            const shape = tidy.names.join(' ');
+            if (!found.has(shape)) found.set(shape, { ...tidy, distance: measure(tidy.points) });
+        }
+        const direct = { names: [], points: [start, end], distance: RoutePlanner.distance(start, end) };
+        const pool = [...found.values()].filter((option) => option.distance <= direct.distance * 1.5).sort((a, b) => a.distance - b.distance);
+        const chosen = pool.length ? [pool.splice(seed > 1 ? Math.floor(random() * Math.min(3, pool.length)) : 0, 1)[0]] : [];
+        while (chosen.length < 4 && pool.length) {
+            let pick = 0;
+            let score = -1;
+            pool.forEach((option, i) => {
+                const apart = Math.min(...chosen.map((other) => RoutePlanner.spread(option.points, other.points)));
+                const value = apart / (option.distance / direct.distance);
+                if (value > score) {
+                    score = value;
+                    pick = i;
+                }
+            });
+            if (score < 400) break;
+            chosen.push(pool.splice(pick, 1)[0]);
+        }
+        const label = (kind, icao, fix) => {
+            const list = RoutePlanner.procedures(icao, kind).filter((proc) => proc.fixes.includes(fix));
+            return list.find((proc) => proc.name.startsWith(fix)) || list[0] || null;
+        };
+        return [...chosen, direct].sort((a, b) => a.distance - b.distance).map((option) => {
+            const sid = option.names.length ? label('SID', from, option.names[0]) : null;
+            const star = option.names.length ? label('STAR', to, option.names[option.names.length - 1]) : null;
+            return {
+                ...option,
+                sid,
+                star,
+                via: option.names.length ? [sid && sid.name, star && star.name].filter(Boolean).join(' → ') || `via ${option.names[0]}` : 'Direct',
+                text: [from, sid && RoutePlanner.code(sid.name), option.names.join(' ') || 'DCT', star && RoutePlanner.code(star.name), to].filter(Boolean).join(' ')
+            };
         });
-        const all = [...found.values()].sort((a, b) => a.distance - b.distance);
-        const direct = all.find((option) => !option.names.length);
-        const top = all.filter((option) => option !== direct).slice(0, 4);
-        return [...top, direct].filter(Boolean).sort((a, b) => a.distance - b.distance).map((option) => ({
-            ...option,
-            via: [option.sid && option.sid.name, option.star && option.star.name].filter(Boolean).join(' → ') || 'Direct',
-            text: [from, option.sid && RoutePlanner.code(option.sid.name), option.names.join(' DCT ') || 'DCT', option.star && RoutePlanner.code(option.star.name), to].filter(Boolean).join(' ')
-        }));
     }
 
     read() {
@@ -101,9 +244,10 @@ class RoutePlanner {
     }
 
     bind() {
-        const { from, to, swap, speed, list, copy, enroute } = this.els;
-        from.addEventListener('change', () => { this.from = from.value; this.plan(); });
-        to.addEventListener('change', () => { this.to = to.value; this.plan(); });
+        const { from, to, swap, speed, list, copy, enroute, shuffle } = this.els;
+        from.addEventListener('change', () => { this.from = from.value; this.seed = 1; this.plan(); });
+        to.addEventListener('change', () => { this.to = to.value; this.seed = 1; this.plan(); });
+        shuffle.addEventListener('click', () => { this.seed += 1; this.plan(); });
         swap.addEventListener('click', () => {
             [this.from, this.to] = [this.to, this.from];
             from.value = this.from;
@@ -130,7 +274,7 @@ class RoutePlanner {
 
     plan() {
         this.save();
-        this.options = typeof NAV_AIRPORTS === 'undefined' ? [] : RoutePlanner.build(this.from, this.to);
+        this.options = typeof NAV_AIRPORTS === 'undefined' ? [] : RoutePlanner.build(this.from, this.to, this.seed);
         this.picked = 0;
         this.renderList();
         this.draw();

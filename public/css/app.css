@@ -1135,6 +1135,10 @@ svg {
     border-color: var(--line-strong);
 }
 
+.route-btn-wide {
+    grid-column: 1 / -1;
+}
+
 .route-btn-main {
     background: var(--accent);
     border-color: var(--accent-line);

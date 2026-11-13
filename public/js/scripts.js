@@ -40,7 +40,8 @@ const routePlanner = new RoutePlanner(chartViewer, ownship, {
     note: document.getElementById('routeNote'),
     actions: document.getElementById('routeActions'),
     copy: document.getElementById('routeCopy'),
-    enroute: document.getElementById('routeEnroute')
+    enroute: document.getElementById('routeEnroute'),
+    shuffle: document.getElementById('routeShuffle')
 }, {
     openEnroute: () => {
         const chart = pinned.find(p => p.id === 'ENROUTE');
