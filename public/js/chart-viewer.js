@@ -373,7 +373,7 @@ class ChartViewer {
         ctx.rect(0, 0, this.natW * this.scale, this.natH * this.scale);
         ctx.clip();
         ctx.strokeStyle = 'rgba(150, 70, 210, 0.55)';
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 9;
         ctx.beginPath();
         route.forEach(([u, v], i) => {
             if (i) ctx.lineTo(u * k, v * k);
@@ -385,7 +385,7 @@ class ChartViewer {
         ctx.lineWidth = 2;
         route.forEach(([u, v]) => {
             ctx.beginPath();
-            ctx.arc(u * k, v * k, 4, 0, Math.PI * 2);
+            ctx.arc(u * k, v * k, 6, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
         });
