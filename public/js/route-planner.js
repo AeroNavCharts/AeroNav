@@ -282,20 +282,37 @@ class RoutePlanner {
 
     renderEnds(info) {
         const names = RoutePlanner.DISCORD_AIRPORTS;
+        const short = {};
+        if (typeof AIRPORTS !== 'undefined') AIRPORTS.forEach((airport) => { short[airport.icao] = airport.iata; });
         const paint = (end, icao, idle, runways, verb, known) => {
-            end.code.textContent = icao || '\u2013\u2013\u2013\u2013';
-            end.code.classList.toggle('idle', !icao);
+            end.code.textContent = icao ? [icao, short[icao]].filter(Boolean).join(' / ') : 'Not Selected';
             end.name.textContent = icao ? names[icao] || icao : idle;
-            end.runway.textContent = !icao || !info ? '' : runways.length ? `${verb} ${runways.join(' ')}` : known ? '' : 'no ATIS';
+            end.runway.textContent = !icao || !info ? '' : runways.length ? `${verb} runway ${runways.join(', ')}` : known ? '' : 'No ATIS available';
         };
-        paint(this.els.ends.from, this.from, 'Choose departure', info ? info.depNames : [], 'departing', info && info.origin);
-        paint(this.els.ends.to, this.to, 'Choose arrival', info ? info.arrNames : [], 'landing', info && info.target);
+        paint(this.els.ends.from, this.from, 'Origin Airport not selected', info ? info.depNames : [], 'Departing', info && info.origin);
+        paint(this.els.ends.to, this.to, 'Destination Airport not selected', info ? info.arrNames : [], 'Landing', info && info.target);
+        this.els.title.textContent = this.from && this.to ? `${this.from} to ${this.to}` : 'New Flight';
+    }
+
+    setTab(name) {
+        this.els.tabs.forEach((tab) => {
+            const on = tab.dataset.routeTab === name;
+            tab.classList.toggle('active', on);
+            tab.setAttribute('aria-selected', String(on));
+        });
+        this.els.panes.forEach((pane) => { pane.hidden = pane.dataset.routePane !== name; });
     }
 
     bind() {
         const { from, to, swap, speed, list, copy, enroute, shuffle } = this.els;
-        from.addEventListener('change', () => { this.from = from.value; this.seed = 1; this.active = {}; this.plan(); });
-        to.addEventListener('change', () => { this.to = to.value; this.seed = 1; this.active = {}; this.plan(); });
+        const chosen = () => {
+            this.seed = 1;
+            this.active = {};
+            this.plan();
+            if (this.options.length) this.setTab('routes');
+        };
+        from.addEventListener('change', () => { this.from = from.value; chosen(); });
+        to.addEventListener('change', () => { this.to = to.value; chosen(); });
         shuffle.addEventListener('click', () => { this.seed += 1; this.plan(); });
         swap.addEventListener('click', () => {
             [this.from, this.to] = [this.to, this.from];
@@ -320,6 +337,9 @@ class RoutePlanner {
         });
         copy.addEventListener('click', () => this.copy());
         this.els.command.addEventListener('click', () => this.copyCommand());
+        this.els.find.addEventListener('click', () => this.setTab('routes'));
+        this.els.hide.addEventListener('click', () => this.actions.hide && this.actions.hide());
+        this.els.tabs.forEach((tab) => tab.addEventListener('click', () => this.setTab(tab.dataset.routeTab)));
         this.els.clear.addEventListener('click', () => this.clear());
         this.bindPilot();
         enroute.addEventListener('click', () => this.actions.openEnroute && this.actions.openEnroute());
@@ -440,6 +460,7 @@ class RoutePlanner {
         this.els.from.value = '';
         this.els.to.value = '';
         this.plan();
+        this.setTab('general');
     }
 
     flash(text) {
@@ -464,37 +485,36 @@ class RoutePlanner {
     }
 
     renderList() {
-        const { list, empty, actions, count } = this.els;
+        const { list, empty, actions, count, text } = this.els;
         const ready = this.options.length > 0;
         actions.hidden = !ready;
-        this.els.details.hidden = !ready;
         this.els.tools.hidden = !ready;
         empty.hidden = ready;
         if (!ready) {
-            empty.textContent = this.from && this.to && this.from === this.to ? 'Departure and arrival are the same airport. Change one of them.' : 'Tap the two airport codes above to choose where you are flying from and to.';
+            empty.textContent = this.from && this.to && this.from === this.to ? 'Origin and destination are the same airport.' : 'Select an origin and a destination on the General tab to see routes.';
+            count.textContent = 'Routes';
+            text.textContent = 'No route selected yet.';
             list.innerHTML = '';
             return;
         }
-        count.textContent = `${this.options.length} ${this.options.length === 1 ? 'route' : 'routes'}, fastest first`;
+        count.textContent = `${this.options.length} ${this.options.length === 1 ? 'Route' : 'Routes'}, Fastest First`;
+        text.textContent = this.options[this.picked].text;
         const fastest = this.minutes(this.options[0]);
         list.innerHTML = this.options.map((option, index) => {
             const minutes = this.minutes(option);
-            const extra = index === 0 ? 'fastest' : minutes === fastest ? 'same time' : `+${RoutePlanner.clock(minutes - fastest)}`;
+            const extra = index === 0 ? 'Fastest' : minutes === fastest ? 'Same time' : `+${RoutePlanner.clock(minutes - fastest)}`;
             const on = index === this.picked;
+            const procs = [option.sid ? option.sid.name : this.from, option.star ? option.star.name : this.to].join(' to ');
             return `<li>
-                <button type="button" class="strip${on ? ' active' : ''}" data-index="${index}" aria-pressed="${on}">
-                    <span class="strip-time">
-                        <span class="strip-clock">${RoutePlanner.clock(minutes)}</span>
-                        <span class="strip-miles">${option.distance.toFixed(1)} NM</span>
-                        <span class="strip-delta${index === 0 ? ' best' : ''}">${extra}</span>
+                <button type="button" class="chart-row route-row${on ? ' selected' : ''}" data-index="${index}" aria-pressed="${on}">
+                    <span class="chart-main">
+                        <span class="chart-title">${procs}</span>
+                        <span class="chart-id">${option.names.join(' ') || 'DCT'}</span>
                     </span>
-                    <span class="strip-body">
-                        <span class="strip-procs">
-                            <span class="strip-proc">${option.sid ? option.sid.name : this.from}</span>
-                            <span class="strip-rule"></span>
-                            <span class="strip-proc">${option.star ? option.star.name : this.to}</span>
-                        </span>
-                        <span class="strip-fixes">${option.names.join(' ') || 'direct'}</span>
+                    <span class="route-row-side">
+                        <span class="route-row-time">${RoutePlanner.clock(minutes)}</span>
+                        <span class="route-row-sub">${option.distance.toFixed(1)} NM</span>
+                        <span class="route-row-sub${index === 0 ? ' best' : ''}">${extra}</span>
                     </span>
                 </button>
             </li>`;

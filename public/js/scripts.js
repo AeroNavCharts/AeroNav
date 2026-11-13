@@ -49,6 +49,12 @@ const routePlanner = new RoutePlanner(chartViewer, ownship, {
     },
     details: document.getElementById('routeDetails'),
     tools: document.getElementById('routeTools'),
+    title: document.getElementById('routeTitle'),
+    text: document.getElementById('routeText'),
+    find: document.getElementById('routeFind'),
+    hide: document.getElementById('routeHide'),
+    tabs: Array.from(document.querySelectorAll('[data-route-tab]')),
+    panes: Array.from(document.querySelectorAll('[data-route-pane]')),
     command: document.getElementById('routeCommand'),
     clear: document.getElementById('routeClear'),
     fields: {
@@ -60,6 +66,7 @@ const routePlanner = new RoutePlanner(chartViewer, ownship, {
         flightlevel: document.getElementById('routeLevel')
     }
 }, {
+    hide: () => { const hide = document.getElementById('hideBtn'); if (hide) hide.click(); },
     atis: (icao) => new Promise((resolve) => setTimeout(resolve)).then(() => atisFor(icao)),
     openEnroute: () => {
         const chart = pinned.find(p => p.id === 'ENROUTE');

@@ -164,89 +164,100 @@ import LoaderLogo from '../components/LoaderLogo.astro';
         </section>
 
         <section class="panel-view" id="viewRoute">
-          <div class="panel-head route-head">
+          <div class="panel-head airport-head">
+            <div class="head-bar">
+              <button class="head-btn" id="routeClear" type="button">Unload</button>
+              <button class="head-btn" id="routeHide" type="button">Hide</button>
+            </div>
             <div class="panel-heading">
-              <div class="panel-title">Route</div>
-              <div class="panel-sub">Pick two airports, get a flight plan</div>
+              <div class="panel-title" id="routeTitle">New Flight</div>
             </div>
-            <button class="head-btn route-clear" id="routeClear" type="button">Clear</button>
-          </div>
-          <div class="list route-scroll">
-            <div class="route-ends">
-              <label class="route-end">
-                <span class="route-end-code" id="routeFromCode"></span>
-                <span class="route-end-name" id="routeFromName"></span>
-                <span class="route-end-rwy" id="routeFromRwy"></span>
-                <select id="routeFrom" aria-label="Departure airport"></select>
-              </label>
-              <button class="route-swap" id="routeSwap" type="button" aria-label="Swap departure and arrival" title="Swap">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-                  <path d="M20.5 12c0 .8-.7 1.3-1.6 1.3h-3.6l-4 7h-2l2.1-7h-4l-1.6 2.3H4.1L5 12l-.9-3.6h1.7l1.6 2.3h4l-2.1-7h2l4 7h3.6c.9 0 1.6.5 1.6 1.3Z" />
-                </svg>
-              </button>
-              <label class="route-end route-end-to">
-                <span class="route-end-code" id="routeToCode"></span>
-                <span class="route-end-name" id="routeToName"></span>
-                <span class="route-end-rwy" id="routeToRwy"></span>
-                <select id="routeTo" aria-label="Arrival airport"></select>
-              </label>
-            </div>
-            <p class="route-empty" id="routeEmpty"></p>
-            <div class="route-section" id="routeTools" hidden>
-              <span class="route-section-title" id="routeCount"></span>
-              <button class="route-tool" id="routeShuffle" type="button">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3l10 10h3M4 17h3l3-3M14 10l3-3h3M18 4l3 3-3 3M18 14l3 3-3 3" /></svg>
-                Shuffle
-              </button>
-              <button class="route-tool" id="routeEnroute" type="button">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14" /></svg>
-                Map
-              </button>
-            </div>
-            <ol class="route-list" id="routeList"></ol>
-            <p class="panel-note route-note" id="routeNote" hidden></p>
-            <div class="route-details" id="routeDetails" hidden>
-              <div class="route-section">
-                <span class="route-section-title">Flight plan</span>
-              </div>
-              <div class="route-form">
-                <label class="route-detail">
-                  <span>In-game callsign</span>
-                  <input id="routeGameCallsign" type="text" placeholder="Jester-3263" autocomplete="off" spellcheck="false" />
-                </label>
-                <label class="route-detail">
-                  <span>Callsign</span>
-                  <input id="routeCallsign" type="text" placeholder="DAL123" autocomplete="off" spellcheck="false" autocapitalize="characters" />
-                </label>
-                <label class="route-detail">
-                  <span>Aircraft</span>
-                  <input id="routeAircraft" type="text" placeholder="B737" autocomplete="off" spellcheck="false" />
-                </label>
-                <label class="route-detail">
-                  <span>In-game name</span>
-                  <input id="routeGameName" type="text" placeholder="Roblox username" autocomplete="off" spellcheck="false" autocapitalize="off" />
-                </label>
-                <label class="route-detail route-detail-third">
-                  <span>Rules</span>
-                  <select id="routeRules">
-                    <option value="IFR">IFR</option>
-                    <option value="VFR">VFR</option>
-                  </select>
-                </label>
-                <label class="route-detail route-detail-third">
-                  <span>Flight level</span>
-                  <input id="routeLevel" type="text" inputmode="numeric" maxlength="3" placeholder="040" autocomplete="off" />
-                </label>
-                <label class="route-detail route-detail-third">
-                  <span>Speed (kt)</span>
-                  <input id="routeSpeed" type="number" min="40" max="2000" step="10" inputmode="numeric" />
-                </label>
-              </div>
+            <div class="category-bar seg-bar" id="routeTabs" role="tablist" aria-label="Flight sections">
+              <button class="cat-btn active" data-route-tab="general" role="tab" type="button">General</button>
+              <button class="cat-btn" data-route-tab="routes" role="tab" type="button">Routes</button>
+              <button class="cat-btn" data-route-tab="export" role="tab" type="button">Export</button>
             </div>
           </div>
-          <div class="route-actions" id="routeActions" hidden>
-            <button class="route-btn route-btn-main" id="routeCommand" type="button">Copy Discord command</button>
-            <button class="route-btn" id="routeCopy" type="button">Copy route</button>
+          <div class="list">
+            <div class="route-pane" data-route-pane="general">
+              <div class="list-group-header">Origin</div>
+              <div class="item-airport flight-row">
+                <div class="airport-main">
+                  <div class="airport-title" id="routeFromCode"></div>
+                  <div class="airport-name" id="routeFromName"></div>
+                  <div class="airport-sub" id="routeFromRwy"></div>
+                </div>
+                <label class="flight-select">
+                  <span>Select</span>
+                  <select id="routeFrom" aria-label="Origin airport"></select>
+                </label>
+              </div>
+              <div class="list-group-header">Destination</div>
+              <div class="item-airport flight-row">
+                <div class="airport-main">
+                  <div class="airport-title" id="routeToCode"></div>
+                  <div class="airport-name" id="routeToName"></div>
+                  <div class="airport-sub" id="routeToRwy"></div>
+                </div>
+                <label class="flight-select">
+                  <span>Select</span>
+                  <select id="routeTo" aria-label="Destination airport"></select>
+                </label>
+              </div>
+              <div class="flight-buttons">
+                <button class="flight-btn" id="routeSwap" type="button">Swap Airports</button>
+                <button class="flight-btn" id="routeFind" type="button">Find Routes</button>
+              </div>
+            </div>
+            <div class="route-pane" data-route-pane="routes" hidden>
+              <div class="list-group-header" id="routeCount">Routes</div>
+              <p class="route-empty" id="routeEmpty"></p>
+              <ol class="route-list" id="routeList"></ol>
+              <p class="panel-note route-note" id="routeNote" hidden></p>
+              <div class="flight-buttons" id="routeTools" hidden>
+                <button class="flight-btn" id="routeShuffle" type="button">Shuffle Routes</button>
+                <button class="flight-btn" id="routeEnroute" type="button">Show on Enroute</button>
+              </div>
+            </div>
+            <div class="route-pane" data-route-pane="export" hidden>
+              <div class="list-group-header">Flight Plan</div>
+              <div id="routeDetails">
+              <label class="flight-field">
+                <span>In-game callsign</span>
+                <input id="routeGameCallsign" type="text" placeholder="Jester-3263" autocomplete="off" spellcheck="false" />
+              </label>
+              <label class="flight-field">
+                <span>Callsign</span>
+                <input id="routeCallsign" type="text" placeholder="DAL123" autocomplete="off" spellcheck="false" autocapitalize="characters" />
+              </label>
+              <label class="flight-field">
+                <span>Aircraft</span>
+                <input id="routeAircraft" type="text" placeholder="B737" autocomplete="off" spellcheck="false" />
+              </label>
+              <label class="flight-field">
+                <span>In-game name</span>
+                <input id="routeGameName" type="text" placeholder="Roblox username" autocomplete="off" spellcheck="false" autocapitalize="off" />
+              </label>
+              <label class="flight-field">
+                <span>Flight rules</span>
+                <select id="routeRules"><option value="IFR">IFR</option><option value="VFR">VFR</option></select>
+              </label>
+              <label class="flight-field">
+                <span>Flight level</span>
+                <input id="routeLevel" type="text" inputmode="numeric" maxlength="3" placeholder="040" autocomplete="off" />
+              </label>
+              <label class="flight-field">
+                <span>Cruise speed (kt)</span>
+                <input id="routeSpeed" type="number" min="40" max="2000" step="10" inputmode="numeric" />
+              </label>
+              </div>
+              <div class="list-group-header">Selected Route</div>
+              <p class="route-empty" id="routeText"></p>
+              <div class="flight-buttons" id="routeActions" hidden>
+                <button class="flight-btn flight-btn-main" id="routeCommand" type="button">Copy Discord Command</button>
+                <button class="flight-btn" id="routeCopy" type="button">Copy Route</button>
+              </div>
+            </div>
           </div>
         </section>
 
