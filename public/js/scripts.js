@@ -17,6 +17,9 @@ const chartViewer = new ChartViewer(chartWrap, {
         drawBtn.classList.toggle('active', on);
         drawBtn.setAttribute('aria-pressed', String(on));
     },
+    onDocError: () => {
+        if (currentChart && currentChart.link) showChartInFrame(currentChart.link);
+    },
     onLoad: () => {
         if (typeof ownship !== 'undefined') ownship.refresh();
         if (typeof routePlanner !== 'undefined') routePlanner.draw();
@@ -1343,7 +1346,7 @@ function loadChartInViewer(chartObj, opts = {}) {
     const loadToken = ++chartLoadToken;
     const driveId = ChartViewer.driveId(link);
     if (driveId) {
-        chartViewer.load(driveId).then((shown) => {
+        chartViewer.load(driveId, { pdf: /\b(SOP|LOA)\b/i.test(chartObj.title || '') }).then((shown) => {
             if (!shown || loadToken !== chartLoadToken) return;
             setViewerMode('image');
             if (viewerFrame.getAttribute('src') !== 'about:blank') viewerFrame.src = 'about:blank';

@@ -6,6 +6,7 @@ class ChartViewer {
         this.onZoom = opts.onZoom || (() => { });
         this.onDrawMode = opts.onDrawMode || (() => { });
         this.onLoad = opts.onLoad || (() => { });
+        this.onDocError = opts.onDocError || (() => { });
         this.storageKey = 'aeronav_chart_marks';
         this.rotationKey = 'aeronav_chart_rotation';
         this.rotation = 0;
@@ -59,6 +60,14 @@ class ChartViewer {
         this.toolbar = this.buildToolbar();
         this.toolbar.hidden = true;
         wrap.insertBefore(this.toolbar, wrap.querySelector('iframe'));
+        this.doc = null;
+        this.docId = null;
+        this.page = 1;
+        this.pages = 1;
+        this.pageCache = new Map();
+        this.turning = false;
+        this.pager = this.buildPager();
+        wrap.insertBefore(this.pager, wrap.querySelector('iframe'));
         this.bind();
     }
 
@@ -82,21 +91,164 @@ class ChartViewer {
         });
     }
 
-    async load(id) {
-        const token = ++this.token;
-        const low = await this.fetchImage(ChartViewer.imageUrl(id, 1200));
-        if (token !== this.token) return false;
+    static pdfUrl(id) {
+        return `/pdf/${id}`;
+    }
+
+    static pdfLib() {
+        if (!ChartViewer.pdfReady) {
+            const base = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build';
+            ChartViewer.pdfReady = import(`${base}/pdf.min.mjs`).then((lib) => {
+                lib.GlobalWorkerOptions.workerSrc = `${base}/pdf.worker.min.mjs`;
+                return lib;
+            }).catch((error) => {
+                ChartViewer.pdfReady = null;
+                throw error;
+            });
+        }
+        return ChartViewer.pdfReady;
+    }
+
+    buildPager() {
+        const pager = document.createElement('div');
+        pager.className = 'chart-pager';
+        pager.hidden = true;
+        const button = (label, path, step) => {
+            const el = document.createElement('button');
+            el.type = 'button';
+            el.className = 'chart-pager-btn';
+            el.setAttribute('aria-label', label);
+            el.title = label;
+            el.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}" /></svg>`;
+            el.addEventListener('click', () => this.goPage(this.page + step));
+            return el;
+        };
+        this.pagerPrev = button('Previous page', 'M15 5l-7 7 7 7', -1);
+        this.pagerNext = button('Next page', 'M9 5l7 7-7 7', 1);
+        this.pagerLabel = document.createElement('span');
+        this.pagerLabel.className = 'chart-pager-label';
+        this.pagerLabel.setAttribute('aria-live', 'polite');
+        pager.append(this.pagerPrev, this.pagerLabel, this.pagerNext);
+        return pager;
+    }
+
+    renderPager() {
+        this.pager.hidden = this.pages < 2 || this.stage.hidden;
+        this.pagerLabel.textContent = `${this.page} / ${this.pages}`;
+        this.pagerPrev.disabled = this.page <= 1 || this.turning;
+        this.pagerNext.disabled = this.page >= this.pages || this.turning;
+        this.pager.classList.toggle('busy', this.turning);
+    }
+
+    closeDocument() {
+        if (this.doc) this.doc.destroy();
+        this.pageCache.forEach((image) => URL.revokeObjectURL(image.src));
+        this.pageCache = new Map();
+        this.doc = null;
+        this.docId = null;
+        this.page = 1;
+        this.pages = 1;
+        this.turning = false;
+        this.renderPager();
+    }
+
+    openPage(key, image, reset) {
         this.commitText();
-        this.chartId = id;
-        this.marks = this.readMarks()[id] || [];
-        this.rotation = this.readRotations()[id] || 0;
-        this.show(low, true);
-        this.onLoad(id);
+        this.chartId = key;
+        this.marks = this.readMarks()[key] || [];
+        this.rotation = this.readRotations()[key] || 0;
+        this.show(image, reset);
+        this.onLoad(key);
+    }
+
+    async load(id, opts = {}) {
+        const token = ++this.token;
+        let low = null;
+        try {
+            low = await this.fetchImage(ChartViewer.imageUrl(id, 1200));
+        } catch (error) {
+            if (!opts.pdf) throw error;
+        }
+        if (token !== this.token) return false;
+        this.closeDocument();
+        this.docId = id;
+        if (low) this.openPage(id, low, true);
+        if (opts.pdf) {
+            const ready = this.openDocument(id, token, !low);
+            return low ? true : ready;
+        }
         this.fetchImage(ChartViewer.imageUrl(id, 3200)).then((high) => {
             if (token !== this.token || high.naturalWidth <= this.img.naturalWidth) return;
             this.show(high, false);
         }).catch(() => { });
         return true;
+    }
+
+    async openDocument(id, token, fresh) {
+        try {
+            const lib = await ChartViewer.pdfLib();
+            const doc = await lib.getDocument({ url: ChartViewer.pdfUrl(id) }).promise;
+            if (token !== this.token) {
+                doc.destroy();
+                return false;
+            }
+            this.doc = doc;
+            this.pages = doc.numPages;
+            const first = await this.pageImage(1);
+            if (token !== this.token) return false;
+            if (fresh) this.openPage(id, first, true);
+            else if (this.page === 1) this.show(first, false);
+            this.renderPager();
+            if (this.pages > 1) this.pageImage(2).catch(() => { });
+            return true;
+        } catch (error) {
+            if (token !== this.token) return false;
+            this.renderPager();
+            if (fresh) throw error;
+            this.onDocError(id);
+            return false;
+        }
+    }
+
+    async pageImage(number) {
+        const cached = this.pageCache.get(number);
+        if (cached) return cached;
+        const doc = this.doc;
+        const page = await doc.getPage(number);
+        const base = page.getViewport({ scale: 1 });
+        const viewport = page.getViewport({ scale: 2200 / base.width });
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(viewport.width);
+        canvas.height = Math.round(viewport.height);
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+        const image = await this.fetchImage(URL.createObjectURL(blob));
+        if (this.doc !== doc) {
+            URL.revokeObjectURL(image.src);
+            return image;
+        }
+        this.pageCache.set(number, image);
+        return image;
+    }
+
+    async goPage(number) {
+        if (!this.doc || this.turning || number < 1 || number > this.pages || number === this.page) return;
+        const token = this.token;
+        this.turning = true;
+        this.renderPager();
+        try {
+            const image = await this.pageImage(number);
+            if (token !== this.token) return;
+            this.page = number;
+            this.openPage(number > 1 ? `${this.docId}#${number}` : this.docId, image, true);
+            if (number < this.pages) this.pageImage(number + 1).catch(() => { });
+        } catch (error) {
+        } finally {
+            if (token === this.token) {
+                this.turning = false;
+                this.renderPager();
+            }
+        }
     }
 
     show(source, reset) {
@@ -126,6 +278,7 @@ class ChartViewer {
         this.token++;
         this.setDrawMode(false);
         this.stage.hidden = true;
+        this.closeDocument();
         this.img.removeAttribute('src');
         this.natW = 0;
         this.natH = 0;
@@ -812,6 +965,19 @@ class ChartViewer {
                 this.undo();
             }
             if (e.key === 'Escape') this.setDrawMode(false);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!this.active || this.pages < 2 || this.editing || !stage.clientWidth) return;
+            if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return;
+            if (e.key === 'PageDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                this.goPage(this.page + 1);
+            }
+            if (e.key === 'PageUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.goPage(this.page - 1);
+            }
         });
 
         new ResizeObserver(() => {
