@@ -181,3 +181,134 @@ const NAV_FIXES = {
     "YOUTH": [-31587, -8874],
     "ZESTA": [47413, -23359]
 };
+
+const NAV_PROCEDURES = {
+    IBTH: {
+        SID: [
+            ["MOUNTAIN 1", ["DINER", "OCEEN"]],
+            ["OCEAN 1", ["DINER", "OCEEN"]],
+            ["RESURGE 1", ["PIPER", "PROBE", "WELSH", "INDEX"]],
+            ["VONARX 1", ["DUNKS", "CAMEL", "CYRIL"]]
+        ],
+        STAR: [
+            ["DINER 1", ["DINER", "TINDR", "KNIFE", "STRAX", "PROBE", "WELSH"]],
+            ["GAVIN 1", ["GAVIN", "WELSH", "ENDER", "SILVA", "OCEEN", "SETHR"]],
+            ["ROMENS 1", ["TINDR", "KNIFE", "STRAX", "DINER", "TALIS", "CAMEL"]],
+            ["SILVA 1", ["SILVA", "CYRIL", "GAVIN", "OCEEN"]],
+            ["WELSH 1", ["WELSH", "RENDR"]]
+        ]
+    },
+    IIAB: {
+        SID: [
+            ["MCCONNELL 1", ["ANYMS", "RENTS", "JAMSI", "GRASS", "JACKI"]]
+        ],
+        STAR: [
+            ["LARNACA 1", ["RENTS", "GRASS", "AQWRT"]]
+        ]
+    },
+    IKFL: {
+        SID: [
+            ["BLANK 1", ["BLANK"]],
+            ["CELAR 5", ["CELAR"]],
+            ["WILLG 1", ["WILLG"]]
+        ],
+        STAR: [
+            ["SPACE 2", ["SPACE"]]
+        ]
+    },
+    ILAR: {
+        SID: [
+            ["GRASS 1", ["GRASS", "ANYMS", "RENTS"]],
+            ["ODOKU 1", ["ODOKU", "LAZER"]],
+            ["RENTS 1", ["RENTS", "CAWZE", "JUSTY", "ANYMS"]]
+        ],
+        STAR: [
+            ["LUBAN 1", ["RENTS", "GRASS", "ODOKU"]],
+            ["SOUTHERN 1", ["CAWZE", "JUSTY", "RENTS"]],
+            ["WESTERN 1", ["ANYMS", "JAMSI", "RENTS", "GRASS"]]
+        ]
+    },
+    IMLR: {
+        SID: [
+            ["BEANS 3", ["BEANS", "SPACE", "SEEKS"]],
+            ["HAWFA 1", ["HAWFA", "OCEEN", "BUCFA", "KUNAV", "SAWPE", "ATPEV", "ANYMS", "SETHR"]],
+            ["KENED 2", ["KENED", "RENDR", "DINER", "WELSH", "INDEX", "KUNAV", "ICTAM", "SAWPE"]],
+            ["SAWPE 1", ["SAWPE", "BUCFA", "SPACE", "BEANS"]]
+        ],
+        STAR: [
+            ["BIGDY 1", ["SETHR", "KUNAV", "HAWFA", "ATPEV"]],
+            ["BUCFA 1", ["BUCFA", "SPACE", "BEANS", "SAWPE"]],
+            ["NORTHERN 1", ["RENDR", "DINER", "WELSH", "INDEX", "KENED", "KUNAV", "BUCFA"]],
+            ["URMOM 1", ["SPACE", "SEEKS", "ALDER", "BEANS"]]
+        ]
+    },
+    IPAP: {
+        SID: [
+            ["KINDLE 1", ["JUSTY", "ANYMS", "RENTS", "GRASS"]]
+        ],
+        STAR: [
+            ["JAMSI 1", ["JAMSI", "GRASS", "AQWRT"]],
+            ["JUSTY 1", ["JUSTY", "BOBUX"]]
+        ]
+    },
+    IPPH: {
+        SID: [
+            ["CAMEL 2", ["CAMEL", "TINDR", "NOONU", "STRAX", "TALIS"]],
+            ["DINER 2", ["DINER", "TINDR", "NOONU", "STRAX", "TALIS"]],
+            ["NARRX 1", ["TINDR", "NOONU", "STRAX", "TALIS"]],
+            ["PERTH 2", ["ROSMO", "CAMEL", "CYRIL"]]
+        ],
+        STAR: [
+            ["HONDA 2", ["HONDA", "STRAX"]],
+            ["SISTA 2", ["SISTA", "NOONU", "CAMEL", "SILVA", "TALIS", "DINER"]],
+            ["TALIS 2", ["TALIS", "TINDR", "CAMEL", "DUNKS", "SILVA", "CYRIL"]]
+        ]
+    },
+    IRFD: {
+        SID: [
+            ["DARRK 3", ["SPACE", "BEANS", "SEEKS", "EXMOR"]],
+            ["KENED 2", ["KENED", "JOOPY", "RENDR", "DINER", "PROBE", "WELSH", "INDEX", "KUNAV"]],
+            ["LOGAN 4", ["LOGAN", "RENDR", "DINER", "WELSH", "BUCFA"]],
+            ["OSHNN 1", ["CYRIL", "SILVA", "OCEEN", "ATPEV", "JAMSI", "GRASS"]],
+            ["TRAINING 1", ["CYRIL", "SILVA", "OCEEN", "ATPEV", "JAMSI", "GRASS", "PEPUL", "GODLU"]],
+            ["WNNDY 3", ["OCEEN", "SILVA"]]
+        ],
+        STAR: [
+            ["BEANS 1", ["BEANS", "HAWFA", "SPACE", "LOGAN", "ICTAM", "SEEKS"]],
+            ["GORDO 1", ["GODLU"]],
+            ["JAMSI 1", ["JAMSI", "ANYMS", "GRASS", "GODLU", "PEPUL"]],
+            ["KUNAV 2", ["KUNAV", "RENDR", "DINER", "WELSH", "INDEX", "KENED", "HAWFA"]],
+            ["MELLOR 1", ["ICTAM"]],
+            ["POPPY 3", ["GAVIN", "CYRIL", "SILVA", "OCEEN", "SETHR"]],
+            ["SUNST 3", ["SUNST", "BUCFA", "HAWFA", "LOGAN"]]
+        ]
+    },
+    ISAU: {
+        SID: [
+            ["ECHHO 1", ["THACC", "SPACE", "GEORG"]],
+            ["SAUTHEMPTONA 1", ["THACC", "SHREK", "SPACE", "BEANS"]],
+            ["SAYOW 1", ["EXMOR", "GODLU", "ALDER", "ODOKU"]],
+            ["ZZOOO 1", ["GODLU", "STACK", "ODOKU", "PEPUL", "ALDER"]]
+        ],
+        STAR: [
+            ["ALDER 1", ["ALDER", "PEPUL", "EMJAY"]],
+            ["GEORG 1", ["GEORG", "SHREK", "SPACE"]],
+            ["VYDDA 1", ["SEEKS", "BEANS", "EXMOR"]]
+        ]
+    },
+    ITKO: {
+        SID: [
+            ["ASTRO 1", ["ASTRO", "GULEG", "PIPER", "ONDER", "BLANK", "PROBE", "DINER"]],
+            ["HONDA 1", ["HONDA", "LETSE"]],
+            ["LETSE 1", ["LETSE", "HONDA", "KNIFE", "ONDER", "RENDR", "PROBE"]],
+            ["ONDER 1", ["ONDER", "PROBE", "DINER"]],
+            ["TOKYO 1", ["ASTRO", "ONDER", "PIPER"]]
+        ],
+        STAR: [
+            ["GULEG 1", ["GULEG", "EURAD", "PIPER", "ONDER", "BLANK"]],
+            ["ISLAND 2", ["ONDER", "ASTRO", "KNIFE"]],
+            ["KNIFE 2", ["KNIFE", "ONDER", "PROBE", "DINER"]],
+            ["PIPER 1", ["PIPER", "ASTRO", "ONDER", "RENDR", "DINER"]]
+        ]
+    }
+};
