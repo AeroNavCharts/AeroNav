@@ -522,8 +522,7 @@ class RoutePlanner {
         if (!geo || !option) {
             this.viewer.setPlanned(null);
         } else {
-            const [a, b, c, d, e, f] = geo;
-            const project = (points) => points.map(([x, y]) => [a * x + b * y + c, d * x + e * y + f]);
+            const project = (points) => points.map(([x, y]) => Ownship.locate(geo, x, y));
             this.viewer.setPlanned(project(option.points), this.options.filter((other) => other !== option).map((other) => project(other.points)));
         }
         this.renderNote();

@@ -126,13 +126,35 @@ class Ownship {
         const local = this.readJson(this.geoKey)[id];
         if (Array.isArray(local) && local.length === 6) return local;
         const built = typeof CHART_GEO !== 'undefined' ? CHART_GEO[id] : null;
-        return Array.isArray(built) && built.length === 6 ? built : null;
+        if (Array.isArray(built)) return built.length === 6 ? built : null;
+        return built && Array.isArray(built.p) ? built : null;
+    }
+
+    static locate(geo, x, y) {
+        if (Array.isArray(geo)) return [geo[0] * x + geo[1] * y + geo[2], geo[3] * x + geo[4] * y + geo[5]];
+        const gx = x * geo.k;
+        const gy = y * geo.k;
+        let u = geo.a[0] + geo.a[1] * gx + geo.a[2] * gy + geo.s[0];
+        let v = geo.a[3] + geo.a[4] * gx + geo.a[5] * gy + geo.s[1];
+        geo.p.forEach(([px, py, wu, wv]) => {
+            const r = (gx - px) ** 2 + (gy - py) ** 2;
+            if (!r) return;
+            const bend = (r * Math.log(r)) / 2;
+            u += wu * bend;
+            v += wv * bend;
+        });
+        return [u, v];
     }
 
     project(geo, entry) {
         const { x, y } = entry.position;
-        const [a, b, c, d, e, f] = geo;
         const h = (entry.heading * Math.PI) / 180;
+        if (!Array.isArray(geo)) {
+            const [u, v] = Ownship.locate(geo, x, y);
+            const [nu, nv] = Ownship.locate(geo, x + Math.sin(h) * 100, y - Math.cos(h) * 100);
+            return { u, v, heading: (Math.atan2(nu - u, v - nv) * 180) / Math.PI };
+        }
+        const [a, b, c, d, e, f] = geo;
         const south = a * e - b * d >= 0 ? -1 : 1;
         const gx = Math.sin(h);
         const gy = Math.cos(h) * south;
@@ -310,8 +332,7 @@ class Ownship {
         const id = this.viewer.chartId;
         const geo = this.geoFor(id);
         this.plan = this.findPlan(found);
-        const [a, b, c, d, e, f] = geo || [];
-        const route = geo ? Ownship.routePoints(this.plan).map(([x, y]) => [a * x + b * y + c, d * x + e * y + f]) : [];
+        const route = geo ? Ownship.routePoints(this.plan).map(([x, y]) => Ownship.locate(geo, x, y)) : [];
         this.viewer.setRoute(route);
         this.viewer.setTraffic(this.others(geo, this.mine));
         this.place(found && geo ? this.project(geo, found.entry) : null, id);
@@ -441,7 +462,7 @@ class Ownship {
         button('Copy', () => {
             const id = this.viewer.chartId;
             const geo = this.geoFor(id);
-            if (!geo || !navigator.clipboard) return;
+            if (!Array.isArray(geo) || !navigator.clipboard) return;
             const line = `"${id}": [${geo.map((n) => Number(n.toPrecision(8))).join(', ')}],`;
             navigator.clipboard.writeText(line).then(() => {
                 this.panelNote = 'Copied.';
