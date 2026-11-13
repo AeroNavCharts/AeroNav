@@ -164,6 +164,30 @@ import LoaderLogo from '../components/LoaderLogo.astro';
         </section>
 
         <section class="panel-view" id="viewRoute">
+          <div class="route-screen" data-route-screen="airports" hidden>
+            <div class="panel-head airport-head">
+              <div class="head-bar">
+                <button class="head-btn" id="routePickBack" type="button">New Flight</button>
+                <button class="head-btn" id="routePickHide" type="button">Hide</button>
+              </div>
+              <div class="panel-heading">
+                <div class="panel-title">Airports</div>
+                <div class="panel-sub" id="routePickSub"></div>
+              </div>
+            </div>
+            <div class="search-wrap">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+              <input id="routePickSearch" class="search" placeholder="Search" autocomplete="off" spellcheck="false" aria-label="Search airports" />
+            </div>
+            <div class="list">
+              <div class="list-group-header">Airport</div>
+              <div id="routePickList"></div>
+            </div>
+          </div>
+          <div class="route-screen" data-route-screen="flight">
           <div class="panel-head airport-head">
             <div class="head-bar">
               <button class="head-btn" id="routeClear" type="button">Unload</button>
@@ -187,10 +211,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
                   <div class="airport-name" id="routeFromName"></div>
                   <div class="airport-sub" id="routeFromRwy"></div>
                 </div>
-                <label class="flight-select">
-                  <span>Select</span>
-                  <select id="routeFrom" aria-label="Origin airport"></select>
-                </label>
+                <button class="flight-select" data-route-pick="from" type="button" aria-label="Select origin airport">Select</button>
               </div>
               <div class="list-group-header">Destination</div>
               <div class="item-airport flight-row">
@@ -199,10 +220,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
                   <div class="airport-name" id="routeToName"></div>
                   <div class="airport-sub" id="routeToRwy"></div>
                 </div>
-                <label class="flight-select">
-                  <span>Select</span>
-                  <select id="routeTo" aria-label="Destination airport"></select>
-                </label>
+                <button class="flight-select" data-route-pick="to" type="button" aria-label="Select destination airport">Select</button>
               </div>
               <div class="flight-buttons">
                 <button class="flight-btn" id="routeSwap" type="button">Swap Airports</button>
@@ -258,6 +276,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
                 <button class="flight-btn" id="routeCopy" type="button">Copy Route</button>
               </div>
             </div>
+          </div>
           </div>
         </section>
 

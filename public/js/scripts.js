@@ -31,8 +31,13 @@ const ownship = new Ownship(chartViewer, {
     host: chartWrap
 });
 const routePlanner = new RoutePlanner(chartViewer, ownship, {
-    from: document.getElementById('routeFrom'),
-    to: document.getElementById('routeTo'),
+    pickers: Array.from(document.querySelectorAll('[data-route-pick]')),
+    screens: Array.from(document.querySelectorAll('[data-route-screen]')),
+    pickBack: document.getElementById('routePickBack'),
+    pickHide: document.getElementById('routePickHide'),
+    pickSub: document.getElementById('routePickSub'),
+    pickSearch: document.getElementById('routePickSearch'),
+    pickList: document.getElementById('routePickList'),
     swap: document.getElementById('routeSwap'),
     speed: document.getElementById('routeSpeed'),
     list: document.getElementById('routeList'),
@@ -67,6 +72,7 @@ const routePlanner = new RoutePlanner(chartViewer, ownship, {
     }
 }, {
     hide: () => { const hide = document.getElementById('hideBtn'); if (hide) hide.click(); },
+    push: (direction, change) => pushPanel(direction, change, panelViews.route),
     atis: (icao) => new Promise((resolve) => setTimeout(resolve)).then(() => atisFor(icao)),
     openEnroute: () => {
         const chart = pinned.find(p => p.id === 'ENROUTE');
@@ -343,13 +349,13 @@ function endPanelPush() {
     clearTimeout(panelPushTimer);
     if (panelGhost) panelGhost.remove();
     panelGhost = null;
-    const view = panelViews.airports;
-    if (view) view.classList.remove('panel-push-in');
+    Object.values(panelViews).forEach(view => {
+        if (view) view.classList.remove('panel-push-in');
+    });
     if (leftCol) leftCol.classList.remove('pushing');
 }
 
-function pushPanel(direction, change) {
-    const view = panelViews.airports;
+function pushPanel(direction, change, view = panelViews.airports) {
     endPanelPush();
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!view || !leftCol || still || !view.classList.contains('active') || !view.offsetWidth) {

@@ -267,30 +267,79 @@ class RoutePlanner {
     }
 
     fill() {
-        if (typeof NAV_AIRPORTS === 'undefined') return;
-        const names = RoutePlanner.DISCORD_AIRPORTS;
-        const charted = typeof NAV_PROCEDURES !== 'undefined' ? NAV_PROCEDURES : {};
-        const codes = Object.keys(NAV_AIRPORTS).sort((a, b) => Boolean(charted[b]) - Boolean(charted[a]) || a.localeCompare(b));
-        const html = codes.map((icao) => `<option value="${icao}">${icao} ${names[icao] || ''}</option>`).join('');
-        [this.els.from, this.els.to].forEach((select) => {
-            select.innerHTML = `<option value="">Choose airport</option>${html}`;
-        });
-        this.els.from.value = this.from;
-        this.els.to.value = this.to;
         this.els.speed.value = this.speed;
     }
 
-    renderEnds(info) {
+    airports() {
+        if (typeof NAV_AIRPORTS === 'undefined') return [];
         const names = RoutePlanner.DISCORD_AIRPORTS;
         const short = {};
         if (typeof AIRPORTS !== 'undefined') AIRPORTS.forEach((airport) => { short[airport.icao] = airport.iata; });
-        const paint = (end, icao, idle, runways, verb, known) => {
-            end.code.textContent = icao ? [icao, short[icao]].filter(Boolean).join(' / ') : 'Not Selected';
-            end.name.textContent = icao ? names[icao] || icao : idle;
-            end.runway.textContent = !icao || !info ? '' : runways.length ? `${verb} runway ${runways.join(', ')}` : known ? '' : 'No ATIS available';
+        const charted = typeof NAV_PROCEDURES !== 'undefined' ? NAV_PROCEDURES : {};
+        return Object.keys(NAV_AIRPORTS)
+            .sort((a, b) => Boolean(charted[b]) - Boolean(charted[a]) || a.localeCompare(b))
+            .map((icao) => ({ icao, iata: short[icao] || '', name: names[icao] || icao, charted: Boolean(charted[icao]) }));
+    }
+
+    showScreen(name) {
+        this.els.screens.forEach((screen) => { screen.hidden = screen.dataset.routeScreen !== name; });
+    }
+
+    slide(direction, change) {
+        if (this.actions.push) this.actions.push(direction, change);
+        else change();
+    }
+
+    openPicker(side) {
+        this.picking = side;
+        this.els.pickSub.textContent = side === 'from' ? 'Select origin airport' : 'Select destination airport';
+        this.els.pickSearch.value = '';
+        this.renderPicker();
+        this.slide('right', () => this.showScreen('airports'));
+        if (window.matchMedia('(hover: hover)').matches) this.els.pickSearch.focus({ preventScroll: true });
+    }
+
+    closePicker(icao) {
+        const side = this.picking;
+        this.picking = null;
+        this.slide('left', () => {
+            this.showScreen('flight');
+            if (icao && side) this.choose(side, icao);
+        });
+    }
+
+    choose(side, icao) {
+        this[side] = icao;
+        this.seed = 1;
+        this.active = {};
+        this.plan();
+    }
+
+    renderPicker() {
+        const query = this.els.pickSearch.value.trim().toLowerCase();
+        const current = this.picking ? this[this.picking] : '';
+        const hits = this.airports().filter((airport) => !query || `${airport.icao} ${airport.iata} ${airport.name}`.toLowerCase().includes(query));
+        this.els.pickList.innerHTML = hits.length ? hits.map((airport) => `<button type="button" class="item-airport route-pick-row${airport.icao === current ? ' selected' : ''}" data-icao="${airport.icao}">
+                <span class="airport-main">
+                    <span class="airport-title">${[airport.icao, airport.iata].filter(Boolean).join(' / ')}</span>
+                    <span class="airport-name">${airport.name}</span>
+                    <span class="airport-sub">${airport.charted ? 'SIDs and STARs available' : 'No published procedures'}</span>
+                </span>
+            </button>`).join('') : '<p class="route-empty">No airport matches that search.</p>';
+    }
+
+    renderEnds(info) {
+        const known = Object.fromEntries(this.airports().map((airport) => [airport.icao, airport]));
+        const paint = (end, side, icao, idle, runways, verb, heard) => {
+            const airport = known[icao];
+            end.code.textContent = airport ? [airport.icao, airport.iata].filter(Boolean).join(' / ') : 'Not Selected';
+            end.name.textContent = airport ? airport.name : idle;
+            end.runway.textContent = !airport || !info ? '' : runways.length ? `${verb} runway ${runways.join(', ')}` : heard ? '' : 'No ATIS available';
+            const button = this.els.pickers.find((picker) => picker.dataset.routePick === side);
+            if (button) button.textContent = airport ? 'Change' : 'Select';
         };
-        paint(this.els.ends.from, this.from, 'Origin Airport not selected', info ? info.depNames : [], 'Departing', info && info.origin);
-        paint(this.els.ends.to, this.to, 'Destination Airport not selected', info ? info.arrNames : [], 'Landing', info && info.target);
+        paint(this.els.ends.from, 'from', this.from, 'Origin Airport not selected', info ? info.depNames : [], 'Departing', info && info.origin);
+        paint(this.els.ends.to, 'to', this.to, 'Destination Airport not selected', info ? info.arrNames : [], 'Landing', info && info.target);
         this.els.title.textContent = this.from && this.to ? `${this.from} to ${this.to}` : 'New Flight';
     }
 
@@ -304,21 +353,19 @@ class RoutePlanner {
     }
 
     bind() {
-        const { from, to, swap, speed, list, copy, enroute, shuffle } = this.els;
-        const chosen = () => {
-            this.seed = 1;
-            this.active = {};
-            this.plan();
-            if (this.options.length) this.setTab('routes');
-        };
-        from.addEventListener('change', () => { this.from = from.value; chosen(); });
-        to.addEventListener('change', () => { this.to = to.value; chosen(); });
+        const { swap, speed, list, copy, enroute, shuffle } = this.els;
+        this.els.pickers.forEach((button) => button.addEventListener('click', () => this.openPicker(button.dataset.routePick)));
+        this.els.pickBack.addEventListener('click', () => this.closePicker(null));
+        this.els.pickHide.addEventListener('click', () => this.actions.hide && this.actions.hide());
+        this.els.pickSearch.addEventListener('input', () => this.renderPicker());
+        this.els.pickList.addEventListener('click', (event) => {
+            const row = event.target.closest('[data-icao]');
+            if (row) this.closePicker(row.dataset.icao);
+        });
         shuffle.addEventListener('click', () => { this.seed += 1; this.plan(); });
         swap.addEventListener('click', () => {
             [this.from, this.to] = [this.to, this.from];
             this.active = {};
-            from.value = this.from;
-            to.value = this.to;
             this.plan();
         });
         speed.addEventListener('input', () => {
@@ -457,8 +504,6 @@ class RoutePlanner {
         this.to = '';
         this.seed = 1;
         this.active = {};
-        this.els.from.value = '';
-        this.els.to.value = '';
         this.plan();
         this.setTab('general');
     }

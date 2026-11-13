@@ -949,6 +949,36 @@ svg {
     display: none;
 }
 
+.route-screen {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.route-screen[hidden] {
+    display: none;
+}
+
+.route-pick-row {
+    width: 100%;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+}
+
+.route-pick-row .airport-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.route-pick-row.selected {
+    background: rgba(29, 89, 149, 0.35);
+}
+
 .flight-row {
     cursor: default;
 }
@@ -963,11 +993,10 @@ svg {
 }
 
 .flight-select {
-    position: relative;
     flex-shrink: 0;
-    display: grid;
-    place-items: center;
+    min-width: 68px;
     height: 28px;
+    font-family: inherit;
     padding: 0 14px;
     background: var(--accent);
     border: 1px solid var(--accent-line);
@@ -983,19 +1012,9 @@ svg {
     background: var(--accent-line);
 }
 
-.flight-select:focus-within {
+.flight-select:focus-visible {
     outline: 2px solid var(--accent-text);
     outline-offset: 2px;
-}
-
-.flight-select select {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    font-size: 16px;
 }
 
 .flight-buttons {
