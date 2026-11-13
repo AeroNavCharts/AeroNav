@@ -366,24 +366,26 @@ class ChartViewer {
         this.renderInk();
     }
 
-    setPlanned(route) {
+    setPlanned(route, others = []) {
         this.planned = route && route.length > 1 ? route : null;
+        this.plannedOthers = this.planned ? others.filter((r) => r && r.length > 1) : [];
         this.renderInk();
     }
 
     drawRoute(ctx, k) {
-        this.strokeRoute(ctx, k, this.planned, 'rgba(20, 150, 95, 0.6)', 'rgba(10, 110, 70, 0.95)');
-        this.strokeRoute(ctx, k, this.route, 'rgba(150, 70, 210, 0.55)', 'rgba(120, 50, 180, 0.95)');
+        (this.plannedOthers || []).forEach((r) => this.strokeRoute(ctx, k, r, 'rgba(85, 100, 120, 0.5)', null, 5));
+        this.strokeRoute(ctx, k, this.planned, 'rgba(20, 150, 95, 0.65)', 'rgba(10, 110, 70, 0.95)', 9);
+        this.strokeRoute(ctx, k, this.route, 'rgba(150, 70, 210, 0.55)', 'rgba(120, 50, 180, 0.95)', 9);
     }
 
-    strokeRoute(ctx, k, route, line, edge) {
+    strokeRoute(ctx, k, route, line, edge, width) {
         if (!route) return;
         ctx.save();
         ctx.beginPath();
         ctx.rect(0, 0, this.natW * this.scale, this.natH * this.scale);
         ctx.clip();
         ctx.strokeStyle = line;
-        ctx.lineWidth = 9;
+        ctx.lineWidth = width;
         ctx.lineJoin = 'round';
         ctx.beginPath();
         route.forEach(([u, v], i) => {
@@ -391,15 +393,17 @@ class ChartViewer {
             else ctx.moveTo(u * k, v * k);
         });
         ctx.stroke();
-        ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = edge;
-        ctx.lineWidth = 2;
-        route.forEach(([u, v]) => {
-            ctx.beginPath();
-            ctx.arc(u * k, v * k, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-        });
+        if (edge) {
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = edge;
+            ctx.lineWidth = 2;
+            route.forEach(([u, v]) => {
+                ctx.beginPath();
+                ctx.arc(u * k, v * k, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+        }
         ctx.restore();
     }
 
