@@ -69,7 +69,10 @@ class RoutePlanner {
         });
         const gate = (icao, kind) => {
             const pos = NAV_AIRPORTS[icao];
-            const named = new Set(RoutePlanner.procedures(icao, kind).flatMap((proc) => proc.fixes).filter((fix) => index.has(fix)));
+            const named = new Set(RoutePlanner.procedures(icao, kind).flatMap((proc) => {
+                const own = proc.fixes.filter((fix) => proc.name.startsWith(`${fix} `));
+                return own.length ? own : proc.fixes;
+            }).filter((fix) => index.has(fix)));
             const picks = named.size ? [...named].map((fix) => index.get(fix)) : nodes.map((node, i) => [span(pos, node.pos), i]).sort((a, b) => a[0] - b[0]).slice(0, 5).map(([, i]) => i);
             return new Map(picks.map((i) => [i, span(pos, nodes[i].pos)]));
         };
@@ -181,7 +184,9 @@ class RoutePlanner {
             if (!found.has(shape)) found.set(shape, { ...tidy, distance: measure(tidy.points) });
         }
         const direct = { names: [], points: [start, end], distance: RoutePlanner.distance(start, end) };
-        const pool = [...found.values()].filter((option) => option.distance <= direct.distance * 1.5).sort((a, b) => a.distance - b.distance);
+        const every = [...found.values()].sort((a, b) => a.distance - b.distance);
+        const near = every.filter((option) => option.distance <= direct.distance * 1.5);
+        const pool = near.length ? near : every.slice(0, 3);
         const chosen = pool.length ? [pool.splice(seed > 1 ? Math.floor(random() * Math.min(3, pool.length)) : 0, 1)[0]] : [];
         while (chosen.length < 5 && pool.length) {
             let pick = 0;
