@@ -167,34 +167,35 @@ import LoaderLogo from '../components/LoaderLogo.astro';
           <div class="panel-head">
             <div class="panel-heading">
               <div class="panel-title">Route</div>
-              <div class="panel-sub">Plan a route and see it on the charts</div>
+              <div class="panel-sub">Pick two airports, get a flight plan</div>
             </div>
           </div>
-          <form class="search-wrap route-form" id="routeForm" autocomplete="off">
-            <input id="routeInput" class="search" list="routeOptions" placeholder="Add points, e.g. IRFD KENED IPPH" autocapitalize="characters" spellcheck="false" aria-label="Add airports or waypoints" />
-            <button class="route-add" type="submit">Add</button>
-            <datalist id="routeOptions"></datalist>
-          </form>
+          <div class="route-pick">
+            <div class="route-fields">
+              <label class="route-field">
+                <span>From</span>
+                <select id="routeFrom" aria-label="Departure airport"></select>
+              </label>
+              <label class="route-field">
+                <span>To</span>
+                <select id="routeTo" aria-label="Arrival airport"></select>
+              </label>
+            </div>
+            <button class="route-swap" id="routeSwap" type="button" aria-label="Swap departure and arrival" title="Swap">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M8 4v15M4 15l4 4 4-4M16 20V5M12 9l4-4 4 4" />
+              </svg>
+            </button>
+          </div>
+          <label class="route-speed-row">Cruise speed <input id="routeSpeed" class="route-speed" type="number" min="40" max="2000" step="10" inputmode="numeric" aria-label="Cruise speed in knots" /> kt</label>
           <div class="list">
-            <p class="route-empty" id="routeEmpty">Type airport codes and waypoint names in order. You can paste a whole route at once.</p>
+            <p class="route-empty" id="routeEmpty"></p>
             <ol class="route-list" id="routeList"></ol>
           </div>
-          <div class="route-summary" id="routeSummary" hidden>
-            <div class="route-stat">
-              <span class="route-stat-label">Distance</span>
-              <span class="route-stat-value" id="routeTotal"></span>
-            </div>
-            <div class="route-stat">
-              <span class="route-stat-label">Time at <input id="routeSpeed" class="route-speed" type="number" min="40" max="2000" step="10" inputmode="numeric" aria-label="Ground speed in knots" /> kt</span>
-              <span class="route-stat-value" id="routeTime"></span>
-            </div>
-          </div>
           <p class="panel-note" id="routeNote" hidden></p>
-          <div class="route-actions">
+          <div class="route-actions" id="routeActions" hidden>
+            <button class="route-btn route-btn-main" id="routeCopy" type="button">Copy flight plan</button>
             <button class="route-btn" id="routeEnroute" type="button">Enroute chart</button>
-            <button class="route-btn" id="routeFiled" type="button">Use filed plan</button>
-            <button class="route-btn" id="routeCopy" type="button">Copy</button>
-            <button class="route-btn" id="routeClear" type="button">Clear</button>
           </div>
         </section>
 

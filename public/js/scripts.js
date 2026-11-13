@@ -28,20 +28,16 @@ const ownship = new Ownship(chartViewer, {
     host: chartWrap
 });
 const routePlanner = new RoutePlanner(chartViewer, ownship, {
-    form: document.getElementById('routeForm'),
-    input: document.getElementById('routeInput'),
-    options: document.getElementById('routeOptions'),
+    from: document.getElementById('routeFrom'),
+    to: document.getElementById('routeTo'),
+    swap: document.getElementById('routeSwap'),
+    speed: document.getElementById('routeSpeed'),
     list: document.getElementById('routeList'),
     empty: document.getElementById('routeEmpty'),
-    summary: document.getElementById('routeSummary'),
-    total: document.getElementById('routeTotal'),
-    time: document.getElementById('routeTime'),
-    speed: document.getElementById('routeSpeed'),
     note: document.getElementById('routeNote'),
-    enroute: document.getElementById('routeEnroute'),
-    filed: document.getElementById('routeFiled'),
+    actions: document.getElementById('routeActions'),
     copy: document.getElementById('routeCopy'),
-    clear: document.getElementById('routeClear')
+    enroute: document.getElementById('routeEnroute')
 }, {
     openEnroute: () => {
         const chart = pinned.find(p => p.id === 'ENROUTE');
