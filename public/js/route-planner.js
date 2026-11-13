@@ -5,6 +5,7 @@ class RoutePlanner {
         this.els = els;
         this.actions = actions;
         this.key = 'aeronav_route_plan';
+        this.pilotKey = 'aeronav_route_pilot';
         this.options = [];
         this.picked = 0;
         this.seed = 1;
@@ -282,6 +283,9 @@ class RoutePlanner {
             this.draw();
         });
         copy.addEventListener('click', () => this.copy());
+        this.els.command.addEventListener('click', () => this.copyCommand());
+        this.els.clear.addEventListener('click', () => this.clear());
+        this.bindPilot();
         enroute.addEventListener('click', () => this.actions.openEnroute && this.actions.openEnroute());
     }
 
@@ -331,15 +335,82 @@ class RoutePlanner {
         return minutes >= 60 ? `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, '0')} min` : `${minutes} min`;
     }
 
-    async copy() {
-        const option = this.options[this.picked];
-        if (!option) return;
+    readPilot() {
         try {
-            await navigator.clipboard.writeText(option.text);
-            this.flash('Flight plan copied.');
+            return JSON.parse(localStorage.getItem(this.pilotKey)) || {};
         } catch (e) {
-            this.flash(option.text);
+            return {};
         }
+    }
+
+    bindPilot() {
+        const saved = this.readPilot();
+        if (!saved.ingamename) {
+            try {
+                saved.ingamename = localStorage.getItem('aeronav_pilot_name') || '';
+            } catch (e) { }
+        }
+        Object.entries(this.els.fields).forEach(([name, field]) => {
+            if (saved[name]) field.value = saved[name];
+            field.addEventListener('input', () => {
+                const values = {};
+                Object.entries(this.els.fields).forEach(([key, el]) => { values[key] = el.value.trim(); });
+                try {
+                    localStorage.setItem(this.pilotKey, JSON.stringify(values));
+                } catch (e) { }
+            });
+        });
+    }
+
+    command() {
+        const option = this.options[this.picked];
+        if (!option) return '';
+        const { fields } = this.els;
+        const value = (name) => fields[name].value.trim();
+        const level = value('flightlevel').replace(/\D/g, '');
+        const parts = [
+            ['ingamecallsign', value('ingamecallsign')],
+            ['callsign', value('callsign').toUpperCase()],
+            ['aircraft', value('aircraft')],
+            ['flightrules', value('flightrules')],
+            ['departing', this.from],
+            ['arriving', this.to],
+            ['flightlevel', level ? level.padStart(3, '0') : ''],
+            ['ingamename', value('ingamename')],
+            ['route', option.text.split(' ').slice(1, -1).join(' ')]
+        ];
+        return `/createflightplan ${parts.filter(([, text]) => text).map(([name, text]) => `${name}:${text}`).join(' ')}`;
+    }
+
+    async write(text, done) {
+        if (!text) return;
+        try {
+            await navigator.clipboard.writeText(text);
+            this.flash(done);
+        } catch (e) {
+            this.flash(text);
+        }
+    }
+
+    copy() {
+        const option = this.options[this.picked];
+        return this.write(option ? option.text : '', 'Route copied.');
+    }
+
+    copyCommand() {
+        const missing = ['ingamecallsign', 'callsign', 'aircraft', 'flightlevel'].filter((name) => !this.els.fields[name].value.trim());
+        if (missing.length) this.els.details.open = true;
+        return this.write(this.command(), missing.length ? 'Command copied, but some details are still empty.' : 'Discord command copied.');
+    }
+
+    clear() {
+        this.from = '';
+        this.to = '';
+        this.seed = 1;
+        this.active = {};
+        this.els.from.value = '';
+        this.els.to.value = '';
+        this.plan();
     }
 
     flash(text) {
@@ -367,6 +438,7 @@ class RoutePlanner {
         const { list, empty, actions } = this.els;
         const ready = this.options.length > 0;
         actions.hidden = !ready;
+        this.els.details.hidden = !ready;
         empty.hidden = ready;
         if (!ready) {
             empty.textContent = this.from && this.to && this.from === this.to ? 'Pick two different airports.' : 'Pick a departure and an arrival airport to see route options, fastest first.';

@@ -194,10 +194,44 @@ import LoaderLogo from '../components/LoaderLogo.astro';
             <ol class="route-list" id="routeList"></ol>
           </div>
           <p class="panel-note" id="routeNote" hidden></p>
+          <details class="route-details" id="routeDetails" hidden>
+            <summary>Flight plan details</summary>
+            <div class="route-details-grid">
+              <label class="route-detail">
+                <span>In-game callsign</span>
+                <input id="routeGameCallsign" type="text" placeholder="Jester-3263" autocomplete="off" spellcheck="false" />
+              </label>
+              <label class="route-detail">
+                <span>Callsign</span>
+                <input id="routeCallsign" type="text" placeholder="DAL123" autocomplete="off" spellcheck="false" autocapitalize="characters" />
+              </label>
+              <label class="route-detail">
+                <span>Aircraft</span>
+                <input id="routeAircraft" type="text" placeholder="B737" autocomplete="off" spellcheck="false" />
+              </label>
+              <label class="route-detail">
+                <span>In-game name</span>
+                <input id="routeGameName" type="text" placeholder="Roblox username" autocomplete="off" spellcheck="false" autocapitalize="off" />
+              </label>
+              <label class="route-detail">
+                <span>Flight rules</span>
+                <select id="routeRules">
+                  <option value="IFR">IFR</option>
+                  <option value="VFR">VFR</option>
+                </select>
+              </label>
+              <label class="route-detail">
+                <span>Flight level</span>
+                <input id="routeLevel" type="text" inputmode="numeric" maxlength="3" placeholder="040" autocomplete="off" />
+              </label>
+            </div>
+          </details>
           <div class="route-actions" id="routeActions" hidden>
-            <button class="route-btn route-btn-main" id="routeCopy" type="button">Copy flight plan</button>
+            <button class="route-btn route-btn-main" id="routeCommand" type="button">Copy Discord command</button>
+            <button class="route-btn" id="routeCopy" type="button">Copy route</button>
             <button class="route-btn" id="routeShuffle" type="button">Shuffle routes</button>
-            <button class="route-btn route-btn-wide" id="routeEnroute" type="button">Enroute chart</button>
+            <button class="route-btn" id="routeEnroute" type="button">Enroute chart</button>
+            <button class="route-btn" id="routeClear" type="button">Clear</button>
           </div>
         </section>
 

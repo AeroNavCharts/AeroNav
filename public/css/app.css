@@ -1116,10 +1116,67 @@ svg {
     overflow-wrap: anywhere;
 }
 
+.route-details {
+    flex-shrink: 0;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+}
+
+.route-details[hidden] {
+    display: none;
+}
+
+.route-details summary {
+    padding: 9px 12px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+}
+
+.route-details summary:hover {
+    color: var(--text);
+}
+
+.route-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 12px 10px;
+}
+
+.route-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.route-detail input,
+.route-detail select {
+    width: 100%;
+    min-width: 0;
+    height: 30px;
+    padding: 0 8px;
+    background: var(--rail-bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    outline: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+}
+
+.route-detail input:focus,
+.route-detail select:focus {
+    border-color: var(--accent-line);
+}
+
 .route-actions {
     flex-shrink: 0;
     display: grid;
-    grid-template-columns: 1.4fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 6px;
     padding: 10px 12px 12px;
     border-top: 1px solid var(--line);
@@ -1150,6 +1207,7 @@ svg {
 }
 
 .route-btn-main {
+    grid-column: 1 / -1;
     background: var(--accent);
     border-color: var(--accent-line);
     color: #fff;

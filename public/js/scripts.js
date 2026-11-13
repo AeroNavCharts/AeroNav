@@ -42,7 +42,18 @@ const routePlanner = new RoutePlanner(chartViewer, ownship, {
     copy: document.getElementById('routeCopy'),
     enroute: document.getElementById('routeEnroute'),
     shuffle: document.getElementById('routeShuffle'),
-    atis: document.getElementById('routeAtis')
+    atis: document.getElementById('routeAtis'),
+    details: document.getElementById('routeDetails'),
+    command: document.getElementById('routeCommand'),
+    clear: document.getElementById('routeClear'),
+    fields: {
+        ingamecallsign: document.getElementById('routeGameCallsign'),
+        callsign: document.getElementById('routeCallsign'),
+        aircraft: document.getElementById('routeAircraft'),
+        ingamename: document.getElementById('routeGameName'),
+        flightrules: document.getElementById('routeRules'),
+        flightlevel: document.getElementById('routeLevel')
+    }
 }, {
     atis: (icao) => new Promise((resolve) => setTimeout(resolve)).then(() => atisFor(icao)),
     openEnroute: () => {
