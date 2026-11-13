@@ -213,6 +213,8 @@ function showPanel(name) {
     });
     railButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.panel === name));
     if (leftCol) leftCol.classList.remove('collapsed');
+    const restore = document.querySelector('.panel-restore');
+    if (restore) restore.style.display = 'none';
     if (window.innerWidth <= 900 && leftCol) leftCol.classList.add('active');
 }
 
