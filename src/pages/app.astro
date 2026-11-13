@@ -194,8 +194,8 @@ import LoaderLogo from '../components/LoaderLogo.astro';
             <ol class="route-list" id="routeList"></ol>
           </div>
           <p class="panel-note" id="routeNote" hidden></p>
-          <details class="route-details" id="routeDetails" hidden>
-            <summary>Flight plan details</summary>
+          <div class="route-details" id="routeDetails" hidden>
+            <div class="route-details-title">Flight plan details</div>
             <div class="route-details-grid">
               <label class="route-detail">
                 <span>In-game callsign</span>
@@ -225,7 +225,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
                 <input id="routeLevel" type="text" inputmode="numeric" maxlength="3" placeholder="040" autocomplete="off" />
               </label>
             </div>
-          </details>
+          </div>
           <div class="route-actions" id="routeActions" hidden>
             <button class="route-btn route-btn-main" id="routeCommand" type="button">Copy Discord command</button>
             <button class="route-btn" id="routeCopy" type="button">Copy route</button>

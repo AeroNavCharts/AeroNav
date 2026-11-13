@@ -424,7 +424,6 @@ class RoutePlanner {
 
     copyCommand() {
         const missing = ['ingamecallsign', 'callsign', 'aircraft', 'flightlevel'].filter((name) => !this.els.fields[name].value.trim());
-        if (missing.length) this.els.details.open = true;
         return this.write(this.command(), missing.length ? 'Command copied, but some details are still empty.' : 'Discord command copied.');
     }
 

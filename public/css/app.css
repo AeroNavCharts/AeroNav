@@ -1126,15 +1126,9 @@ svg {
     display: none;
 }
 
-.route-details summary {
-    padding: 9px 12px;
+.route-details-title {
+    padding: 9px 12px 7px;
     color: var(--muted);
-    cursor: pointer;
-    user-select: none;
-}
-
-.route-details summary:hover {
-    color: var(--text);
 }
 
 .route-details-grid {
