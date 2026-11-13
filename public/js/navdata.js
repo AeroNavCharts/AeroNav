@@ -185,17 +185,17 @@ const NAV_FIXES = {
 const NAV_PROCEDURES = {
     IBTH: {
         SID: [
-            ["MOUNTAIN 1", ["DINER", "OCEEN"]],
-            ["OCEAN 1", ["DINER", "OCEEN"]],
-            ["RESURGE 1", ["PIPER", "PROBE", "WELSH", "INDEX"]],
-            ["VONARX 1", ["DUNKS", "CAMEL", "CYRIL"]]
+            ["MOUNTAIN 1", ["DINER", "OCEEN"], [9]],
+            ["OCEAN 1", ["DINER", "OCEEN"], [27]],
+            ["RESURGE 1", ["PIPER", "PROBE", "WELSH", "INDEX"], [27]],
+            ["VONARX 1", ["DUNKS", "CAMEL", "CYRIL"], [9]]
         ],
         STAR: [
-            ["DINER 1", ["DINER", "TINDR", "KNIFE", "STRAX", "PROBE", "WELSH"]],
-            ["GAVIN 1", ["GAVIN", "WELSH", "ENDER", "SILVA", "OCEEN", "SETHR"]],
-            ["ROMENS 1", ["TINDR", "KNIFE", "STRAX", "DINER", "TALIS", "CAMEL"]],
-            ["SILVA 1", ["SILVA", "CYRIL", "GAVIN", "OCEEN"]],
-            ["WELSH 1", ["WELSH", "RENDR"]]
+            ["DINER 1", ["DINER", "TINDR", "KNIFE", "STRAX", "PROBE", "WELSH"], [9]],
+            ["GAVIN 1", ["GAVIN", "WELSH", "ENDER", "SILVA", "OCEEN", "SETHR"], [9]],
+            ["ROMENS 1", ["TINDR", "KNIFE", "STRAX", "DINER", "TALIS", "CAMEL"], [27]],
+            ["SILVA 1", ["SILVA", "CYRIL", "GAVIN", "OCEEN"], [27]],
+            ["WELSH 1", ["WELSH", "RENDR"], [9]]
         ]
     },
     IIAB: {
@@ -218,9 +218,9 @@ const NAV_PROCEDURES = {
     },
     ILAR: {
         SID: [
-            ["GRASS 1", ["GRASS", "ANYMS", "RENTS"]],
+            ["GRASS 1", ["GRASS", "ANYMS", "RENTS"], [24]],
             ["ODOKU 1", ["ODOKU", "LAZER"]],
-            ["RENTS 1", ["RENTS", "CAWZE", "JUSTY", "ANYMS"]]
+            ["RENTS 1", ["RENTS", "CAWZE", "JUSTY", "ANYMS"], [6]]
         ],
         STAR: [
             ["LUBAN 1", ["RENTS", "GRASS", "ODOKU"]],
@@ -230,16 +230,16 @@ const NAV_PROCEDURES = {
     },
     IMLR: {
         SID: [
-            ["BEANS 3", ["BEANS", "SPACE", "SEEKS"]],
+            ["BEANS 3", ["BEANS", "SPACE", "SEEKS"], [25]],
             ["HAWFA 1", ["HAWFA", "OCEEN", "BUCFA", "KUNAV", "SAWPE", "ATPEV", "ANYMS", "SETHR"]],
             ["KENED 2", ["KENED", "RENDR", "DINER", "WELSH", "INDEX", "KUNAV", "ICTAM", "SAWPE"]],
-            ["SAWPE 1", ["SAWPE", "BUCFA", "SPACE", "BEANS"]]
+            ["SAWPE 1", ["SAWPE", "BUCFA", "SPACE", "BEANS"], [7]]
         ],
         STAR: [
             ["BIGDY 1", ["SETHR", "KUNAV", "HAWFA", "ATPEV"]],
-            ["BUCFA 1", ["BUCFA", "SPACE", "BEANS", "SAWPE"]],
+            ["BUCFA 1", ["BUCFA", "SPACE", "BEANS", "SAWPE"], [25]],
             ["NORTHERN 1", ["RENDR", "DINER", "WELSH", "INDEX", "KENED", "KUNAV", "BUCFA"]],
-            ["URMOM 1", ["SPACE", "SEEKS", "ALDER", "BEANS"]]
+            ["URMOM 1", ["SPACE", "SEEKS", "ALDER", "BEANS"], [7]]
         ]
     },
     IPAP: {
@@ -253,15 +253,15 @@ const NAV_PROCEDURES = {
     },
     IPPH: {
         SID: [
-            ["CAMEL 2", ["CAMEL", "TINDR", "NOONU", "STRAX", "TALIS"]],
-            ["DINER 2", ["DINER", "TINDR", "NOONU", "STRAX", "TALIS"]],
-            ["NARRX 1", ["TINDR", "NOONU", "STRAX", "TALIS"]],
+            ["CAMEL 2", ["CAMEL", "TINDR", "NOONU", "STRAX", "TALIS"], [11, 29, 33]],
+            ["DINER 2", ["DINER", "TINDR", "NOONU", "STRAX", "TALIS"], [11, 29, 33]],
+            ["NARRX 1", ["TINDR", "NOONU", "STRAX", "TALIS"], [11, 29, 33]],
             ["PERTH 2", ["ROSMO", "CAMEL", "CYRIL"]]
         ],
         STAR: [
             ["HONDA 2", ["HONDA", "STRAX"]],
-            ["SISTA 2", ["SISTA", "NOONU", "CAMEL", "SILVA", "TALIS", "DINER"]],
-            ["TALIS 2", ["TALIS", "TINDR", "CAMEL", "DUNKS", "SILVA", "CYRIL"]]
+            ["SISTA 2", ["SISTA", "NOONU", "CAMEL", "SILVA", "TALIS", "DINER"], [29, 33]],
+            ["TALIS 2", ["TALIS", "TINDR", "CAMEL", "DUNKS", "SILVA", "CYRIL"], [11, 15]]
         ]
     },
     IRFD: {
@@ -275,7 +275,7 @@ const NAV_PROCEDURES = {
         ],
         STAR: [
             ["BEANS 1", ["BEANS", "HAWFA", "SPACE", "LOGAN", "ICTAM", "SEEKS"]],
-            ["GORDO 1", ["GODLU"]],
+            ["GORDO 1", ["GODLU"], [7]],
             ["JAMSI 1", ["JAMSI", "ANYMS", "GRASS", "GODLU", "PEPUL"]],
             ["KUNAV 2", ["KUNAV", "RENDR", "DINER", "WELSH", "INDEX", "KENED", "HAWFA"]],
             ["MELLOR 1", ["ICTAM"]],
@@ -287,8 +287,8 @@ const NAV_PROCEDURES = {
         SID: [
             ["ECHHO 1", ["THACC", "SPACE", "GEORG"]],
             ["SAUTHEMPTONA 1", ["THACC", "SHREK", "SPACE", "BEANS"]],
-            ["SAYOW 1", ["EXMOR", "GODLU", "ALDER", "ODOKU"]],
-            ["ZZOOO 1", ["GODLU", "STACK", "ODOKU", "PEPUL", "ALDER"]]
+            ["SAYOW 1", ["EXMOR", "GODLU", "ALDER", "ODOKU"], [8]],
+            ["ZZOOO 1", ["GODLU", "STACK", "ODOKU", "PEPUL", "ALDER"], [26]]
         ],
         STAR: [
             ["ALDER 1", ["ALDER", "PEPUL", "EMJAY"]],
@@ -305,10 +305,10 @@ const NAV_PROCEDURES = {
             ["TOKYO 1", ["ASTRO", "ONDER", "PIPER"]]
         ],
         STAR: [
-            ["GULEG 1", ["GULEG", "EURAD", "PIPER", "ONDER", "BLANK"]],
-            ["ISLAND 2", ["ONDER", "ASTRO", "KNIFE"]],
-            ["KNIFE 2", ["KNIFE", "ONDER", "PROBE", "DINER"]],
-            ["PIPER 1", ["PIPER", "ASTRO", "ONDER", "RENDR", "DINER"]]
+            ["GULEG 1", ["GULEG", "EURAD", "PIPER", "ONDER", "BLANK"], [13, 20, 31]],
+            ["ISLAND 2", ["ONDER", "ASTRO", "KNIFE"], [13, 20]],
+            ["KNIFE 2", ["KNIFE", "ONDER", "PROBE", "DINER"], [20]],
+            ["PIPER 1", ["PIPER", "ASTRO", "ONDER", "RENDR", "DINER"], [13]]
         ]
     }
 };
