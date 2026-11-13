@@ -231,9 +231,32 @@ class ChartViewer {
         return image;
     }
 
-    async goPage(number) {
+    scrollPage(dx, dy) {
+        if (this.turning) return;
+        const b = this.bounds();
+        const view = this.stage.clientHeight;
+        const top = this.y + b.top;
+        const atTop = top >= -1;
+        const atBottom = top + b.height <= view + 1;
+        const settled = Date.now() - (this.turnedAt || 0) > 450;
+        if (dy > 0 && atBottom) {
+            if (settled) this.goPage(this.page + 1, 'top');
+            return;
+        }
+        if (dy < 0 && atTop) {
+            if (settled) this.goPage(this.page - 1, 'bottom');
+            return;
+        }
+        const next = b.height > view ? Math.min(0, Math.max(view - b.height, top - dy)) : top;
+        this.y = next - b.top;
+        if (b.width > this.stage.clientWidth) this.x -= dx;
+        this.apply();
+    }
+
+    async goPage(number, edge) {
         if (!this.doc || this.turning || number < 1 || number > this.pages || number === this.page) return;
         const token = this.token;
+        const held = edge ? { scale: this.scale, x: this.x } : null;
         this.turning = true;
         this.renderPager();
         try {
@@ -241,6 +264,16 @@ class ChartViewer {
             if (token !== this.token) return;
             this.page = number;
             this.openPage(number > 1 ? `${this.docId}#${number}` : this.docId, image, true);
+            if (held) {
+                this.scale = held.scale;
+                this.x = held.x;
+                const b = this.bounds();
+                const view = this.stage.clientHeight;
+                if (b.height > view) this.y = (edge === 'top' ? 0 : view - b.height) - b.top;
+                else this.y = (view - b.height) / 2 - b.top;
+                this.apply();
+            }
+            this.turnedAt = Date.now();
             if (number < this.pages) this.pageImage(number + 1).catch(() => { });
         } catch (error) {
         } finally {
@@ -884,6 +917,10 @@ class ChartViewer {
             this.stopGlide();
             const p = this.point(e);
             const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+            if (this.pages > 1 && !e.ctrlKey && !e.metaKey) {
+                this.scrollPage(e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX, delta);
+                return;
+            }
             this.zoomAt(p.x, p.y, Math.exp(-delta * 0.0015));
         }, { passive: false });
 
