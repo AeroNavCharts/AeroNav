@@ -21,7 +21,24 @@ class ChartViewer {
         this.ink = document.createElement('canvas');
         this.ink.className = 'chart-ink';
         this.inkCtx = this.ink.getContext('2d');
-        this.stage.append(this.img, this.ink);
+        this.planeEl = document.createElement('div');
+        this.planeEl.className = 'chart-plane';
+        this.planeEl.hidden = true;
+        this.planeImg = document.createElement('img');
+        this.planeImg.alt = '';
+        this.planeImg.draggable = false;
+        this.planeImg.src = '/assets/ownship.png';
+        this.planeEl.appendChild(this.planeImg);
+        this.plane = null;
+        this.route = null;
+        this.planned = null;
+        this.picker = null;
+        this.tapStart = null;
+        this.trafficEl = document.createElement('div');
+        this.trafficEl.className = 'chart-traffic';
+        this.traffic = [];
+        this.trafficPool = [];
+        this.stage.append(this.img, this.ink, this.trafficEl, this.planeEl);
         wrap.insertBefore(this.stage, wrap.querySelector('iframe'));
         this.x = 0;
         this.y = 0;
@@ -150,13 +167,14 @@ class ChartViewer {
         try {
             low = await this.fetchImage(ChartViewer.imageUrl(id, 1200));
         } catch (error) {
-            if (!opts.pdf) throw error;
+            low = null;
         }
+        const pdf = opts.pdf || !low;
         if (token !== this.token) return false;
         this.closeDocument();
         this.docId = id;
         if (low) this.openPage(id, low, true);
-        if (opts.pdf) {
+        if (pdf) {
             const ready = this.openDocument(id, token, !low);
             return low ? true : ready;
         }
@@ -490,6 +508,115 @@ class ChartViewer {
         this.onZoom(Math.round((this.scale / this.fitScale) * 100));
         this.placeInput();
         this.renderInk();
+        this.placeTraffic();
+        this.placePlane();
+    }
+
+    setTraffic(traffic) {
+        this.traffic = traffic || [];
+        this.placeTraffic();
+    }
+
+    placeTraffic() {
+        const list = this.natW ? this.traffic : [];
+        const k = this.unit;
+        const size = Math.max(0.8, Math.min(1.6, Math.sqrt(this.scale / this.fitScale)));
+        while (this.trafficPool.length < list.length) {
+            const el = document.createElement('div');
+            el.className = 'chart-plane chart-other';
+            const img = document.createElement('img');
+            img.alt = '';
+            img.draggable = false;
+            el.appendChild(img);
+            this.trafficEl.appendChild(el);
+            this.trafficPool.push({ el, img });
+        }
+        this.trafficPool.forEach(({ el, img }, i) => {
+            const p = list[i];
+            if (!p) {
+                el.hidden = true;
+                return;
+            }
+            if (el.dataset.kind !== p.kind) {
+                el.dataset.kind = p.kind;
+                img.src = `/assets/planes/${p.kind}.png`;
+            }
+            el.title = p.label || '';
+            const [sx, sy] = this.spin(p.u * k, p.v * k);
+            el.hidden = false;
+            el.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg) scale(${size})`;
+        });
+    }
+
+    setRoute(route) {
+        this.route = route && route.length > 1 ? route : null;
+        this.renderInk();
+    }
+
+    setPlanned(route, others = []) {
+        this.planned = route && route.length > 1 ? route : null;
+        this.plannedOthers = this.planned ? others.filter((r) => r && r.length > 1) : [];
+        this.renderInk();
+    }
+
+    drawRoute(ctx, k) {
+        (this.plannedOthers || []).forEach((r) => this.strokeRoute(ctx, k, r, 'rgba(85, 100, 120, 0.5)', null, 5));
+        this.strokeRoute(ctx, k, this.planned, 'rgba(20, 150, 95, 0.65)', 'rgba(10, 110, 70, 0.95)', 9);
+        this.strokeRoute(ctx, k, this.route, 'rgba(150, 70, 210, 0.55)', 'rgba(120, 50, 180, 0.95)', 9);
+    }
+
+    strokeRoute(ctx, k, route, line, edge, width) {
+        if (!route) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, this.natW * this.scale, this.natH * this.scale);
+        ctx.clip();
+        ctx.strokeStyle = line;
+        ctx.lineWidth = width;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        route.forEach(([u, v], i) => {
+            if (i) ctx.lineTo(u * k, v * k);
+            else ctx.moveTo(u * k, v * k);
+        });
+        ctx.stroke();
+        if (edge) {
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = edge;
+            ctx.lineWidth = 2;
+            route.forEach(([u, v]) => {
+                ctx.beginPath();
+                ctx.arc(u * k, v * k, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+        }
+        ctx.restore();
+    }
+
+    setPlane(plane) {
+        this.plane = plane;
+        this.placePlane();
+    }
+
+    placePlane() {
+        const p = this.plane;
+        if (!p || !this.natW) {
+            this.planeEl.hidden = true;
+            return;
+        }
+        const k = this.unit;
+        const [sx, sy] = this.spin(p.u * k, p.v * k);
+        this.planeEl.hidden = false;
+        const size = Math.max(0.8, Math.min(1.6, Math.sqrt(this.scale / this.fitScale)));
+        this.planeEl.style.transform = `translate(${this.x + sx}px, ${this.y + sy}px) rotate(${p.heading + this.rotation}deg) scale(${size})`;
+    }
+
+    pickPoint() {
+        return new Promise((resolve) => {
+            this.picker = resolve;
+            this.stage.classList.add('picking');
+        });
     }
 
     point(e) {
@@ -608,13 +735,14 @@ class ChartViewer {
         const dpr = window.devicePixelRatio || 1;
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, this.ink.width, this.ink.height);
-        if (!this.natW || !this.marks.length) return;
+        if (!this.natW || (!this.marks.length && !this.route && !this.planned)) return;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         const k = this.unit;
         ctx.translate(this.x, this.y);
         ctx.rotate((this.rotation * Math.PI) / 180);
+        this.drawRoute(ctx, k);
         const sx = (u) => u * k;
         const sy = (v) => v * k;
         this.marks.forEach((m) => {
@@ -809,6 +937,7 @@ class ChartViewer {
             this.stopGlide();
             stage.setPointerCapture(e.pointerId);
             this.pointers.set(e.pointerId, this.point(e));
+            this.tapStart = this.pointers.size === 1 ? this.point(e) : null;
             this.pinch = null;
             if (this.drawMode && this.natW) {
                 if (this.pointers.size === 1) {
@@ -848,6 +977,14 @@ class ChartViewer {
         });
 
         const release = (e) => {
+            const start = this.tapStart;
+            const end = this.point(e);
+            if (this.picker && e.type === 'pointerup' && start && Math.hypot(end.x - start.x, end.y - start.y) < 6) {
+                const done = this.picker;
+                this.picker = null;
+                stage.classList.remove('picking');
+                done(this.toChart(end));
+            }
             this.pointers.delete(e.pointerId);
             this.pinch = null;
             if (this.drawing && this.drawing.id === e.pointerId) {

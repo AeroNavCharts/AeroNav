@@ -19,6 +19,66 @@ const chartViewer = new ChartViewer(chartWrap, {
     },
     onDocError: () => {
         if (currentChart && currentChart.link) showChartInFrame(currentChart.link);
+    },
+    onLoad: () => {
+        if (typeof ownship !== 'undefined') ownship.refresh();
+        if (typeof routePlanner !== 'undefined') routePlanner.draw();
+    }
+});
+const ownship = new Ownship(chartViewer, {
+    button: document.getElementById('ownshipBtn'),
+    chip: document.getElementById('ownshipChip'),
+    host: chartWrap
+});
+const routePlanner = new RoutePlanner(chartViewer, ownship, {
+    pickers: Array.from(document.querySelectorAll('[data-route-pick]')),
+    screens: Array.from(document.querySelectorAll('[data-route-screen]')),
+    pickBack: document.getElementById('routePickBack'),
+    pickHide: document.getElementById('routePickHide'),
+    pickSub: document.getElementById('routePickSub'),
+    pickSearch: document.getElementById('routePickSearch'),
+    pickList: document.getElementById('routePickList'),
+    swap: document.getElementById('routeSwap'),
+    speed: document.getElementById('routeSpeed'),
+    list: document.getElementById('routeList'),
+    empty: document.getElementById('routeEmpty'),
+    note: document.getElementById('routeNote'),
+    actions: document.getElementById('routeActions'),
+    copy: document.getElementById('routeCopy'),
+    enroute: document.getElementById('routeEnroute'),
+    shuffle: document.getElementById('routeShuffle'),
+    count: document.getElementById('routeCount'),
+    ends: {
+        from: { code: document.getElementById('routeFromCode'), name: document.getElementById('routeFromName'), runway: document.getElementById('routeFromRwy') },
+        to: { code: document.getElementById('routeToCode'), name: document.getElementById('routeToName'), runway: document.getElementById('routeToRwy') }
+    },
+    details: document.getElementById('routeDetails'),
+    tools: document.getElementById('routeTools'),
+    title: document.getElementById('routeTitle'),
+    text: document.getElementById('routeText'),
+    find: document.getElementById('routeFind'),
+    hide: document.getElementById('routeHide'),
+    tabs: Array.from(document.querySelectorAll('[data-route-tab]')),
+    panes: Array.from(document.querySelectorAll('[data-route-pane]')),
+    command: document.getElementById('routeCommand'),
+    clear: document.getElementById('routeClear'),
+    fields: {
+        ingamecallsign: document.getElementById('routeGameCallsign'),
+        callsign: document.getElementById('routeCallsign'),
+        aircraft: document.getElementById('routeAircraft'),
+        ingamename: document.getElementById('routeGameName'),
+        flightrules: document.getElementById('routeRules'),
+        flightlevel: document.getElementById('routeLevel')
+    }
+}, {
+    hide: () => { const hide = document.getElementById('hideBtn'); if (hide) hide.click(); },
+    push: (direction, change) => pushPanel(direction, change, panelViews.route),
+    atis: (icao) => new Promise((resolve) => setTimeout(resolve)).then(() => atisFor(icao)),
+    openEnroute: () => {
+        const chart = pinned.find(p => p.id === 'ENROUTE');
+        if (!chart) return;
+        loadChartInViewer(chart, { fromPinned: true });
+        if (window.innerWidth <= 900) closeMobileMenu();
     }
 });
 let chartLoadToken = 0;
@@ -48,8 +108,6 @@ const menuToggle = document.getElementById('menuToggle');
 const mobileSearchToggle = document.getElementById('mobileSearchToggle');
 const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
 const leftCol = document.getElementById('leftCol');
-const moreBtn = document.getElementById('moreBtn');
-const controlsDropdown = document.getElementById('controlsDropdown');
 const skeletonLoader = document.getElementById('skeletonLoader');
 const emptyState = document.getElementById('emptyState');
 const quickActionsBtn = document.getElementById('quickActionsBtn');
@@ -62,6 +120,7 @@ const favBtn = document.getElementById('favBtn');
 const railButtons = Array.from(document.querySelectorAll('.rail-btn[data-panel]'));
 const panelViews = {
     airports: document.getElementById('viewAirports'),
+    route: document.getElementById('viewRoute'),
     links: document.getElementById('viewLinks')
 };
 
@@ -290,13 +349,13 @@ function endPanelPush() {
     clearTimeout(panelPushTimer);
     if (panelGhost) panelGhost.remove();
     panelGhost = null;
-    const view = panelViews.airports;
-    if (view) view.classList.remove('panel-push-in');
+    Object.values(panelViews).forEach(view => {
+        if (view) view.classList.remove('panel-push-in');
+    });
     if (leftCol) leftCol.classList.remove('pushing');
 }
 
-function pushPanel(direction, change) {
-    const view = panelViews.airports;
+function pushPanel(direction, change, view = panelViews.airports) {
     endPanelPush();
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!view || !leftCol || still || !view.classList.contains('active') || !view.offsetWidth) {
@@ -345,16 +404,6 @@ function animateList(direction) {
 function closeMobileSearch() {
     if (!mobileSearchOverlay) return;
     mobileSearchOverlay.classList.remove('active');
-}
-
-function toggleMoreMenu() {
-    if (!controlsDropdown) return;
-    controlsDropdown.classList.toggle('active');
-}
-
-function closeMoreMenu() {
-    if (!controlsDropdown) return;
-    controlsDropdown.classList.remove('active');
 }
 
 function toggleQuickActions() {
@@ -682,10 +731,6 @@ function init() {
         mobileSearchToggle.addEventListener('click', toggleMobileSearch);
     }
     
-    if (moreBtn) {
-        moreBtn.addEventListener('click', toggleMoreMenu);
-    }
-    
     if (quickActionsBtn) {
         quickActionsBtn.addEventListener('click', toggleQuickActions);
     }
@@ -702,10 +747,6 @@ function init() {
         if (leftCol && leftCol.classList.contains('active') &&
             !inside(leftCol) && !inside(menuToggle) && !inside(mobileSearchToggle) && !inside(document.querySelector('.rail'))) {
             closeMobileMenu();
-        }
-        if (controlsDropdown && controlsDropdown.classList.contains('active') &&
-            !inside(moreBtn) && !inside(controlsDropdown)) {
-            closeMoreMenu();
         }
         if (mobileSearchOverlay && mobileSearchOverlay.classList.contains('active') &&
             !inside(mobileSearchOverlay) && !inside(mobileSearchToggle)) {
@@ -1785,21 +1826,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const doneBtn = document.getElementById('doneBtn');
     const listInnerDiv = document.getElementById('listInner');
 
-    const showPanelBtn = document.createElement('button');
-    showPanelBtn.className = 'panel-restore';
-    showPanelBtn.setAttribute('aria-label', 'Show panel');
-    showPanelBtn.innerHTML = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M9 5l7 7-7 7\"/></svg>";
-    showPanelBtn.style.display = 'none';
-    document.body.appendChild(showPanelBtn);
-
     function setPanelCollapsed(collapsed) {
         if (!panel) return;
         panel.classList.toggle('collapsed', collapsed);
-        showPanelBtn.style.display = collapsed ? 'flex' : 'none';
     }
 
     if (hideBtn) hideBtn.addEventListener('click', () => setPanelCollapsed(true));
-    showPanelBtn.addEventListener('click', () => setPanelCollapsed(false));
 
     const siteAd = document.getElementById('siteAd');
     const adCloseBtn = document.getElementById('adCloseBtn');
