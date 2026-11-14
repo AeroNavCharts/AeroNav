@@ -376,7 +376,8 @@ class Ownship {
         if (!this.geoFor(this.viewer.chartId)) return `${this.callsign}: no position on this chart`;
         const plan = this.plan;
         const leg = plan && plan.departing && plan.arriving ? `, ${plan.departing} to ${plan.arriving}` : '';
-        return `Tracking ${this.callsign}${leg}`;
+        const rough = typeof CHART_GEO_ROUGH !== 'undefined' && CHART_GEO_ROUGH.includes(this.viewer.chartId);
+        return `Tracking ${this.callsign}${leg}${rough ? ' (approximate here)' : ''}`;
     }
 
     render() {

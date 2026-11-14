@@ -169,6 +169,19 @@ const CHART_GEO = {
     "10RusXppV5bEoOlj3LojQyBrKC6wU_BNr": [0.0001849728, 0, 9.0860749, 0, 0.0001849728, -3.7637099]
 };
 
+const CHART_GEO_ROUGH = [
+    "15Mg7vONSg36rlhOi-8S_5FH5b2dGXHho",
+    "1RsYwJjGPalqE6xhBiiT54nl_iHHK3QbZ",
+    "10imKbnPhjPjZdxiGxziJtr2b88Zd8aC7",
+    "1L1YbN5aK1VG-Hs0UVXJJwk52htdrnw1T",
+    "1OrKVw41nrcBDu5WIEUS369hmVdIzvbvc",
+    "1nwgQOhy__Evg0mSoBJ9mUOBciuIEd4IF",
+    "1s2-5moV1OUtCug63X_LI60CDvMZhxhFI",
+    "1oyJZyXjX9Vu1RR8jo2XJEsGmHCeshih5",
+    "1Y4bgcSUErAAJrJfD0HMeL9-VSu_vMzUY",
+    "1EwDFL_bwMdV4PHGnslTPoBqwy-LNrgZv"
+];
+
 const AIRPORTS = [
     {
         "icao": "IBTH",
