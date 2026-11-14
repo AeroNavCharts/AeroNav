@@ -167,13 +167,14 @@ class ChartViewer {
         try {
             low = await this.fetchImage(ChartViewer.imageUrl(id, 1200));
         } catch (error) {
-            if (!opts.pdf) throw error;
+            low = null;
         }
+        const pdf = opts.pdf || !low;
         if (token !== this.token) return false;
         this.closeDocument();
         this.docId = id;
         if (low) this.openPage(id, low, true);
-        if (opts.pdf) {
+        if (pdf) {
             const ready = this.openDocument(id, token, !low);
             return low ? true : ready;
         }
