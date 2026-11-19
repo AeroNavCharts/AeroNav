@@ -1833,19 +1833,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (hideBtn) hideBtn.addEventListener('click', () => setPanelCollapsed(true));
 
-    const siteAd = document.getElementById('siteAd');
-    const adCloseBtn = document.getElementById('adCloseBtn');
-
-    if (siteAd) {
-        if (localStorage.getItem('adsHidden') === 'true') siteAd.classList.add('ad-hidden');
-        if (adCloseBtn) {
-            adCloseBtn.addEventListener('click', () => {
-                siteAd.classList.add('ad-hidden');
-                localStorage.setItem('adsHidden', 'true');
-            });
-        }
-    }
-
     if (doneBtn && searchInput) {
         doneBtn.addEventListener('click', () => {
             searchInput.value = '';
