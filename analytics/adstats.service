@@ -1,0 +1,19 @@
+[Unit]
+Description=AeroNav ad stats
+After=network.target
+
+[Service]
+User=adstats
+Group=adstats
+EnvironmentFile=/etc/adstats.env
+ExecStart=/usr/bin/python3 /opt/adstats/server.py
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/adstats
+
+[Install]
+WantedBy=multi-user.target
