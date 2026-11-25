@@ -416,7 +416,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
           <button class="ghost-btn text pinboard-clear" id="clearPinned" style="display: none;" title="Unpin all charts">Clear</button>
         </div>
 
-        <div class="ad" role="complementary" aria-label="Sponsored">
+        <div class="ad" role="complementary" aria-label="Sponsored" data-ad="crc">
           <span class="ad-label">Sponsored</span>
           <a href="https://crc.afterrfluff.com/" target="_blank" rel="noopener">vNAS CRC Radar (ATC24) - as close as it gets to VATUSA CRC client for STARS, ASDE-X &amp; CAB displays</a>
         </div>
@@ -484,6 +484,7 @@ import LoaderLogo from '../components/LoaderLogo.astro';
     <script is:inline src={versioned("/js/route-planner.js")}></script>
     <script is:inline src={versioned("/js/install.js")}></script>
     <script is:inline src={versioned("/js/scripts.js")} defer></script>
+    <script is:inline src={versioned("/js/ad-stats.js")} defer></script>
     <script is:inline src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </body>
 </html>
